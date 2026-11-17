@@ -472,6 +472,11 @@
       document.getElementById('pwa-install-section').classList.remove('hidden');
     });
 
+    function compareArabic(a, b) {
+      const norm = s => String(s || '').trim().replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي');
+      return norm(a).localeCompare(norm(b), 'ar');
+    }
+
     function objToArray(val) {
       if (Array.isArray(val)) return val.filter(Boolean);
       if (val && typeof val === 'object') return Object.values(val).filter(Boolean);
@@ -847,7 +852,7 @@
       summaryEl.textContent = `أيام الاستماع: ${activeListeningDays.length} • أيام التسميع: ${activeRecitationDays.length} • المثابرات: ${stars.length} من ${members.length}`;
       currentWeeklyMessage = stars.length === 0
         ? '🤍 مثابرات الإسبوع 🤍\n\nلا يوجد أعضاء ملتزمون في الاستماع والتسميع معاً طوال هذا الأسبوع.'
-        : `🤍 مثابرات الإسبوع 🤍\n\n${stars.map(m => `🌻 الجميلة / ${m.name} 👑`).join('\n\n')}`;
+        : `🤍 مثابرات الإسبوع 🤍\n\n${stars.sort((a, b) => compareArabic(a.name, b.name)).map(m => `🌻 الجميلة / ${m.name} 👑`).join('\n\n')}`;
       outputEl.textContent = currentWeeklyMessage;
     }
     function copyWeeklyStarsMessage() { if (!currentWeeklyMessage) return showToast('لا توجد رسالة للنسخ'); copyTextSilently(currentWeeklyMessage, '✅ تم نسخ رسالة مثابرات الإسبوع بنجاح!'); }
@@ -919,7 +924,10 @@
 
     function renderListening() {
       const list = document.getElementById('listening-list'), q = document.getElementById('search-listening').value.trim().toLowerCase();
-      const members = getListeningMembers().filter(m => m.name.toLowerCase().includes(q)), day = ensureDayRecord();
+      const members = getListeningMembers()
+        .filter(m => m.name.toLowerCase().includes(q))
+        .sort((a, b) => compareArabic(a.name, b.name));
+      const day = ensureDayRecord();
       if (members.length === 0) { list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`; return; }
       list.innerHTML = members.map(m => {
         const st = day.listening[m.id] || '', absCount = getAbsenceCount(m.id, 'listening');
@@ -1204,7 +1212,12 @@
     function buildAbsenceSection(type) {
       const members = type === 'listening' ? getListeningMembers() : getGroupMembers(), day = ensureDayRecord();
       const title = type === 'listening' ? `🌹غياب الإستماع ليوم ${getArabicWeekday(currentDate)}🌹` : `🌹غياب التسميع ليوم ${getArabicWeekday(currentDate)}🌹`;
-      const absentList = members.filter(m => day[type][m.id] === 'absent').map(m => ({ name: m.name, count: getAbsenceCount(m.id, type, currentDate) })).sort((a, b) => a.count - b.count);
+      const absentList = members
+        .filter(m => day[type][m.id] === 'absent')
+        .map(m => ({ name: m.name, count: getAbsenceCount(m.id, type, currentDate) }))
+        .sort((a, b) => type === 'listening'
+          ? (a.count - b.count) || compareArabic(a.name, b.name)
+          : (a.count - b.count));
       if (absentList.length === 0) return `${title}\n\n✨ ما شاء الله، لا يوجد غياب اليوم!`;
       return `${title}\n\n${absentList.map(it => `🥀${it.name} ${'🔴'.repeat(Math.max(1, it.count))}${it.count > 2 ? ' إنذار بالحذف' : ''}`).join('\n')}`;
     }
