@@ -333,7 +333,10 @@
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
             <h3 style="font-size:16px;">قائمة أعضاء الجروب (<span id="manage-count">0</span>)</h3>
-            <button class="btn btn-outline btn-sm" onclick="resetAbsenceCounter()">🔄 تصفير العداد</button>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" onclick="resetAbsenceCounter()">🔄 تصفير العداد</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteAllGroupMembers()">🗑️ مسح جميع الأسماء</button>
+            </div>
           </div>
           <p id="reset-date-note" style="font-size:12px; color:var(--muted); margin-bottom:8px;"></p>
           <div id="manage-members-list"></div>
@@ -1149,6 +1152,23 @@
       db.partnerships.forEach(p => { if (p.memberIds.includes(mId)) { p.memberIds = p.memberIds.filter(id => id !== mId); if (p.memberIds.length >= 2) updP.push(p); else delP.push(p.id); } });
       db.partnerships = db.partnerships.filter(p => p.memberIds.length >= 2);
       cloudDeleteMember(mId, updP, delP); renderAll(); showToast('تم حذف العضو');
+    }
+
+    function deleteAllGroupMembers() {
+      const members = getGroupMembers();
+      if (members.length === 0) return showToast('القائمة فارغة بالفعل');
+      const group = getCurrentGroup();
+      if (!confirm(`هل أنت متأكد من مسح جميع الأسماء في "${group.name}" (${members.length} عضو) مع رفقاء التسميع نهائياً؟`)) return;
+      const delM = members.map(m => m.id);
+      const delP = getGroupPartnerships().map(p => p.id);
+      db.members = db.members.filter(m => m.groupId !== currentGroupId);
+      db.partnerships = db.partnerships.filter(p => p.groupId !== currentGroupId);
+      cloudExec(async () => {
+        if (delM.length) { const p = {}; delM.forEach(id => p[id] = null); await cloudRequest('/members', 'PATCH', p); }
+        if (delP.length) { const p = {}; delP.forEach(id => p[id] = null); await cloudRequest('/partnerships', 'PATCH', p); }
+      });
+      renderAll();
+      showToast('تم مسح جميع الأسماء في المجموعة');
     }
 
     function resetAbsenceCounter() {
