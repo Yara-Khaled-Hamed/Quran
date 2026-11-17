@@ -279,16 +279,18 @@
           <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">
             🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
           </button>
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div>
-              <h3 style="font-size:16px;">رفقاء التسميع (ثنائي أو ثلاثي)</h3>
-              <p style="font-size:12.5px; color:var(--muted);">علّم على من سمّع أو بعذر، ثم اضغط «الباقي غياب»</p>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="togglePartnerBuilder()">➕ تكوين رفقاء جدد</button>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+          <input type="text" id="search-recitation" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+            <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
             <button class="btn btn-outline btn-sm" onclick="clearDayType('recitation')">مسح اليوم</button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:10px; border-top:1px dashed var(--border);">
+            <div>
+              <h3 style="font-size:15.5px;">رفقاء التسميع (ثنائي أو ثلاثي)</h3>
+              <p style="font-size:12px; color:var(--muted);">علّم على من سمّع أو بعذر، ثم اضغط «الباقي غياب»</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="togglePartnerBuilder()">➕ تكوين رفقاء جدد</button>
           </div>
           <div id="partner-builder" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
             <p style="font-size:13px; font-weight:700; color:var(--primary);">حدد 2 أو 3 أفراد للربط معاً (المحدد حالياً: <span id="selected-count">0</span> / 3):</p>
@@ -958,6 +960,13 @@
       renderStats(); renderListening(); renderManage(); showToast('تم تحضير الجميع في الاستماع');
     }
 
+    function markAllRecitation(status) {
+      const day = ensureDayRecord(), patch = {};
+      getGroupMembers().forEach(m => { day.recitation[m.id] = status; patch[m.id] = status; });
+      cloudPatchAttendance(currentDate, 'recitation', patch);
+      renderStats(); renderRecitation(); renderManage(); showToast('تم تحضير الجميع في التسميع');
+    }
+
     function togglePartnerBuilder(forceState) {
       const box = document.getElementById('partner-builder'), show = forceState !== undefined ? forceState : box.classList.contains('hidden');
       box.classList.toggle('hidden', !show);
@@ -1015,13 +1024,36 @@
     function renderRecitation() {
       const container = document.getElementById('recitation-list'), members = getGroupMembers();
       const memberMap = Object.fromEntries(members.map(m => [m.id, m])), partnerships = getGroupPartnerships(), day = ensureDayRecord();
+      const rawQ = document.getElementById('search-recitation').value.trim();
+      const normQ = toEnglishDigits(rawQ).replace(/^#/, '').replace(/^رقم\s*/, '').trim().toLowerCase();
+      const isNumSearch = /^\d+$/.test(normQ);
+
+      let visiblePartnerships = partnerships.map((p, idx) => ({ p, pNum: p.number || (idx + 1) }));
+      if (normQ) {
+        if (isNumSearch) {
+          visiblePartnerships = visiblePartnerships
+            .filter(item => String(item.pNum).startsWith(normQ))
+            .sort((a, b) => {
+              const aExact = a.pNum === Number(normQ) ? 0 : 1;
+              const bExact = b.pNum === Number(normQ) ? 0 : 1;
+              return (aExact - bExact) || (a.pNum - b.pNum);
+            });
+        } else {
+          visiblePartnerships = visiblePartnerships.filter(item =>
+            item.p.memberIds.some(id => memberMap[id] && memberMap[id].name.toLowerCase().includes(normQ))
+          );
+        }
+      }
+
       let html = '';
       if (partnerships.length === 0) {
         html += `<div class="card empty-state">لم يتم تكوين رفقاء تسميع بعد.</div>`;
+      } else if (visiblePartnerships.length === 0 && isNumSearch) {
+        html += `<div class="card empty-state">لا توجد مجموعة رفقاء برقم "${escapeHtml(rawQ)}".</div>`;
       } else {
-        partnerships.forEach((p, idx) => {
+        visiblePartnerships.forEach(({ p, pNum }) => {
           const valid = p.memberIds.map(id => memberMap[id]).filter(Boolean); if (valid.length === 0) return;
-          const pNum = p.number || (idx + 1), allPresent = valid.every(m => day.recitation[m.id] === 'present');
+          const allPresent = valid.every(m => day.recitation[m.id] === 'present');
           const typeLabel = valid.length === 3 ? 'ثلاثي (3 رفقاء)' : 'ثنائي (رفيقان)', isEd = editingPartnerNumId === p.id;
           html += `
             <div class="partner-card ${allPresent ? 'all-done' : ''}">
@@ -1046,13 +1078,20 @@
             </div>`;
         });
       }
-      const paired = getPairedMemberIds(), unpaired = members.filter(m => !paired.has(m.id));
+
+      const paired = getPairedMemberIds();
+      let unpaired = members.filter(m => !paired.has(m.id));
+      if (normQ) {
+        unpaired = isNumSearch ? [] : unpaired.filter(m => m.name.toLowerCase().includes(normQ));
+      }
       if (unpaired.length > 0) {
         html += `
           <div class="card" style="background:#fffbeb; border-color:#fde68a;">
             <strong style="font-size:14px; color:#92400e;">أعضاء غير مرتبطين برفقاء حالياً (${unpaired.length}):</strong>
             <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">${unpaired.map(m => renderRecitationMemberRow(m, day)).join('')}</div>
           </div>`;
+      } else if (normQ && !isNumSearch && visiblePartnerships.length === 0 && partnerships.length > 0) {
+        html = `<div class="card empty-state">لا توجد نتائج مطابقة للبحث "${escapeHtml(rawQ)}".</div>`;
       }
       container.innerHTML = html;
     }
