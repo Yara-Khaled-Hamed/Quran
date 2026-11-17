@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#065f46" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="تعاهدوا القرءان" />
+  <title>تعاهدوا القرءان - متابعة الحضور</title>
+  <link id="favicon-link" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23065f46'/%3E%3Crect x='8' y='8' width='112' height='112' rx='22' fill='none' stroke='%23fbbf24' stroke-width='3' opacity='0.6'/%3E%3Cpath d='M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z' fill='%23ffffff'/%3E%3Cpath d='M64 42 L64 92' stroke='%23d97706' stroke-width='3'/%3E%3Cpath d='M34 52 H54 M34 62 H54 M34 72 H50 M74 52 H94 M74 62 H94 M78 72 H94' stroke='%23065f46' stroke-width='3' stroke-linecap='round' opacity='0.45'/%3E%3Ccircle cx='64' cy='24' r='5' fill='%23fbbf24'/%3E%3C/svg%3E" />
+  <link id="apple-icon-link" rel="apple-touch-icon" href="" />
+  <link id="manifest-link" rel="manifest" href="" />
+  <style>
+    :root {
+      --primary: #065f46;
+      --primary-light: #059669;
+      --primary-soft: #ecfdf5;
+      --accent: #d97706;
+      --accent-soft: #fef3c7;
+      --bg: #f6f8f7;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --shadow: 0 4px 16px rgba(6, 95, 70, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      outline: none;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: transform 0.1s, opacity 0.2s, background 0.2s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-light); }
+    .btn-soft { background: var(--primary-soft); color: var(--primary); }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-gold { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+    .btn-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
+    .btn-danger-solid { background: var(--danger); color: #fff; }
+    .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-sm { padding: 7px 12px; font-size: 13px; border-radius: 10px; }
+    .btn-xs { padding: 4px 8px; font-size: 12px; border-radius: 8px; }
+    .btn-block { width: 100%; }
+
+    .input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      font-size: 15px;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+    .input:focus { border-color: var(--primary-light); }
+
+    .pw-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pw-toggle {
+      position: absolute;
+      left: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+    }
+
+    /* Login Screen */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: linear-gradient(160deg, #065f46 0%, #047857 45%, #f6f8f7 45%);
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 440px;
+      background: #fff;
+      border-radius: 22px;
+      padding: 28px 22px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .logo-badge {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      padding: 7px 12px;
+      border-radius: 99px;
+      background: #f3f4f6;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .chip:hover { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); }
+    .chip-head {
+      background: var(--accent-soft);
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, #065f46, #047857);
+      color: #fff;
+      padding: 18px 16px 22px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 6px 20px rgba(6, 95, 70, 0.18);
+    }
+
+    .header-top {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-title h1 { font-size: 19px; font-weight: 800; }
+    .header-title p { font-size: 13px; opacity: 0.9; }
+
+    .header-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .header-btn {
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.26); }
+
+    /* Date & Stats */
+    .date-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .date-controls { display: flex; align-items: center; gap: 6px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: var(--primary-soft);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-box.amber { background: var(--accent-soft); }
+    .stat-box.gray { background: #f3f4f6; }
+
+    .stat-num { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .stat-box.amber .stat-num { color: #b45309; }
+    .stat-box.gray .stat-num { color: #374151; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+    /* Tabs */
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: #e5e7eb;
+      padding: 5px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      padding: 10px 6px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* Member Row (Listening) */
+    .member-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .status-present { border-color: #6ee7b7 !important; background: #f0fdf4 !important; }
+    .status-absent { border-color: #fca5a5 !important; background: #fef2f2 !important; }
+    .status-excused { border-color: #fcd34d !important; background: #fffbeb !important; }
+
+    .member-info { display: flex; flex-direction: column; gap: 2px; }
+    .member-name { font-weight: 700; font-size: 15.5px; }
+    .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; }
+
+    .status-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .pill.active-present { background: #059669; border-color: #059669; color: #fff; }
+    .pill.active-absent { background: #dc2626; border-color: #dc2626; color: #fff; }
+    .pill.active-excused { background: #d97706; border-color: #d97706; color: #fff; }
+
+    /* Partner Card (Recitation) */
+    .partner-card {
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    .partner-card.all-done { border-color: #6ee7b7; background: #f0fdf4; }
+
+    .partner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+      flex-wrap: wrap;
+    }
+
+    .partner-num-pill {
+      background: var(--primary);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .partner-type-pill {
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .partner-members-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .partner-member-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.9);
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+    }
+
+    /* Checkbox grid */
+    .select-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .select-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .select-item.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+
+    /* Group Manage Item */
+    .group-manage-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    /* Weekly Stars Box */
+    .stars-box {
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      border-radius: 14px;
+      padding: 14px;
+      white-space: pre-wrap;
+      font-size: 14.5px;
+      line-height: 1.65;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 12px 0;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      width: 100%;
+      max-width: 490px;
+      border-radius: 20px;
+      padding: 22px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 2000;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      white-space: nowrap;
+    }
+
+    .empty-state { text-align: center; padding: 30px 14px; color: var(--muted); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 520px) {
+      .member-row { flex-direction: column; align-items: stretch; }
+      .partner-member-item { flex-direction: column; align-items: stretch; }
+      .status-pills { justify-content: space-between; }
+      .pill { flex: 1; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="login-screen" class="login-wrap">
+    <div class="login-box">
+      <div class="logo-badge">
+        <svg viewBox="0 0 128 128" width="76" height="76">
+          <rect width="128" height="128" rx="28" fill="#065f46"/>
+          <rect x="8" y="8" width="112" height="112" rx="22" fill="none" stroke="#fbbf24" stroke-width="3" opacity="0.65"/>
+          <path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/>
+          <path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/>
+          <path d="M34 52 H54 M34 62 H54 M34 72 H50 M74 52 H94 M74 62 H94 M78 72 H94" stroke="#065f46" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+          <circle cx="64" cy="24" r="5" fill="#fbbf24"/>
+        </svg>
+      </div>
+      <h2 style="text-align:center; color:var(--primary); font-size:22px; margin-bottom:4px;">جروبات تعاهدوا القرءان</h2>
+      <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:18px;">
+        متابعة حضور الاستماع والتسميع لحفظة كتاب الله
+      </p>
+
+      <div id="login-step-1">
+        <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم المشرف / المشرفة</label>
+        <input type="text" id="supervisor-input" class="input" placeholder="اكتب اسمك..." onkeypress="if(event.key==='Enter') document.getElementById('password-input').focus()" />
+
+        <label style="display:block; font-weight:700; font-size:14px; margin:10px 0 6px;">كلمة المرور (الباسورد)</label>
+        <div class="pw-wrap">
+          <input type="password" id="password-input" class="input" style="padding-left:40px;" placeholder="أدخل كلمة المرور..." onkeypress="if(event.key==='Enter') handleLogin()" />
+          <button type="button" class="pw-toggle" onclick="togglePwVisibility('password-input', this)" title="إظهار/إخفاء">👁️</button>
+        </div>
+
+        <button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="handleLogin()">دخول</button>
+
+        <div id="existing-supervisors-wrap" style="margin-top:16px;">
+          <p style="font-size:12.5px; color:var(--muted); font-weight:600;">اختر الاسم ثم اكتب كلمة المرور (الافتراضية للتجربة: 123):</p>
+          <div id="quick-supervisors" class="quick-chips"></div>
+        </div>
+      </div>
+
+      <div id="login-step-2" class="hidden">
+        <div style="background:var(--primary-soft); padding:12px; border-radius:12px; margin-bottom:14px; font-size:14px;">
+          أهلاً بك يا <strong id="new-sup-display"></strong>! لم نجد جروباً مسجلاً بهذا الاسم بعد.
+        </div>
+        <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم الجروب المسؤول عنه</label>
+        <input type="text" id="new-group-input" class="input" placeholder="مثال: جروب الهمة، جروب الفجر..." onkeypress="if(event.key==='Enter') createNewSupervisorGroup()" />
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="btn btn-primary" style="flex:1;" onclick="createNewSupervisorGroup()">إنشاء الجروب والدخول</button>
+          <button class="btn btn-outline" onclick="cancelNewSupervisor()">رجوع</button>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--border); margin:18px 0 12px;" />
+      <button class="btn btn-soft btn-block btn-sm" onclick="openDownloadModal()">📲 تحميل وتثبيت البرنامج على جهازك</button>
+    </div>
+  </div>
+
+  <!-- ================= HEAD SUPERVISOR DASHBOARD (ALL GROUPS) ================= -->
+  <div id="head-screen" class="hidden">
+    <header class="app-header">
+      <div class="header-top">
+        <div class="header-brand">
+          <svg viewBox="0 0 128 128" width="42" height="42" style="flex-shrink:0;">
+            <rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/>
+            <path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/>
+            <path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/>
+            <circle cx="64" cy="24" r="5" fill="#fbbf24"/>
+          </svg>
+          <div class="header-title">
+            <h1>👑 لوحة المشرف الرئيسي</h1>
+            <p>متابعة وإدارة جميع جروبات تعاهدوا القرءان (<span id="head-name-display"></span>)</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
+          <button class="header-btn" onclick="logout()">خروج</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Add new group -->
+      <div class="card">
+        <h3 style="font-size:16px; margin-bottom:10px; color:var(--primary);">➕ إضافة جروب ومشرف جديد</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px;">
+          <input type="text" id="head-add-gname" class="input" style="padding:9px 12px;" placeholder="اسم الجروب..." />
+          <input type="text" id="head-add-sname" class="input" style="padding:9px 12px;" placeholder="اسم المشرف..." />
+          <input type="text" id="head-add-spass" class="input" style="padding:9px 12px;" placeholder="كلمة المرور (مثلاً: 123)" />
+        </div>
+        <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="headCreateGroup()">إضافة الجروب</button>
+      </div>
+
+      <!-- All Groups List -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3 style="font-size:16px;">📋 جميع الجروبات (<span id="head-groups-count">0</span>)</h3>
+          <span style="font-size:12px; color:var(--muted);">إحصائيات اليوم: <strong id="head-today-date"></strong></span>
+        </div>
+        <div id="head-groups-list"></div>
+      </div>
+
+      <!-- Head Supervisor Account Settings -->
+      <div class="card">
+        <details>
+          <summary style="cursor:pointer; font-weight:700; font-size:14.5px; color:var(--primary);">🔐 تغيير اسم أو كلمة مرور المشرف الرئيسي</summary>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
+            <div>
+              <label style="font-size:12px; font-weight:700;">اسم الدخول للمشرف الرئيسي:</label>
+              <input type="text" id="head-edit-name" class="input" style="padding:8px 10px; margin-top:4px;" />
+            </div>
+            <div>
+              <label style="font-size:12px; font-weight:700;">كلمة المرور الجديدة:</label>
+              <input type="text" id="head-edit-pass" class="input" style="padding:8px 10px; margin-top:4px;" />
+            </div>
+          </div>
+          <button class="btn btn-soft btn-sm" style="margin-top:10px;" onclick="saveHeadCredentials()">💾 حفظ بيانات المشرف الرئيسي</button>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN GROUP APP SCREEN ================= -->
+  <div id="app-screen" class="hidden">
+    <header class="app-header">
+      <div class="header-top">
+        <div class="header-brand">
+          <svg viewBox="0 0 128 128" width="42" height="42" style="flex-shrink:0;">
+            <rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/>
+            <path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/>
+            <path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/>
+            <circle cx="64" cy="24" r="5" fill="#fbbf24"/>
+          </svg>
+          <div class="header-title">
+            <h1 id="header-group-name">جروب تعاهدوا القرءان</h1>
+            <p>المشرف: <span id="header-supervisor-name"></span></p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
+          <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
+          <button class="header-btn" onclick="logout()">خروج</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Date & Summary Card -->
+      <div class="card">
+        <div class="date-bar">
+          <div>
+            <span style="font-size:13px; color:var(--muted); font-weight:600;">تاريخ المتابعة:</span>
+            <div style="font-weight:800; font-size:15px;" id="date-readable"></div>
+          </div>
+          <div class="date-controls">
+            <button class="btn btn-outline btn-sm" onclick="changeDate(-1)">السابق</button>
+            <input type="date" id="date-picker" class="input" style="padding:6px 10px; width:auto; font-size:13px;" onchange="onDateChange()" />
+            <button class="btn btn-outline btn-sm" onclick="changeDate(1)">التالي</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-num" id="stat-listening">0 / 0</div>
+            <div class="stat-label">حضور الاستماع</div>
+          </div>
+          <div class="stat-box amber">
+            <div class="stat-num" id="stat-recitation">0 / 0</div>
+            <div class="stat-label">حضور التسميع</div>
+          </div>
+          <div class="stat-box gray">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">إجمالي الأعضاء</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-btn-listening" onclick="switchTab('listening')">🎧 الاستماع (فردي)</button>
+        <button class="tab-btn" id="tab-btn-recitation" onclick="switchTab('recitation')">📖 التسميع (رفقاء)</button>
+        <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء والتقرير</button>
+      </div>
+
+      <!-- TAB 1: LISTENING (INDIVIDUAL) -->
+      <div id="tab-listening">
+        <div class="card" style="padding:12px;">
+          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('listening')">
+            🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)
+          </button>
+          <input type="text" id="search-listening" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
+            <button class="btn btn-outline btn-sm" onclick="clearDayType('listening')">مسح اليوم</button>
+          </div>
+        </div>
+        <div id="listening-list"></div>
+      </div>
+
+      <!-- TAB 2: RECITATION (PARTNERS: 2 OR 3) -->
+      <div id="tab-recitation" class="hidden">
+        <div class="card" style="padding:14px;">
+          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">
+            🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
+          </button>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <h3 style="font-size:16px;">رفقاء التسميع (ثنائي أو ثلاثي)</h3>
+              <p style="font-size:12.5px; color:var(--muted);">علّم على من سمّع أو بعذر، ثم اضغط «الباقي غياب»</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="togglePartnerBuilder()">➕ تكوين رفقاء جدد</button>
+          </div>
+
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
+            <button class="btn btn-outline btn-sm" onclick="clearDayType('recitation')">مسح اليوم</button>
+          </div>
+
+          <div id="partner-builder" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+            <p style="font-size:13px; font-weight:700; color:var(--primary);">
+              حدد 2 أو 3 أفراد للربط معاً (المحدد حالياً: <span id="selected-count">0</span> / 3):
+            </p>
+            <div id="unpaired-grid" class="select-grid"></div>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button class="btn btn-primary btn-sm" onclick="createPartnership()">حفظ الرفقاء</button>
+              <button class="btn btn-outline btn-sm" onclick="togglePartnerBuilder(false)">إلغاء</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="recitation-list"></div>
+      </div>
+
+      <!-- TAB 3: MANAGE MEMBERS & REPORTS -->
+      <div id="tab-manage" class="hidden">
+        <div class="card">
+          <h3 style="font-size:16px; margin-bottom:10px;">🌹 رسائل الغياب ومثابرات الإسبوع</h3>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-danger" style="flex:1; min-width:170px;" onclick="copyAbsenceMessage('listening')">🥀 نسخ غياب الاستماع</button>
+              <button class="btn btn-danger" style="flex:1; min-width:170px;" onclick="copyAbsenceMessage('recitation')">🥀 نسخ غياب التسميع</button>
+            </div>
+            <button class="btn btn-gold btn-block" onclick="openWeeklyStarsModal()">
+              🤍 مثابرات الإسبوع (الملتزمات بالحضور طوال الأسبوع) 👑
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:16px; margin-bottom:10px;">➕ إضافة أعضاء جدد للجروب</h3>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="new-member-name" class="input" placeholder="اكتب اسم العضو الجديد..." onkeypress="if(event.key==='Enter') addSingleMember()" />
+            <button class="btn btn-primary" onclick="addSingleMember()">إضافة</button>
+          </div>
+
+          <details style="margin-top:12px;">
+            <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--primary);">أو إضافة عدة أسماء دفعة واحدة (نسخ ولصق)</summary>
+            <textarea id="bulk-members-input" class="input" rows="4" style="margin-top:8px;" placeholder="اكتب كل اسم في سطر منفصل..."></textarea>
+            <button class="btn btn-soft btn-sm" style="margin-top:8px;" onclick="addBulkMembers()">إضافة القائمة كلها</button>
+          </details>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <h3 style="font-size:16px;">قائمة أعضاء الجروب (<span id="manage-count">0</span>)</h3>
+            <button class="btn btn-outline btn-sm" onclick="resetAbsenceCounter()" title="بدء حساب عداد الغياب من تاريخ اليوم فقط">
+              🔄 تصفير العداد
+            </button>
+          </div>
+          <p id="reset-date-note" style="font-size:12px; color:var(--muted); margin-bottom:8px;"></p>
+          <div id="manage-members-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= WEEKLY STARS MODAL ================= -->
+  <div id="weekly-stars-modal" class="modal-backdrop" onclick="if(event.target===this) closeWeeklyStarsModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="color:#b45309; font-size:18px;">🤍 مثابرات الإسبوع 👑</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeWeeklyStarsModal()">✕</button>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+        <div>
+          <label style="font-size:12px; font-weight:700; color:var(--muted);">من تاريخ (بداية الأسبوع):</label>
+          <input type="date" id="week-start-input" class="input" style="padding:7px 10px; font-size:13px;" onchange="renderWeeklyStars()" />
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:700; color:var(--muted);">إلى تاريخ (نهاية الأسبوع):</label>
+          <input type="date" id="week-end-input" class="input" style="padding:7px 10px; font-size:13px;" onchange="renderWeeklyStars()" />
+        </div>
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px; font-weight:700; color:var(--muted);">شرط الالتزام:</label>
+        <select id="week-mode-select" class="input" style="padding:8px 10px; font-size:13.5px; margin-top:4px;" onchange="renderWeeklyStars()">
+          <option value="both">الحضور الكامل في الاستماع والتسميع معاً</option>
+          <option value="listening">الحضور الكامل في الاستماع فقط</option>
+          <option value="recitation">الحضور الكامل في التسميع فقط</option>
+        </select>
+      </div>
+
+      <div id="weekly-stars-summary" style="font-size:12.5px; font-weight:700; color:var(--primary); background:var(--primary-soft); padding:8px 12px; border-radius:10px;"></div>
+
+      <div id="weekly-stars-output" class="stars-box"></div>
+
+      <button class="btn btn-gold btn-block" onclick="copyWeeklyStarsMessage()">
+        📋 نسخ رسالة مثابرات الإسبوع
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= DOWNLOAD / INSTALL MODAL ================= -->
+  <div id="download-modal" class="modal-backdrop" onclick="if(event.target===this) closeDownloadModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img id="modal-app-icon" src="" alt="أيقونة التطبيق" style="width:42px; height:42px; border-radius:10px; display:none;" />
+          <h3 style="color:var(--primary); font-size:18px;">تحميل وتثبيت البرنامج</h3>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeDownloadModal()">✕</button>
+      </div>
+
+      <div id="pwa-install-section" class="hidden" style="margin-bottom:14px;">
+        <button class="btn btn-primary btn-block" onclick="installPWA()">⬇️ تثبيت التطبيق مباشرة بأيقونته على الجهاز</button>
+      </div>
+
+      <div style="background:var(--primary-soft); padding:14px; border-radius:14px; margin-bottom:12px; font-size:14px;">
+        <strong>1. تحميل نسخة البرنامج للعمل بدون إنترنت:</strong>
+        <p style="font-size:13px; color:var(--text); margin:6px 0 10px;">
+          يمكنك تحميل ملف التطبيق الكامل على جهازك وفتحه في أي وقت حتى بدون إنترنت.
+        </p>
+        <button class="btn btn-primary btn-sm btn-block" onclick="downloadAppFile()">📥 تحميل ملف التطبيق (HTML)</button>
+      </div>
+
+      <div style="background:#f9fafb; padding:14px; border-radius:14px; font-size:13.5px; border:1px solid var(--border);">
+        <strong>2. التثبيت كأيقونة تطبيق على الموبايل:</strong>
+        <ul style="padding-right:18px; margin-top:6px; color:#374151;">
+          <li><strong>أندرويد (Chrome):</strong> اضغط على الثلاث نقاط (⋮) بالأعلى ثم اختر <em>"الإضافة إلى الشاشة الرئيسية"</em> أو <em>"تثبيت التطبيق"</em>.</li>
+          <li><strong>آيفون (Safari):</strong> اضغط على زر المشاركة (⬆️) بالأسفل ثم اختر <em>"إضافة إلى الصفحة الرئيسية"</em>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'taahadu_qoran_app_v1';
+    const SESSION_KEY = 'taahadu_session_v1';
+
+    const defaultData = {
+      headSupervisor: { name: 'المشرف الرئيسي', password: '123' },
+      groups: [
+        { id: 'g1', name: 'جروب الفجر - تعاهدوا القرءان', supervisorName: 'أحمد', password: '123', absenceStartDate: '' },
+        { id: 'g2', name: 'جروب الهمة - تعاهدوا القرءان', supervisorName: 'سارة', password: '123', absenceStartDate: '' }
+      ],
+      members: [
+        { id: 'm1', groupId: 'g1', name: 'عبد الرحمن محمد' },
+        { id: 'm2', groupId: 'g1', name: 'يوسف إبراهيم' },
+        { id: 'm3', groupId: 'g1', name: 'معاذ علي' },
+        { id: 'm4', groupId: 'g1', name: 'عمر حسن' },
+        { id: 'm5', groupId: 'g1', name: 'حمزة طارق' },
+        { id: 'm6', groupId: 'g2', name: 'مريم خالد' },
+        { id: 'm7', groupId: 'g2', name: 'فاطمة محمود' },
+        { id: 'm8', groupId: 'g2', name: 'عائشة سعد' }
+      ],
+      partnerships: [
+        { id: 'p1', groupId: 'g1', number: 1, memberIds: ['m1', 'm2'] },
+        { id: 'p2', groupId: 'g1', number: 2, memberIds: ['m3', 'm4', 'm5'] },
+        { id: 'p3', groupId: 'g2', number: 1, memberIds: ['m6', 'm7', 'm8'] }
+      ],
+      attendance: {}
+    };
+
+    let db = loadDB();
+    let session = loadSession(); // { role: 'head' | 'supervisor', groupId: string | null }
+    let currentGroupId = session ? session.groupId : null;
+    let currentDate = getTodayStr();
+    let currentTab = 'listening';
+    let selectedForPartner = [];
+    let pendingSupervisorName = '';
+    let pendingSupervisorPassword = '';
+    let editingGroupId = null;
+    let editingPartnerNumId = null;
+    let currentWeeklyMessage = '';
+    let deferredPrompt = null;
+
+    // Generate crisp PNG icons via Canvas for Android/iOS Home Screen & PWA Manifest
+    (function setupAppIconsAndManifest() {
+      try {
+        function createPngIcon(size) {
+          const c = document.createElement('canvas');
+          c.width = size;
+          c.height = size;
+          const ctx = c.getContext('2d');
+          const r = size * 0.22;
+
+          ctx.fillStyle = '#065f46';
+          ctx.beginPath();
+          ctx.moveTo(r, 0);
+          ctx.lineTo(size - r, 0);
+          ctx.quadraticCurveTo(size, 0, size, r);
+          ctx.lineTo(size, size - r);
+          ctx.quadraticCurveTo(size, size, size - r, size);
+          ctx.lineTo(r, size);
+          ctx.quadraticCurveTo(0, size, 0, size - r);
+          ctx.lineTo(0, r);
+          ctx.quadraticCurveTo(0, 0, r, 0);
+          ctx.closePath();
+          ctx.fill();
+
+          const pad = size * 0.07;
+          const r2 = size * 0.17;
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
+          ctx.lineWidth = Math.max(2, size * 0.025);
+          ctx.beginPath();
+          ctx.moveTo(pad + r2, pad);
+          ctx.lineTo(size - pad - r2, pad);
+          ctx.quadraticCurveTo(size - pad, pad, size - pad, pad + r2);
+          ctx.lineTo(size - pad, size - pad - r2);
+          ctx.quadraticCurveTo(size - pad, size - pad, size - pad - r2, size - pad);
+          ctx.lineTo(pad + r2, size - pad);
+          ctx.quadraticCurveTo(pad, size - pad, pad, size - pad - r2);
+          ctx.lineTo(pad, pad + r2);
+          ctx.quadraticCurveTo(pad, pad, pad + r2, pad);
+          ctx.stroke();
+
+          const s = size / 128;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.moveTo(64 * s, 42 * s);
+          ctx.bezierCurveTo(50 * s, 32 * s, 32 * s, 34 * s, 24 * s, 40 * s);
+          ctx.lineTo(24 * s, 88 * s);
+          ctx.bezierCurveTo(34 * s, 82 * s, 50 * s, 82 * s, 64 * s, 92 * s);
+          ctx.bezierCurveTo(78 * s, 82 * s, 94 * s, 82 * s, 104 * s, 88 * s);
+          ctx.lineTo(104 * s, 40 * s);
+          ctx.bezierCurveTo(96 * s, 34 * s, 78 * s, 32 * s, 64 * s, 42 * s);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.strokeStyle = '#d97706';
+          ctx.lineWidth = Math.max(2, 3 * s);
+          ctx.beginPath();
+          ctx.moveTo(64 * s, 42 * s);
+          ctx.lineTo(64 * s, 92 * s);
+          ctx.stroke();
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath();
+          ctx.arc(64 * s, 24 * s, 5.5 * s, 0, Math.PI * 2);
+          ctx.fill();
+
+          return c.toDataURL('image/png');
+        }
+
+        const icon192 = createPngIcon(192);
+        const icon512 = createPngIcon(512);
+
+        document.getElementById('apple-icon-link').href = icon192;
+        const modalImg = document.getElementById('modal-app-icon');
+        if (modalImg) {
+          modalImg.src = icon192;
+          modalImg.style.display = 'block';
+        }
+
+        const manifest = {
+          name: "جروبات تعاهدوا القرءان",
+          short_name: "تعاهدوا القرءان",
+          start_url: ".",
+          display: "standalone",
+          background_color: "#f6f8f7",
+          theme_color: "#065f46",
+          icons: [
+            { src: icon192, sizes: "192x192", type: "image/png" },
+            { src: icon512, sizes: "512x512", type: "image/png" }
+          ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        document.getElementById('manifest-link').href = URL.createObjectURL(blob);
+      } catch (e) {}
+    })();
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('pwa-install-section').classList.remove('hidden');
+    });
+
+    function loadDB() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (!parsed.headSupervisor) {
+            parsed.headSupervisor = { name: 'المشرف الرئيسي', password: '123' };
+          }
+          if (parsed.groups) {
+            parsed.groups.forEach(g => {
+              if (g.password === undefined || g.password === '') g.password = '123';
+            });
+          }
+          if (parsed.partnerships) {
+            const counts = {};
+            parsed.partnerships.forEach(p => {
+              if (!p.number) {
+                counts[p.groupId] = (counts[p.groupId] || 0) + 1;
+                p.number = counts[p.groupId];
+              }
+            });
+          }
+          return parsed;
+        }
+      } catch (e) {}
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+      return JSON.parse(JSON.stringify(defaultData));
+    }
+
+    function saveDB() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    }
+
+    function loadSession() {
+      try {
+        const raw = localStorage.getItem(SESSION_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveSession(sess) {
+      session = sess;
+      if (sess) localStorage.setItem(SESSION_KEY, JSON.stringify(sess));
+      else localStorage.removeItem(SESSION_KEY);
+    }
+
+    function dateToStr(d) {
+      const offset = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - offset * 60000);
+      return local.toISOString().split('T')[0];
+    }
+
+    function getTodayStr() {
+      return dateToStr(new Date());
+    }
+
+    function uid(prefix) {
+      return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => { t.style.display = 'none'; }, 2700);
+    }
+
+    function togglePwVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        inp.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    // ================= AUTH / LOGIN =================
+    function renderLogin() {
+      const wrap = document.getElementById('quick-supervisors');
+      wrap.innerHTML = '';
+
+      // Head Supervisor quick chip
+      const headBtn = document.createElement('button');
+      headBtn.className = 'chip chip-head';
+      headBtn.textContent = `👑 ${db.headSupervisor.name}`;
+      headBtn.onclick = () => selectQuickName(db.headSupervisor.name);
+      wrap.appendChild(headBtn);
+
+      db.groups.forEach(g => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.textContent = `👤 ${g.supervisorName}`;
+        btn.onclick = () => selectQuickName(g.supervisorName);
+        wrap.appendChild(btn);
+      });
+    }
+
+    function selectQuickName(name) {
+      document.getElementById('supervisor-input').value = name;
+      const pwInput = document.getElementById('password-input');
+      pwInput.value = '';
+      pwInput.focus();
+    }
+
+    function handleLogin() {
+      const name = document.getElementById('supervisor-input').value.trim();
+      const pass = document.getElementById('password-input').value;
+
+      if (!name) return showToast('من فضلك أدخل اسم المشرف أولاً');
+      if (!pass) return showToast('من فضلك أدخل كلمة المرور');
+
+      // Check Head Supervisor first
+      if (name.toLowerCase() === db.headSupervisor.name.trim().toLowerCase()) {
+        if (pass === String(db.headSupervisor.password)) {
+          saveSession({ role: 'head', groupId: null });
+          openHeadDashboard();
+          return;
+        } else {
+          return showToast('❌ كلمة المرور غير صحيحة للمشرف الرئيسي');
+        }
+      }
+
+      // Check regular supervisors
+      const found = db.groups.find(g => g.supervisorName.trim().toLowerCase() === name.toLowerCase());
+      if (found) {
+        if (pass === String(found.password)) {
+          saveSession({ role: 'supervisor', groupId: found.id });
+          openGroupScreen(found.id);
+        } else {
+          return showToast('❌ كلمة المرور غير صحيحة');
+        }
+      } else {
+        pendingSupervisorName = name;
+        pendingSupervisorPassword = pass;
+        document.getElementById('new-sup-display').textContent = name;
+        document.getElementById('login-step-1').classList.add('hidden');
+        document.getElementById('login-step-2').classList.remove('hidden');
+        document.getElementById('new-group-input').focus();
+      }
+    }
+
+    function createNewSupervisorGroup() {
+      const gName = document.getElementById('new-group-input').value.trim();
+      if (!gName) return showToast('اكتب اسم الجروب');
+      const newGroup = {
+        id: uid('g'),
+        name: gName,
+        supervisorName: pendingSupervisorName,
+        password: pendingSupervisorPassword,
+        absenceStartDate: ''
+      };
+      db.groups.push(newGroup);
+      saveDB();
+      document.getElementById('new-group-input').value = '';
+      cancelNewSupervisor();
+      saveSession({ role: 'supervisor', groupId: newGroup.id });
+      openGroupScreen(newGroup.id);
+      showToast('تم إنشاء الجروب بنجاح');
+    }
+
+    function cancelNewSupervisor() {
+      document.getElementById('login-step-2').classList.add('hidden');
+      document.getElementById('login-step-1').classList.remove('hidden');
+    }
+
+    function openGroupScreen(groupId) {
+      currentGroupId = groupId;
+      if (session) {
+        saveSession({ role: session.role, groupId: groupId });
+      }
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('head-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.remove('hidden');
+      document.getElementById('date-picker').value = currentDate;
+
+      const backBtn = document.getElementById('back-to-head-btn');
+      if (session && session.role === 'head') {
+        backBtn.classList.remove('hidden');
+      } else {
+        backBtn.classList.add('hidden');
+      }
+
+      renderAll();
+    }
+
+    function logout() {
+      currentGroupId = null;
+      saveSession(null);
+      document.getElementById('app-screen').classList.add('hidden');
+      document.getElementById('head-screen').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('supervisor-input').value = '';
+      document.getElementById('password-input').value = '';
+      renderLogin();
+    }
+
+    // ================= HEAD SUPERVISOR DASHBOARD =================
+    function openHeadDashboard() {
+      currentGroupId = null;
+      if (session) saveSession({ role: 'head', groupId: null });
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.add('hidden');
+      document.getElementById('head-screen').classList.remove('hidden');
+      renderHeadDashboard();
+    }
+
+    function backToHeadDashboard() {
+      openHeadDashboard();
+    }
+
+    function renderHeadDashboard() {
+      document.getElementById('head-name-display').textContent = db.headSupervisor.name;
+      document.getElementById('head-groups-count').textContent = db.groups.length;
+      document.getElementById('head-today-date').textContent = formatArabicDate(currentDate);
+      document.getElementById('head-edit-name').value = db.headSupervisor.name;
+      document.getElementById('head-edit-pass').value = db.headSupervisor.password;
+
+      const list = document.getElementById('head-groups-list');
+      if (db.groups.length === 0) {
+        list.innerHTML = `<div class="empty-state">لا توجد جروبات مسجلة بعد.</div>`;
+        return;
+      }
+
+      const dayRecord = db.attendance[currentDate] || { listening: {}, recitation: {} };
+
+      list.innerHTML = db.groups.map(g => {
+        const members = db.members.filter(m => m.groupId === g.id);
+        const total = members.length;
+        const listenPresent = members.filter(m => dayRecord.listening && dayRecord.listening[m.id] === 'present').length;
+        const recitPresent = members.filter(m => dayRecord.recitation && dayRecord.recitation[m.id] === 'present').length;
+
+        const isEditing = editingGroupId === g.id;
+        if (isEditing) {
+          return `
+            <div class="group-manage-card" style="background:#ecfdf5; border-color:#6ee7b7;">
+              <label style="font-size:12px; font-weight:700;">اسم الجروب:</label>
+              <input type="text" id="edit-g-name-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 8px;" value="${escapeHtml(g.name)}" />
+              <label style="font-size:12px; font-weight:700;">اسم المشرف / المشرفة:</label>
+              <input type="text" id="edit-s-name-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 8px;" value="${escapeHtml(g.supervisorName)}" />
+              <label style="font-size:12px; font-weight:700;">كلمة المرور:</label>
+              <input type="text" id="edit-s-pass-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 10px;" value="${escapeHtml(g.password)}" />
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-primary btn-sm" style="flex:1;" onclick="saveGroupEdit('${g.id}')">💾 حفظ التعديلات</button>
+                <button class="btn btn-outline btn-sm" onclick="editingGroupId=null; renderHeadDashboard();">إلغاء</button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="group-manage-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:800; font-size:16px; color:var(--primary);">${escapeHtml(g.name)}</div>
+                <div style="font-size:13px; color:var(--text); margin-top:2px;">
+                  👤 المشرف: <strong>${escapeHtml(g.supervisorName)}</strong> • 🔑 الباسورد: <code>${escapeHtml(g.password)}</code>
+                </div>
+                <div style="font-size:12.5px; color:var(--muted); margin-top:4px;">
+                  👥 الأعضاء: <strong>${total}</strong> • 🎧 الاستماع اليوم: <strong>${listenPresent}/${total}</strong> • 📖 التسميع اليوم: <strong>${recitPresent}/${total}</strong>
+                </div>
+              </div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm" onclick="openGroupScreen('${g.id}')">👁️ فتح الجروب</button>
+                <button class="btn btn-soft btn-sm" onclick="editingGroupId='${g.id}'; renderHeadDashboard();">✏️ تعديل</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteGroup('${g.id}')">🗑️ حذف</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function headCreateGroup() {
+      const gName = document.getElementById('head-add-gname').value.trim();
+      const sName = document.getElementById('head-add-sname').value.trim();
+      const sPass = document.getElementById('head-add-spass').value.trim();
+      if (!gName || !sName || !sPass) return showToast('أكمل اسم الجروب واسم المشرف وكلمة المرور');
+
+      db.groups.push({
+        id: uid('g'),
+        name: gName,
+        supervisorName: sName,
+        password: sPass,
+        absenceStartDate: ''
+      });
+      saveDB();
+      document.getElementById('head-add-gname').value = '';
+      document.getElementById('head-add-sname').value = '';
+      document.getElementById('head-add-spass').value = '';
+      renderHeadDashboard();
+      showToast('تمت إضافة الجروب والمشرف بنجاح');
+    }
+
+    function saveGroupEdit(groupId) {
+      const gName = document.getElementById(`edit-g-name-${groupId}`).value.trim();
+      const sName = document.getElementById(`edit-s-name-${groupId}`).value.trim();
+      const sPass = document.getElementById(`edit-s-pass-${groupId}`).value.trim();
+      if (!gName || !sName || !sPass) return showToast('تأكد من كتابة جميع الحقول');
+
+      const group = db.groups.find(g => g.id === groupId);
+      if (group) {
+        group.name = gName;
+        group.supervisorName = sName;
+        group.password = sPass;
+        saveDB();
+      }
+      editingGroupId = null;
+      renderHeadDashboard();
+      showToast('تم تحديث بيانات الجروب والمشرف');
+    }
+
+    function deleteGroup(groupId) {
+      const group = db.groups.find(g => g.id === groupId);
+      if (!group) return;
+      if (!confirm(`هل أنت متأكد من حذف "${group.name}" (للمشرف ${group.supervisorName}) وجميع أعضائه نهائياً؟`)) return;
+
+      db.groups = db.groups.filter(g => g.id !== groupId);
+      db.members = db.members.filter(m => m.groupId !== groupId);
+      db.partnerships = db.partnerships.filter(p => p.groupId !== groupId);
+      saveDB();
+      renderHeadDashboard();
+      showToast('تم حذف الجروب بنجاح');
+    }
+
+    function saveHeadCredentials() {
+      const name = document.getElementById('head-edit-name').value.trim();
+      const pass = document.getElementById('head-edit-pass').value.trim();
+      if (!name || !pass) return showToast('اكتب الاسم وكلمة المرور');
+      db.headSupervisor.name = name;
+      db.headSupervisor.password = pass;
+      saveDB();
+      renderHeadDashboard();
+      showToast('تم تحديث بيانات المشرف الرئيسي');
+    }
+
+    // ================= WEEKLY STARS (مثابرات الإسبوع) =================
+    function openWeeklyStarsModal() {
+      const d = new Date(currentDate + 'T00:00:00');
+      const daysSinceSat = (d.getDay() + 1) % 7;
+      const sat = new Date(d);
+      sat.setDate(d.getDate() - daysSinceSat);
+      const fri = new Date(sat);
+      fri.setDate(sat.getDate() + 6);
+
+      document.getElementById('week-start-input').value = dateToStr(sat);
+      document.getElementById('week-end-input').value = dateToStr(fri);
+      renderWeeklyStars();
+      document.getElementById('weekly-stars-modal').classList.add('open');
+    }
+
+    function closeWeeklyStarsModal() {
+      document.getElementById('weekly-stars-modal').classList.remove('open');
+    }
+
+    function renderWeeklyStars() {
+      const start = document.getElementById('week-start-input').value;
+      const end = document.getElementById('week-end-input').value;
+      const mode = document.getElementById('week-mode-select').value;
+      const members = getGroupMembers();
+
+      const summaryEl = document.getElementById('weekly-stars-summary');
+      const outputEl = document.getElementById('weekly-stars-output');
+
+      if (!start || !end || start > end) {
+        summaryEl.textContent = 'تأكد من اختيار تاريخ البداية والنهاية بشكل صحيح.';
+        outputEl.textContent = '';
+        currentWeeklyMessage = '';
+        return;
+      }
+
+      const memberIds = members.map(m => m.id);
+      const datesInRange = Object.keys(db.attendance)
+        .filter(date => date >= start && date <= end)
+        .sort();
+
+      const activeListeningDays = datesInRange.filter(date => {
+        const rec = db.attendance[date]?.listening || {};
+        return memberIds.some(id => Boolean(rec[id]));
+      });
+
+      const activeRecitationDays = datesInRange.filter(date => {
+        const rec = db.attendance[date]?.recitation || {};
+        return memberIds.some(id => Boolean(rec[id]));
+      });
+
+      const checkListening = mode === 'both' || mode === 'listening';
+      const checkRecitation = mode === 'both' || mode === 'recitation';
+
+      const totalRelevantDays = new Set([
+        ...(checkListening ? activeListeningDays : []),
+        ...(checkRecitation ? activeRecitationDays : [])
+      ]).size;
+
+      if (totalRelevantDays === 0) {
+        summaryEl.textContent = 'لم يتم تسجيل حضور لهذا الجروب خلال هذا الأسبوع بعد.';
+        currentWeeklyMessage = '🤍 مثابرات الإسبوع 🤍\n\nلا توجد أيام مسجلة في هذا الأسبوع بعد.';
+        outputEl.textContent = currentWeeklyMessage;
+        return;
+      }
+
+      const stars = members.filter(m => {
+        if (checkListening && activeListeningDays.length > 0) {
+          const okL = activeListeningDays.every(d => db.attendance[d]?.listening?.[m.id] === 'present');
+          if (!okL) return false;
+        }
+        if (checkRecitation && activeRecitationDays.length > 0) {
+          const okR = activeRecitationDays.every(d => db.attendance[d]?.recitation?.[m.id] === 'present');
+          if (!okR) return false;
+        }
+        return true;
+      });
+
+      summaryEl.textContent = `الأيام المسجلة هذا الأسبوع: ${totalRelevantDays} يوم • عدد المثابرات: ${stars.length} من ${members.length}`;
+
+      if (stars.length === 0) {
+        currentWeeklyMessage = '🤍 مثابرات الإسبوع 🤍\n\nلا يوجد أعضاء ملتزمون بجميع أيام الأسبوع المحددة.';
+      } else {
+        const lines = stars.map(m => `🌻 الجميلة / ${m.name} 👑`);
+        currentWeeklyMessage = `🤍 مثابرات الإسبوع 🤍\n\n${lines.join('\n\n')}`;
+      }
+
+      outputEl.textContent = currentWeeklyMessage;
+    }
+
+    function copyWeeklyStarsMessage() {
+      if (!currentWeeklyMessage) return showToast('لا توجد رسالة للنسخ');
+      copyTextSilently(currentWeeklyMessage, '✅ تم نسخ رسالة مثابرات الإسبوع بنجاح!');
+    }
+
+    // ================= DATE & ABSENCE HELPERS =================
+    function getCurrentGroup() {
+      return db.groups.find(g => g.id === currentGroupId);
+    }
+
+    function getGroupMembers() {
+      return db.members.filter(m => m.groupId === currentGroupId);
+    }
+
+    function getGroupPartnerships() {
+      return db.partnerships
+        .filter(p => p.groupId === currentGroupId)
+        .sort((a, b) => (a.number || 999) - (b.number || 999));
+    }
+
+    function ensureDayRecord() {
+      if (!db.attendance[currentDate]) {
+        db.attendance[currentDate] = { listening: {}, recitation: {} };
+      }
+      if (!db.attendance[currentDate].listening) db.attendance[currentDate].listening = {};
+      if (!db.attendance[currentDate].recitation) db.attendance[currentDate].recitation = {};
+      return db.attendance[currentDate];
+    }
+
+    function getAbsenceCount(memberId, type, upToDate = currentDate) {
+      const group = getCurrentGroup();
+      const startDate = group && group.absenceStartDate ? group.absenceStartDate : '';
+      let count = 0;
+
+      Object.keys(db.attendance).forEach(date => {
+        if (date <= upToDate && (!startDate || date >= startDate)) {
+          if (db.attendance[date]?.[type]?.[memberId] === 'absent') {
+            count++;
+          }
+        }
+      });
+      return count;
+    }
+
+    function markRemainingAbsent(type) {
+      const day = ensureDayRecord();
+      let changed = 0;
+      getGroupMembers().forEach(m => {
+        if (!day[type][m.id]) {
+          day[type][m.id] = 'absent';
+          changed++;
+        }
+      });
+      saveDB();
+      renderAll();
+      if (changed > 0) {
+        showToast(`تم تسجيل ${changed} عضو غير مسجل كـ "غائب"`);
+      } else {
+        showToast('جميع الأعضاء مسجلون بالفعل لهذا اليوم');
+      }
+    }
+
+    function clearDayType(type) {
+      const day = ensureDayRecord();
+      getGroupMembers().forEach(m => {
+        delete day[type][m.id];
+      });
+      saveDB();
+      renderAll();
+      showToast('تم مسح تسجيل اليوم');
+    }
+
+    function onDateChange() {
+      const val = document.getElementById('date-picker').value;
+      if (val) {
+        currentDate = val;
+        renderAll();
+      }
+    }
+
+    function changeDate(delta) {
+      const d = new Date(currentDate + 'T00:00:00');
+      d.setDate(d.getDate() + delta);
+      currentDate = dateToStr(d);
+      document.getElementById('date-picker').value = currentDate;
+      renderAll();
+    }
+
+    function formatArabicDate(dateStr) {
+      try {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    function getArabicWeekday(dateStr) {
+      try {
+        const d = new Date(dateStr + 'T00:00:00');
+        const names = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        return names[d.getDay()];
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    // ================= RENDER ALL =================
+    function renderAll() {
+      const group = getCurrentGroup();
+      if (!group) return logout();
+
+      document.getElementById('header-group-name').textContent = group.name;
+      document.getElementById('header-supervisor-name').textContent = group.supervisorName;
+      document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
+
+      renderStats();
+      renderListening();
+      renderRecitation();
+      renderManage();
+    }
+
+    function renderStats() {
+      const members = getGroupMembers();
+      const day = ensureDayRecord();
+      const total = members.length;
+
+      const listenPresent = members.filter(m => day.listening[m.id] === 'present').length;
+      const recitPresent = members.filter(m => day.recitation[m.id] === 'present').length;
+
+      document.getElementById('stat-listening').textContent = `${listenPresent} / ${total}`;
+      document.getElementById('stat-recitation').textContent = `${recitPresent} / ${total}`;
+      document.getElementById('stat-total').textContent = total;
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      ['listening', 'recitation', 'manage'].forEach(t => {
+        document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
+        document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+      });
+    }
+
+    // ================= TAB 1: LISTENING (INDIVIDUAL) =================
+    function renderListening() {
+      const list = document.getElementById('listening-list');
+      const query = document.getElementById('search-listening').value.trim().toLowerCase();
+      const members = getGroupMembers().filter(m => m.name.toLowerCase().includes(query));
+      const day = ensureDayRecord();
+
+      if (members.length === 0) {
+        list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم. أضف أعضاء من تبويب <strong>"الأعضاء والتقرير"</strong>.</div>`;
+        return;
+      }
+
+      list.innerHTML = members.map(m => {
+        const st = day.listening[m.id] || '';
+        const rowClass = st ? `status-${st}` : '';
+        const absCount = getAbsenceCount(m.id, 'listening');
+        const absTag = absCount > 0
+          ? `<span class="absence-tag">غياب الاستماع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</span>`
+          : '';
+
+        return `
+          <div class="member-row ${rowClass}">
+            <div class="member-info">
+              <div class="member-name">🎧 ${escapeHtml(m.name)}</div>
+              ${absTag}
+            </div>
+            <div class="status-pills">
+              <button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✅ حاضر</button>
+              <button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button>
+              <button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">❌ غائب</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setListening(memberId, status) {
+      const day = ensureDayRecord();
+      if (day.listening[memberId] === status) {
+        delete day.listening[memberId];
+      } else {
+        day.listening[memberId] = status;
+      }
+      saveDB();
+      renderStats();
+      renderListening();
+      renderManage();
+    }
+
+    function markAllListening(status) {
+      const day = ensureDayRecord();
+      getGroupMembers().forEach(m => {
+        if (status === null) delete day.listening[m.id];
+        else day.listening[m.id] = status;
+      });
+      saveDB();
+      renderStats();
+      renderListening();
+      renderManage();
+      showToast('تم تحضير الجميع في الاستماع');
+    }
+
+    // ================= TAB 2: RECITATION (PARTNERS WITH NUMBERS) =================
+    function togglePartnerBuilder(forceState) {
+      const box = document.getElementById('partner-builder');
+      const show = forceState !== undefined ? forceState : box.classList.contains('hidden');
+      box.classList.toggle('hidden', !show);
+      if (show) {
+        selectedForPartner = [];
+        renderUnpairedGrid();
+      }
+    }
+
+    function getPairedMemberIds() {
+      const ids = new Set();
+      getGroupPartnerships().forEach(p => p.memberIds.forEach(id => ids.add(id)));
+      return ids;
+    }
+
+    function renderUnpairedGrid() {
+      const grid = document.getElementById('unpaired-grid');
+      const paired = getPairedMemberIds();
+      const unpaired = getGroupMembers().filter(m => !paired.has(m.id));
+      document.getElementById('selected-count').textContent = selectedForPartner.length;
+
+      if (unpaired.length < 2) {
+        grid.innerHTML = `<p style="grid-column:1/-1; color:var(--muted); font-size:13px;">تحتاج على الأقل إلى عضوين غير مرتبطين لتكوين مجموعة رفقاء. (المتاح حالياً: ${unpaired.length})</p>`;
+        return;
+      }
+
+      grid.innerHTML = unpaired.map(m => {
+        const isSel = selectedForPartner.includes(m.id);
+        return `
+          <div class="select-item ${isSel ? 'selected' : ''}" onclick="toggleSelectPartnerMember('${m.id}')">
+            <span>${isSel ? '☑️' : '⬜'}</span>
+            <span>${escapeHtml(m.name)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSelectPartnerMember(memberId) {
+      const idx = selectedForPartner.indexOf(memberId);
+      if (idx > -1) {
+        selectedForPartner.splice(idx, 1);
+      } else {
+        if (selectedForPartner.length >= 3) {
+          return showToast('الحد الأقصى للرفقاء معاً هو 3 أفراد');
+        }
+        selectedForPartner.push(memberId);
+      }
+      renderUnpairedGrid();
+    }
+
+    function createPartnership() {
+      if (selectedForPartner.length < 2 || selectedForPartner.length > 3) {
+        return showToast('اختر 2 أو 3 أفراد معاً');
+      }
+      const existing = getGroupPartnerships();
+      const maxNum = existing.reduce((max, p) => Math.max(max, Number(p.number) || 0), 0);
+      db.partnerships.push({
+        id: uid('p'),
+        groupId: currentGroupId,
+        number: maxNum + 1,
+        memberIds: [...selectedForPartner]
+      });
+      saveDB();
+      togglePartnerBuilder(false);
+      renderRecitation();
+      showToast(`تم ربط رفقاء رقم ${maxNum + 1} بنجاح`);
+    }
+
+    function savePartnerNumber(partnerId) {
+      const input = document.getElementById(`partner-num-input-${partnerId}`);
+      const val = parseInt(input.value, 10);
+      if (!val || val < 1) return showToast('أدخل رقماً صحيحاً');
+      const p = db.partnerships.find(x => x.id === partnerId);
+      if (p) {
+        p.number = val;
+        saveDB();
+      }
+      editingPartnerNumId = null;
+      renderRecitation();
+      showToast('تم تعديل رقم الرفقاء');
+    }
+
+    function dissolvePartnership(partnerId) {
+      if (!confirm('هل تريد فك ارتباط هؤلاء الرفقاء لإعادة توزيعهم؟')) return;
+      db.partnerships = db.partnerships.filter(p => p.id !== partnerId);
+      saveDB();
+      renderRecitation();
+      showToast('تم فك الارتباط');
+    }
+
+    function renderRecitationMemberRow(m, day) {
+      const st = day.recitation[m.id] || '';
+      const rowClass = st ? `status-${st}` : '';
+      const absCount = getAbsenceCount(m.id, 'recitation');
+      const absTag = absCount > 0
+        ? `<div class="absence-tag">غياب التسميع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</div>`
+        : '';
+      return `
+        <div class="partner-member-item ${rowClass}">
+          <div>
+            <span style="font-weight:700;">${escapeHtml(m.name)}</span>
+            ${absTag}
+          </div>
+          <div class="status-pills">
+            <button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button>
+            <button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button>
+            <button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRecitation() {
+      const container = document.getElementById('recitation-list');
+      const members = getGroupMembers();
+      const memberMap = Object.fromEntries(members.map(m => [m.id, m]));
+      const partnerships = getGroupPartnerships();
+      const day = ensureDayRecord();
+
+      let html = '';
+
+      if (partnerships.length === 0) {
+        html += `<div class="card empty-state">لم يتم تكوين رفقاء تسميع بعد. اضغط على <strong>"➕ تكوين رفقاء جدد"</strong> بالأعلى لربط كل 2 أو 3 أعضاء معاً.</div>`;
+      } else {
+        partnerships.forEach((p, idx) => {
+          const validMembers = p.memberIds.map(id => memberMap[id]).filter(Boolean);
+          if (validMembers.length === 0) return;
+
+          const pNum = p.number || (idx + 1);
+          const allPresent = validMembers.every(m => day.recitation[m.id] === 'present');
+          const typeLabel = validMembers.length === 3 ? 'ثلاثي (3 رفقاء)' : 'ثنائي (رفيقان)';
+          const isEditingNum = editingPartnerNumId === p.id;
+
+          html += `
+            <div class="partner-card ${allPresent ? 'all-done' : ''}">
+              <div class="partner-header">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  ${isEditingNum ? `
+                    <input type="number" min="1" id="partner-num-input-${p.id}" class="input" style="width:72px; padding:4px 8px; font-size:13px;" value="${pNum}" />
+                    <button class="btn btn-primary btn-xs" onclick="savePartnerNumber('${p.id}')">حفظ</button>
+                    <button class="btn btn-outline btn-xs" onclick="editingPartnerNumId=null; renderRecitation();">إلغاء</button>
+                  ` : `
+                    <span class="partner-num-pill">🔢 رفقاء رقم ${pNum}</span>
+                    <button class="btn btn-outline btn-xs" title="تغيير رقم الرفقاء" onclick="editingPartnerNumId='${p.id}'; renderRecitation();">✏️ رقم</button>
+                    <span class="partner-type-pill">${typeLabel}</span>
+                  `}
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-sm ${allPresent ? 'btn-primary' : 'btn-soft'}" onclick="toggleWholePartnership('${p.id}', ${!allPresent})">
+                    ${allPresent ? '✅ تم التسميع للكل' : 'تسميع للكل'}
+                  </button>
+                  <button class="btn btn-danger btn-sm" title="فك الرفقاء" onclick="dissolvePartnership('${p.id}')">فك</button>
+                </div>
+              </div>
+              <div class="partner-members-list">
+                ${validMembers.map(m => renderRecitationMemberRow(m, day)).join('')}
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      const paired = getPairedMemberIds();
+      const unpaired = members.filter(m => !paired.has(m.id));
+      if (unpaired.length > 0) {
+        html += `
+          <div class="card" style="background:#fffbeb; border-color:#fde68a;">
+            <strong style="font-size:14px; color:#92400e;">أعضاء غير مرتبطين برفقاء حالياً (${unpaired.length}):</strong>
+            <p style="font-size:12px; color:#78350f; margin-top:2px;">يمكنك تسجيل تسميعهم أو ربطهم كرفقاء:</p>
+            <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+              ${unpaired.map(m => renderRecitationMemberRow(m, day)).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function toggleWholePartnership(partnerId, markPresent) {
+      const p = db.partnerships.find(x => x.id === partnerId);
+      if (!p) return;
+      const day = ensureDayRecord();
+      p.memberIds.forEach(id => {
+        if (markPresent) day.recitation[id] = 'present';
+        else delete day.recitation[id];
+      });
+      saveDB();
+      renderStats();
+      renderRecitation();
+      renderManage();
+    }
+
+    function setRecitationMember(memberId, status) {
+      const day = ensureDayRecord();
+      if (day.recitation[memberId] === status) {
+        delete day.recitation[memberId];
+      } else {
+        day.recitation[memberId] = status;
+      }
+      saveDB();
+      renderStats();
+      renderRecitation();
+      renderManage();
+    }
+
+    // ================= TAB 3: MANAGE MEMBERS & ABSENCE COPY =================
+    function addSingleMember() {
+      const input = document.getElementById('new-member-name');
+      const name = input.value.trim();
+      if (!name) return showToast('اكتب اسم العضو أولاً');
+
+      db.members.push({ id: uid('m'), groupId: currentGroupId, name });
+      saveDB();
+      input.value = '';
+      renderAll();
+      showToast('تمت إضافة العضو');
+    }
+
+    function addBulkMembers() {
+      const area = document.getElementById('bulk-members-input');
+      const lines = area.value.split('\n').map(s => s.trim()).filter(Boolean);
+      if (lines.length === 0) return showToast('اكتب الأسماء أولاً');
+
+      lines.forEach(name => {
+        db.members.push({ id: uid('m'), groupId: currentGroupId, name });
+      });
+      saveDB();
+      area.value = '';
+      renderAll();
+      showToast(`تمت إضافة ${lines.length} عضو بنجاح`);
+    }
+
+    function deleteMember(memberId) {
+      const m = db.members.find(x => x.id === memberId);
+      if (!m || !confirm(`هل تريد حذف "${m.name}" من الجروب نهائياً؟`)) return;
+
+      db.members = db.members.filter(x => x.id !== memberId);
+      db.partnerships.forEach(p => {
+        p.memberIds = p.memberIds.filter(id => id !== memberId);
+      });
+      db.partnerships = db.partnerships.filter(p => p.memberIds.length >= 2);
+      saveDB();
+      renderAll();
+      showToast('تم حذف العضو');
+    }
+
+    function resetAbsenceCounter() {
+      if (!confirm('هل تريد بدء حساب عداد الغياب (🔴) من تاريخ هذا اليوم (' + currentDate + ') وتجاهل الغياب السابق؟')) return;
+      const group = getCurrentGroup();
+      group.absenceStartDate = currentDate;
+      saveDB();
+      renderAll();
+      showToast('تم تصفير عداد الغياب ليبدأ من ' + currentDate);
+    }
+
+    function renderManage() {
+      const group = getCurrentGroup();
+      const members = getGroupMembers();
+      document.getElementById('manage-count').textContent = members.length;
+
+      const noteEl = document.getElementById('reset-date-note');
+      noteEl.textContent = group && group.absenceStartDate
+        ? `يتم حساب عداد الغياب (🔴) بدءاً من تاريخ: ${group.absenceStartDate}`
+        : 'يتم حساب عداد الغياب (🔴) من جميع الأيام المسجلة.';
+
+      const list = document.getElementById('manage-members-list');
+      if (members.length === 0) {
+        list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`;
+        return;
+      }
+
+      list.innerHTML = members.map((m, i) => {
+        const lAbs = getAbsenceCount(m.id, 'listening');
+        const rAbs = getAbsenceCount(m.id, 'recitation');
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-weight:700;">${i + 1}. ${escapeHtml(m.name)}</div>
+              <div style="font-size:12px; color:var(--muted);">
+                استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'} ${lAbs > 2 ? '⚠️ إنذار' : ''}
+                • تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'} ${rAbs > 2 ? '⚠️ إنذار' : ''}
+              </div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">🗑️ حذف</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function buildAbsenceSection(type) {
+      const members = getGroupMembers();
+      const day = ensureDayRecord();
+      const weekday = getArabicWeekday(currentDate);
+      const title = type === 'listening'
+        ? `🌹غياب الإستماع ليوم ${weekday}🌹`
+        : `🌹غياب التسميع ليوم ${weekday}🌹`;
+
+      const absentList = members
+        .filter(m => day[type][m.id] === 'absent')
+        .map(m => ({
+          name: m.name,
+          count: getAbsenceCount(m.id, type, currentDate)
+        }))
+        .sort((a, b) => a.count - b.count);
+
+      if (absentList.length === 0) {
+        return `${title}\n\n✨ ما شاء الله، لا يوجد غياب اليوم!`;
+      }
+
+      const lines = absentList.map(item => {
+        const dots = '🔴'.repeat(Math.max(1, item.count));
+        const warning = item.count > 2 ? ' إنذار بالحذف' : '';
+        return `🥀${item.name} ${dots}${warning}`;
+      });
+
+      return `${title}\n\n${lines.join('\n')}`;
+    }
+
+    function copyAbsenceMessage(mode) {
+      const text = buildAbsenceSection(mode);
+      copyTextSilently(text, '✅ تم نسخ رسالة الغياب بنجاح!');
+    }
+
+    // Silent mobile-friendly clipboard copy
+    function fallbackCopySync(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.style.left = '-9999px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+
+      const isIOS = /ipad|iphone|ipod/i.test(navigator.userAgent);
+      if (isIOS) {
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        const range = document.createRange();
+        range.selectNodeContents(ta);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        ta.setSelectionRange(0, 999999);
+      } else {
+        ta.select();
+      }
+
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch (e) {
+        ok = false;
+      }
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    function copyTextSilently(text, toastMsg) {
+      if (!window.isSecureContext) {
+        if (fallbackCopySync(text)) {
+          showToast(toastMsg);
+          return;
+        }
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(toastMsg);
+        }).catch(() => {
+          if (fallbackCopySync(text)) {
+            showToast(toastMsg);
+          } else {
+            showToast('تعذر النسخ التلقائي على هذا المتصفح');
+          }
+        });
+      } else {
+        if (fallbackCopySync(text)) {
+          showToast(toastMsg);
+        } else {
+          showToast('تعذر النسخ التلقائي على هذا المتصفح');
+        }
+      }
+    }
+
+    // ================= DOWNLOAD / INSTALL =================
+    function openDownloadModal() {
+      document.getElementById('download-modal').classList.add('open');
+    }
+
+    function closeDownloadModal() {
+      document.getElementById('download-modal').classList.remove('open');
+    }
+
+    async function installPWA() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('pwa-install-section').classList.add('hidden');
+    }
+
+    function downloadAppFile() {
+      const clone = document.documentElement.cloneNode(true);
+      clone.querySelector('#login-screen').classList.remove('hidden');
+      clone.querySelector('#app-screen').classList.add('hidden');
+      clone.querySelector('#head-screen').classList.add('hidden');
+      clone.querySelector('#download-modal').classList.remove('open');
+      clone.querySelector('#weekly-stars-modal').classList.remove('open');
+      clone.querySelector('#listening-list').innerHTML = '';
+      clone.querySelector('#recitation-list').innerHTML = '';
+      clone.querySelector('#manage-members-list').innerHTML = '';
+      clone.querySelector('#quick-supervisors').innerHTML = '';
+      clone.querySelector('#head-groups-list').innerHTML = '';
+      const toast = clone.querySelector('#toast');
+      if (toast) toast.style.display = 'none';
+
+      const htmlContent = '<!DOCTYPE html>\n' + clone.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'تعاهدوا_القرءان.html';
+      a.click();
+      showToast('بدأ تحميل ملف البرنامج');
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[s]));
+    }
+
+    // ================= INIT =================
+    if (session && session.role === 'head') {
+      if (session.groupId && db.groups.some(g => g.id === session.groupId)) {
+        openGroupScreen(session.groupId);
+      } else {
+        openHeadDashboard();
+      }
+    } else if (session && session.role === 'supervisor' && session.groupId && db.groups.some(g => g.id === session.groupId)) {
+      openGroupScreen(session.groupId);
+    } else {
+      renderLogin();
+    }
+  </script>
+</body>
+</html>
