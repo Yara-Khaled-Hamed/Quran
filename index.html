@@ -145,6 +145,24 @@
       justify-content: center;
     }
 
+    .sync-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .sync-pill.dark {
+      background: #f3f4f6;
+      color: #374151;
+      border-color: var(--border);
+    }
+
     .quick-chips {
       display: flex;
       flex-wrap: wrap;
@@ -198,7 +216,7 @@
     .header-title h1 { font-size: 19px; font-weight: 800; }
     .header-title p { font-size: 13px; opacity: 0.9; }
 
-    .header-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .header-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .header-btn {
       background: rgba(255,255,255,0.16);
       color: #fff;
@@ -395,6 +413,25 @@
       background: #fff;
     }
 
+    .sup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f3f4f6;
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .sup-edit-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
     /* Weekly Stars Box */
     .stars-box {
       background: #fffbeb;
@@ -484,9 +521,12 @@
         </svg>
       </div>
       <h2 style="text-align:center; color:var(--primary); font-size:22px; margin-bottom:4px;">جروبات تعاهدوا القرءان</h2>
-      <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:18px;">
+      <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:8px;">
         متابعة حضور الاستماع والتسميع لحفظة كتاب الله
       </p>
+      <div style="text-align:center; margin-bottom:16px;">
+        <span id="login-sync-status" class="sync-pill dark">⏳ جاري الاتصال...</span>
+      </div>
 
       <div id="login-step-1">
         <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم المشرف / المشرفة</label>
@@ -536,10 +576,12 @@
           </svg>
           <div class="header-title">
             <h1>👑 لوحة المشرف الرئيسي</h1>
-            <p>متابعة وإدارة جميع جروبات تعاهدوا القرءان (<span id="head-name-display"></span>)</p>
+            <p>متابعة وإدارة جميع الجروبات (<span id="head-name-display"></span>)</p>
           </div>
         </div>
         <div class="header-actions">
+          <span id="head-sync-status" class="sync-pill">🟢 متزامن</span>
+          <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
           <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
           <button class="header-btn" onclick="logout()">خروج</button>
         </div>
@@ -604,7 +646,9 @@
           </div>
         </div>
         <div class="header-actions">
+          <span id="app-sync-status" class="sync-pill">🟢 متزامن</span>
           <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
+          <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
           <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
           <button class="header-btn" onclick="logout()">خروج</button>
         </div>
@@ -710,7 +754,7 @@
               <button class="btn btn-danger" style="flex:1; min-width:170px;" onclick="copyAbsenceMessage('recitation')">🥀 نسخ غياب التسميع</button>
             </div>
             <button class="btn btn-gold btn-block" onclick="openWeeklyStarsModal()">
-              🤍 مثابرات الإسبوع (الملتزمات بالحضور طوال الأسبوع) 👑
+              🤍 مثابرات الإسبوع (الملتزمات بالتسميع والاستماع طوال الأسبوع) 👑
             </button>
           </div>
         </div>
@@ -750,6 +794,9 @@
         <h3 style="color:#b45309; font-size:18px;">🤍 مثابرات الإسبوع 👑</h3>
         <button class="btn btn-outline btn-sm" onclick="closeWeeklyStarsModal()">✕</button>
       </div>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
+        يظهر هنا الملتزمون بالحضور في <strong>التسميع والاستماع معاً</strong> خلال جميع أيام الأسبوع المحددة.
+      </p>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
         <div>
@@ -760,15 +807,6 @@
           <label style="font-size:12px; font-weight:700; color:var(--muted);">إلى تاريخ (نهاية الأسبوع):</label>
           <input type="date" id="week-end-input" class="input" style="padding:7px 10px; font-size:13px;" onchange="renderWeeklyStars()" />
         </div>
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label style="font-size:12px; font-weight:700; color:var(--muted);">شرط الالتزام:</label>
-        <select id="week-mode-select" class="input" style="padding:8px 10px; font-size:13.5px; margin-top:4px;" onchange="renderWeeklyStars()">
-          <option value="both">الحضور الكامل في الاستماع والتسميع معاً</option>
-          <option value="listening">الحضور الكامل في الاستماع فقط</option>
-          <option value="recitation">الحضور الكامل في التسميع فقط</option>
-        </select>
       </div>
 
       <div id="weekly-stars-summary" style="font-size:12.5px; font-weight:700; color:var(--primary); background:var(--primary-soft); padding:8px 12px; border-radius:10px;"></div>
@@ -797,9 +835,9 @@
       </div>
 
       <div style="background:var(--primary-soft); padding:14px; border-radius:14px; margin-bottom:12px; font-size:14px;">
-        <strong>1. تحميل نسخة البرنامج للعمل بدون إنترنت:</strong>
+        <strong>1. تحميل نسخة البرنامج على جهازك:</strong>
         <p style="font-size:13px; color:var(--text); margin:6px 0 10px;">
-          يمكنك تحميل ملف التطبيق الكامل على جهازك وفتحه في أي وقت حتى بدون إنترنت.
+          يمكنك تحميل ملف التطبيق الكامل على جهازك وفتحه في أي وقت.
         </p>
         <button class="btn btn-primary btn-sm btn-block" onclick="downloadAppFile()">📥 تحميل ملف التطبيق (HTML)</button>
       </div>
@@ -817,14 +855,36 @@
   <div id="toast" class="toast"></div>
 
   <script>
+    // =========================================================================
+    // ضعي رابط Firebase Realtime Database هنا قبل الرفع على Vercel لتتم المزامنة للجميع:
+    // مثال: "https://taahadu-qoran-default-rtdb.firebaseio.com"
+    const CLOUD_DB_URL = "https://quran-attendence-default-rtdb.firebaseio.com/";
+    // =========================================================================
+
     const STORAGE_KEY = 'taahadu_qoran_app_v1';
     const SESSION_KEY = 'taahadu_session_v1';
+    const CLOUD_BASE = CLOUD_DB_URL.trim().replace(/\/+$/, '');
 
     const defaultData = {
       headSupervisor: { name: 'المشرف الرئيسي', password: '123' },
       groups: [
-        { id: 'g1', name: 'جروب الفجر - تعاهدوا القرءان', supervisorName: 'أحمد', password: '123', absenceStartDate: '' },
-        { id: 'g2', name: 'جروب الهمة - تعاهدوا القرءان', supervisorName: 'سارة', password: '123', absenceStartDate: '' }
+        {
+          id: 'g1',
+          name: 'جروب الفجر - تعاهدوا القرءان',
+          supervisors: [
+            { id: 's1', name: 'أحمد', password: '123' },
+            { id: 's2', name: 'محمود', password: '123' }
+          ],
+          absenceStartDate: ''
+        },
+        {
+          id: 'g2',
+          name: 'جروب الهمة - تعاهدوا القرءان',
+          supervisors: [
+            { id: 's3', name: 'سارة', password: '123' }
+          ],
+          absenceStartDate: ''
+        }
       ],
       members: [
         { id: 'm1', groupId: 'g1', name: 'عبد الرحمن محمد' },
@@ -844,8 +904,8 @@
       attendance: {}
     };
 
-    let db = loadDB();
-    let session = loadSession(); // { role: 'head' | 'supervisor', groupId: string | null }
+    let db = loadLocalDB();
+    let session = loadSession();
     let currentGroupId = session ? session.groupId : null;
     let currentDate = getTodayStr();
     let currentTab = 'listening';
@@ -856,6 +916,7 @@
     let editingPartnerNumId = null;
     let currentWeeklyMessage = '';
     let deferredPrompt = null;
+    let lastCloudSnapshot = '';
 
     // Generate crisp PNG icons via Canvas for Android/iOS Home Screen & PWA Manifest
     (function setupAppIconsAndManifest() {
@@ -958,39 +1019,234 @@
       document.getElementById('pwa-install-section').classList.remove('hidden');
     });
 
-    function loadDB() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (!parsed.headSupervisor) {
-            parsed.headSupervisor = { name: 'المشرف الرئيسي', password: '123' };
-          }
-          if (parsed.groups) {
-            parsed.groups.forEach(g => {
-              if (g.password === undefined || g.password === '') g.password = '123';
-            });
-          }
-          if (parsed.partnerships) {
-            const counts = {};
-            parsed.partnerships.forEach(p => {
-              if (!p.number) {
-                counts[p.groupId] = (counts[p.groupId] || 0) + 1;
-                p.number = counts[p.groupId];
-              }
-            });
-          }
-          return parsed;
-        }
-      } catch (e) {}
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
-      return JSON.parse(JSON.stringify(defaultData));
+    // ================= LOCAL & CLOUD SYNC ENGINE =================
+    function objToArray(val) {
+      if (Array.isArray(val)) return val.filter(Boolean);
+      if (val && typeof val === 'object') return Object.values(val).filter(Boolean);
+      return [];
     }
 
-    function saveDB() {
+    function normalizeDB(data) {
+      const out = {
+        headSupervisor: data.headSupervisor || { name: 'المشرف الرئيسي', password: '123' },
+        groups: objToArray(data.groups).map(g => {
+          let sups = g.supervisors ? objToArray(g.supervisors) : [{
+            id: uid('s'),
+            name: g.supervisorName || 'مشرف',
+            password: (g.password !== undefined && g.password !== '') ? String(g.password) : '123'
+          }];
+          return {
+            id: g.id,
+            name: g.name,
+            supervisors: sups,
+            absenceStartDate: g.absenceStartDate || ''
+          };
+        }),
+        members: objToArray(data.members),
+        partnerships: objToArray(data.partnerships).map(p => ({
+          ...p,
+          memberIds: objToArray(p.memberIds)
+        })),
+        attendance: data.attendance || {}
+      };
+
+      const counts = {};
+      out.partnerships.forEach(p => {
+        if (!p.number) {
+          counts[p.groupId] = (counts[p.groupId] || 0) + 1;
+          p.number = counts[p.groupId];
+        }
+      });
+      return out;
+    }
+
+    function toCloudFormat(localDb) {
+      const groupsMap = {};
+      localDb.groups.forEach(g => {
+        const supsMap = {};
+        (g.supervisors || []).forEach(s => { supsMap[s.id] = s; });
+        groupsMap[g.id] = {
+          id: g.id,
+          name: g.name,
+          supervisors: supsMap,
+          absenceStartDate: g.absenceStartDate || ''
+        };
+      });
+      const membersMap = {};
+      localDb.members.forEach(m => { membersMap[m.id] = m; });
+      const partsMap = {};
+      localDb.partnerships.forEach(p => { partsMap[p.id] = p; });
+
+      return {
+        headSupervisor: localDb.headSupervisor,
+        groups: groupsMap,
+        members: membersMap,
+        partnerships: partsMap,
+        attendance: localDb.attendance || {}
+      };
+    }
+
+    function loadLocalDB() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return normalizeDB(JSON.parse(raw));
+      } catch (e) {}
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+      return normalizeDB(JSON.parse(JSON.stringify(defaultData)));
+    }
+
+    function saveLocalDB() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     }
 
+    function setSyncUI(statusText) {
+      ['login-sync-status', 'head-sync-status', 'app-sync-status'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = statusText;
+      });
+    }
+
+    async function cloudRequest(path, method = 'GET', body = undefined) {
+      if (!CLOUD_BASE) return null;
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body !== undefined) opts.body = JSON.stringify(body);
+      const res = await fetch(`${CLOUD_BASE}/taahadu${path}.json`, opts);
+      if (!res.ok) throw new Error('Network error');
+      return await res.json();
+    }
+
+    async function syncFromCloud(silent = true) {
+      if (!CLOUD_BASE) {
+        setSyncUI('💾 وضع محلي (بدون ربط سحابي)');
+        return;
+      }
+      try {
+        const remote = await cloudRequest('', 'GET');
+        if (remote === null) {
+          // Seed initial DB to Firebase if empty
+          await cloudRequest('', 'PUT', toCloudFormat(db));
+          lastCloudSnapshot = JSON.stringify(db);
+          setSyncUI('🟢 متزامن للجميع');
+          return;
+        }
+        const normalized = normalizeDB(remote);
+        const snap = JSON.stringify(normalized);
+        setSyncUI('🟢 متزامن للجميع');
+
+        if (snap !== lastCloudSnapshot) {
+          lastCloudSnapshot = snap;
+          db = normalized;
+          saveLocalDB();
+
+          // Avoid interrupting while user is typing in an input or editing
+          const activeTag = document.activeElement ? document.activeElement.tagName : '';
+          const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT';
+          if (!isTyping && editingGroupId === null && editingPartnerNumId === null) {
+            refreshCurrentView();
+          }
+          if (!silent) showToast('🔄 تم تحديث البيانات');
+        }
+      } catch (e) {
+        setSyncUI('🟡 تعذر المزامنة (وضع مؤقت)');
+      }
+    }
+
+    function manualSync() {
+      syncFromCloud(false);
+    }
+
+    function refreshCurrentView() {
+      if (session && session.role === 'head') {
+        if (currentGroupId && getCurrentGroup()) renderAll();
+        else if (!document.getElementById('head-screen').classList.contains('hidden')) renderHeadDashboard();
+      } else if (session && session.role === 'supervisor' && currentGroupId && getCurrentGroup()) {
+        renderAll();
+      } else {
+        renderLogin();
+      }
+    }
+
+    function cloudExec(promiseFn) {
+      saveLocalDB();
+      if (!CLOUD_BASE) return;
+      setSyncUI('🔄 جاري الحفظ...');
+      promiseFn().then(() => {
+        lastCloudSnapshot = JSON.stringify(db);
+        setSyncUI('🟢 متزامن للجميع');
+      }).catch(() => {
+        setSyncUI('🟡 تعذر الحفظ السحابي');
+      });
+    }
+
+    function cloudSaveGroup(group) {
+      const supsMap = {};
+      (group.supervisors || []).forEach(s => { supsMap[s.id] = s; });
+      const payload = { ...group, supervisors: supsMap };
+      cloudExec(() => cloudRequest(`/groups/${group.id}`, 'PUT', payload));
+    }
+
+    function cloudDeleteGroup(groupId, deletedMemberIds, deletedPartnerIds) {
+      cloudExec(async () => {
+        await cloudRequest(`/groups/${groupId}`, 'DELETE');
+        if (deletedMemberIds.length) {
+          const patchM = {};
+          deletedMemberIds.forEach(id => { patchM[id] = null; });
+          await cloudRequest('/members', 'PATCH', patchM);
+        }
+        if (deletedPartnerIds.length) {
+          const patchP = {};
+          deletedPartnerIds.forEach(id => { patchP[id] = null; });
+          await cloudRequest('/partnerships', 'PATCH', patchP);
+        }
+      });
+    }
+
+    function cloudSaveMember(member) {
+      cloudExec(() => cloudRequest(`/members/${member.id}`, 'PUT', member));
+    }
+
+    function cloudSaveBulkMembers(newMembers) {
+      const patch = {};
+      newMembers.forEach(m => { patch[m.id] = m; });
+      cloudExec(() => cloudRequest('/members', 'PATCH', patch));
+    }
+
+    function cloudDeleteMember(memberId, updatedPartners, deletedPartnerIds) {
+      cloudExec(async () => {
+        await cloudRequest(`/members/${memberId}`, 'DELETE');
+        for (const p of updatedPartners) {
+          await cloudRequest(`/partnerships/${p.id}`, 'PUT', p);
+        }
+        for (const pid of deletedPartnerIds) {
+          await cloudRequest(`/partnerships/${pid}`, 'DELETE');
+        }
+      });
+    }
+
+    function cloudSavePartnership(p) {
+      cloudExec(() => cloudRequest(`/partnerships/${p.id}`, 'PUT', p));
+    }
+
+    function cloudDeletePartnership(pId) {
+      cloudExec(() => cloudRequest(`/partnerships/${pId}`, 'DELETE'));
+    }
+
+    function cloudSetAttendance(date, type, memberId, status) {
+      cloudExec(() => {
+        if (status) return cloudRequest(`/attendance/${date}/${type}/${memberId}`, 'PUT', status);
+        return cloudRequest(`/attendance/${date}/${type}/${memberId}`, 'DELETE');
+      });
+    }
+
+    function cloudPatchAttendance(date, type, patchMap) {
+      cloudExec(() => cloudRequest(`/attendance/${date}/${type}`, 'PATCH', patchMap));
+    }
+
+    function cloudSaveHead() {
+      cloudExec(() => cloudRequest('/headSupervisor', 'PUT', db.headSupervisor));
+    }
+
+    // ================= SESSION & DATES =================
     function loadSession() {
       try {
         const raw = localStorage.getItem(SESSION_KEY);
@@ -1039,12 +1295,24 @@
       }
     }
 
+    function isSupervisorNameTaken(name, excludeSupId = null) {
+      const lower = name.trim().toLowerCase();
+      if (lower === db.headSupervisor.name.trim().toLowerCase()) return true;
+      for (const g of db.groups) {
+        for (const s of (g.supervisors || [])) {
+          if (s.id !== excludeSupId && s.name.trim().toLowerCase() === lower) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
     // ================= AUTH / LOGIN =================
     function renderLogin() {
       const wrap = document.getElementById('quick-supervisors');
       wrap.innerHTML = '';
 
-      // Head Supervisor quick chip
       const headBtn = document.createElement('button');
       headBtn.className = 'chip chip-head';
       headBtn.textContent = `👑 ${db.headSupervisor.name}`;
@@ -1052,11 +1320,13 @@
       wrap.appendChild(headBtn);
 
       db.groups.forEach(g => {
-        const btn = document.createElement('button');
-        btn.className = 'chip';
-        btn.textContent = `👤 ${g.supervisorName}`;
-        btn.onclick = () => selectQuickName(g.supervisorName);
-        wrap.appendChild(btn);
+        (g.supervisors || []).forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'chip';
+          btn.textContent = `👤 ${s.name}`;
+          btn.onclick = () => selectQuickName(s.name);
+          wrap.appendChild(btn);
+        });
       });
     }
 
@@ -1074,10 +1344,9 @@
       if (!name) return showToast('من فضلك أدخل اسم المشرف أولاً');
       if (!pass) return showToast('من فضلك أدخل كلمة المرور');
 
-      // Check Head Supervisor first
       if (name.toLowerCase() === db.headSupervisor.name.trim().toLowerCase()) {
         if (pass === String(db.headSupervisor.password)) {
-          saveSession({ role: 'head', groupId: null });
+          saveSession({ role: 'head', groupId: null, supervisorName: db.headSupervisor.name });
           openHeadDashboard();
           return;
         } else {
@@ -1085,12 +1354,21 @@
         }
       }
 
-      // Check regular supervisors
-      const found = db.groups.find(g => g.supervisorName.trim().toLowerCase() === name.toLowerCase());
-      if (found) {
-        if (pass === String(found.password)) {
-          saveSession({ role: 'supervisor', groupId: found.id });
-          openGroupScreen(found.id);
+      let matchedGroup = null;
+      let matchedSup = null;
+      for (const g of db.groups) {
+        const sup = (g.supervisors || []).find(s => s.name.trim().toLowerCase() === name.toLowerCase());
+        if (sup) {
+          matchedGroup = g;
+          matchedSup = sup;
+          break;
+        }
+      }
+
+      if (matchedGroup && matchedSup) {
+        if (pass === String(matchedSup.password)) {
+          saveSession({ role: 'supervisor', groupId: matchedGroup.id, supervisorName: matchedSup.name });
+          openGroupScreen(matchedGroup.id);
         } else {
           return showToast('❌ كلمة المرور غير صحيحة');
         }
@@ -1110,15 +1388,16 @@
       const newGroup = {
         id: uid('g'),
         name: gName,
-        supervisorName: pendingSupervisorName,
-        password: pendingSupervisorPassword,
+        supervisors: [
+          { id: uid('s'), name: pendingSupervisorName, password: pendingSupervisorPassword }
+        ],
         absenceStartDate: ''
       };
       db.groups.push(newGroup);
-      saveDB();
+      cloudSaveGroup(newGroup);
       document.getElementById('new-group-input').value = '';
       cancelNewSupervisor();
-      saveSession({ role: 'supervisor', groupId: newGroup.id });
+      saveSession({ role: 'supervisor', groupId: newGroup.id, supervisorName: pendingSupervisorName });
       openGroupScreen(newGroup.id);
       showToast('تم إنشاء الجروب بنجاح');
     }
@@ -1131,7 +1410,7 @@
     function openGroupScreen(groupId) {
       currentGroupId = groupId;
       if (session) {
-        saveSession({ role: session.role, groupId: groupId });
+        saveSession({ ...session, groupId: groupId });
       }
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('head-screen').classList.add('hidden');
@@ -1162,7 +1441,7 @@
     // ================= HEAD SUPERVISOR DASHBOARD =================
     function openHeadDashboard() {
       currentGroupId = null;
-      if (session) saveSession({ role: 'head', groupId: null });
+      if (session) saveSession({ role: 'head', groupId: null, supervisorName: db.headSupervisor.name });
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('app-screen').classList.add('hidden');
       document.getElementById('head-screen').classList.remove('hidden');
@@ -1193,40 +1472,64 @@
         const total = members.length;
         const listenPresent = members.filter(m => dayRecord.listening && dayRecord.listening[m.id] === 'present').length;
         const recitPresent = members.filter(m => dayRecord.recitation && dayRecord.recitation[m.id] === 'present').length;
+        const sups = g.supervisors || [];
 
         const isEditing = editingGroupId === g.id;
         if (isEditing) {
           return `
             <div class="group-manage-card" style="background:#ecfdf5; border-color:#6ee7b7;">
               <label style="font-size:12px; font-weight:700;">اسم الجروب:</label>
-              <input type="text" id="edit-g-name-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 8px;" value="${escapeHtml(g.name)}" />
-              <label style="font-size:12px; font-weight:700;">اسم المشرف / المشرفة:</label>
-              <input type="text" id="edit-s-name-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 8px;" value="${escapeHtml(g.supervisorName)}" />
-              <label style="font-size:12px; font-weight:700;">كلمة المرور:</label>
-              <input type="text" id="edit-s-pass-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 10px;" value="${escapeHtml(g.password)}" />
+              <input type="text" id="edit-g-name-${g.id}" class="input" style="padding:8px 10px; margin:4px 0 10px;" value="${escapeHtml(g.name)}" />
+
+              <label style="font-size:12.5px; font-weight:800; color:var(--primary); display:block; margin-bottom:6px;">
+                المشرفون المشاركون في هذا الجروب (${sups.length}):
+              </label>
+              <div id="edit-sups-container-${g.id}">
+                ${sups.map(s => `
+                  <div class="sup-edit-row">
+                    <input type="text" class="input" style="padding:7px 10px; font-size:13.5px; flex:1;" data-sup-name="${s.id}" value="${escapeHtml(s.name)}" placeholder="اسم المشرف" />
+                    <input type="text" class="input" style="padding:7px 10px; font-size:13.5px; width:110px;" data-sup-pass="${s.id}" value="${escapeHtml(s.password)}" placeholder="الباسورد" />
+                    ${sups.length > 1 ? `<button class="btn btn-danger btn-xs" title="حذف المشرف" onclick="removeSupervisorFromGroup('${g.id}', '${s.id}')">🗑️</button>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+
+              <div style="background:#fff; padding:10px; border-radius:12px; border:1px dashed var(--border); margin:10px 0;">
+                <p style="font-size:12px; font-weight:700; color:var(--primary); margin-bottom:6px;">➕ إضافة مشرف مشارك جديد لنفس الجروب:</p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <input type="text" id="add-cosup-name-${g.id}" class="input" style="padding:7px 10px; font-size:13.5px; flex:1; min-width:120px;" placeholder="اسم المشرف الجديد..." />
+                  <input type="text" id="add-cosup-pass-${g.id}" class="input" style="padding:7px 10px; font-size:13.5px; width:110px;" placeholder="الباسورد" />
+                  <button class="btn btn-soft btn-sm" onclick="addCoSupervisor('${g.id}')">إضافة</button>
+                </div>
+              </div>
+
               <div style="display:flex; gap:6px;">
                 <button class="btn btn-primary btn-sm" style="flex:1;" onclick="saveGroupEdit('${g.id}')">💾 حفظ التعديلات</button>
-                <button class="btn btn-outline btn-sm" onclick="editingGroupId=null; renderHeadDashboard();">إلغاء</button>
+                <button class="btn btn-outline btn-sm" onclick="editingGroupId=null; renderHeadDashboard();">إغلاق</button>
               </div>
             </div>
           `;
         }
 
+        const supsBadges = sups.map(s =>
+          `<span class="sup-badge">👤 ${escapeHtml(s.name)} <span style="color:var(--muted);">🔑 ${escapeHtml(s.password)}</span></span>`
+        ).join(' ');
+
         return `
           <div class="group-manage-card">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
-              <div>
+              <div style="flex:1; min-width:200px;">
                 <div style="font-weight:800; font-size:16px; color:var(--primary);">${escapeHtml(g.name)}</div>
-                <div style="font-size:13px; color:var(--text); margin-top:2px;">
-                  👤 المشرف: <strong>${escapeHtml(g.supervisorName)}</strong> • 🔑 الباسورد: <code>${escapeHtml(g.password)}</code>
+                <div style="display:flex; flex-wrap:wrap; gap:5px; margin:6px 0;">
+                  ${supsBadges || '<span style="color:var(--danger); font-size:12px;">لا يوجد مشرفون</span>'}
                 </div>
-                <div style="font-size:12.5px; color:var(--muted); margin-top:4px;">
+                <div style="font-size:12.5px; color:var(--muted);">
                   👥 الأعضاء: <strong>${total}</strong> • 🎧 الاستماع اليوم: <strong>${listenPresent}/${total}</strong> • 📖 التسميع اليوم: <strong>${recitPresent}/${total}</strong>
                 </div>
               </div>
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
                 <button class="btn btn-primary btn-sm" onclick="openGroupScreen('${g.id}')">👁️ فتح الجروب</button>
-                <button class="btn btn-soft btn-sm" onclick="editingGroupId='${g.id}'; renderHeadDashboard();">✏️ تعديل</button>
+                <button class="btn btn-soft btn-sm" onclick="editingGroupId='${g.id}'; renderHeadDashboard();">✏️ تعديل والمشرفين</button>
                 <button class="btn btn-danger btn-sm" onclick="deleteGroup('${g.id}')">🗑️ حذف</button>
               </div>
             </div>
@@ -1240,15 +1543,16 @@
       const sName = document.getElementById('head-add-sname').value.trim();
       const sPass = document.getElementById('head-add-spass').value.trim();
       if (!gName || !sName || !sPass) return showToast('أكمل اسم الجروب واسم المشرف وكلمة المرور');
+      if (isSupervisorNameTaken(sName)) return showToast('اسم المشرف مستخدم بالفعل، اختر اسماً مميزاً');
 
-      db.groups.push({
+      const newGroup = {
         id: uid('g'),
         name: gName,
-        supervisorName: sName,
-        password: sPass,
+        supervisors: [{ id: uid('s'), name: sName, password: sPass }],
         absenceStartDate: ''
-      });
-      saveDB();
+      };
+      db.groups.push(newGroup);
+      cloudSaveGroup(newGroup);
       document.getElementById('head-add-gname').value = '';
       document.getElementById('head-add-sname').value = '';
       document.getElementById('head-add-spass').value = '';
@@ -1256,33 +1560,74 @@
       showToast('تمت إضافة الجروب والمشرف بنجاح');
     }
 
-    function saveGroupEdit(groupId) {
-      const gName = document.getElementById(`edit-g-name-${groupId}`).value.trim();
-      const sName = document.getElementById(`edit-s-name-${groupId}`).value.trim();
-      const sPass = document.getElementById(`edit-s-pass-${groupId}`).value.trim();
-      if (!gName || !sName || !sPass) return showToast('تأكد من كتابة جميع الحقول');
+    function addCoSupervisor(groupId) {
+      const nameInput = document.getElementById(`add-cosup-name-${groupId}`);
+      const passInput = document.getElementById(`add-cosup-pass-${groupId}`);
+      const sName = nameInput.value.trim();
+      const sPass = passInput.value.trim();
+      if (!sName || !sPass) return showToast('اكتب اسم المشرف المشارك وكلمة المرور');
+      if (isSupervisorNameTaken(sName)) return showToast('هذا الاسم مسجل لمشرف آخر، استخدم اسماً مميزاً');
 
       const group = db.groups.find(g => g.id === groupId);
-      if (group) {
-        group.name = gName;
-        group.supervisorName = sName;
-        group.password = sPass;
-        saveDB();
+      if (!group) return;
+      group.supervisors.push({ id: uid('s'), name: sName, password: sPass });
+      cloudSaveGroup(group);
+      renderHeadDashboard();
+      showToast(`تمت إضافة "${sName}" كمشرف مشارك للجروب`);
+    }
+
+    function removeSupervisorFromGroup(groupId, supId) {
+      const group = db.groups.find(g => g.id === groupId);
+      if (!group || group.supervisors.length <= 1) return showToast('يجب أن يبقى مشرف واحد على الأقل للجروب');
+      const sup = group.supervisors.find(s => s.id === supId);
+      if (!sup || !confirm(`هل تريد إزالة المشرف "${sup.name}" من هذا الجروب؟`)) return;
+
+      group.supervisors = group.supervisors.filter(s => s.id !== supId);
+      cloudSaveGroup(group);
+      renderHeadDashboard();
+      showToast('تمت إزالة المشرف');
+    }
+
+    function saveGroupEdit(groupId) {
+      const gName = document.getElementById(`edit-g-name-${groupId}`).value.trim();
+      if (!gName) return showToast('اكتب اسم الجروب');
+
+      const group = db.groups.find(g => g.id === groupId);
+      if (!group) return;
+
+      const updatedSups = [];
+      for (const s of group.supervisors) {
+        const nEl = document.querySelector(`[data-sup-name="${s.id}"]`);
+        const pEl = document.querySelector(`[data-sup-pass="${s.id}"]`);
+        const newName = nEl ? nEl.value.trim() : s.name;
+        const newPass = pEl ? pEl.value.trim() : s.password;
+        if (!newName || !newPass) return showToast('تأكد من كتابة اسم وباسورد كل مشرف');
+        if (isSupervisorNameTaken(newName, s.id)) {
+          return showToast(`الاسم "${newName}" مستخدم بالفعل لمشرف آخر`);
+        }
+        updatedSups.push({ id: s.id, name: newName, password: newPass });
       }
+
+      group.name = gName;
+      group.supervisors = updatedSups;
+      cloudSaveGroup(group);
       editingGroupId = null;
       renderHeadDashboard();
-      showToast('تم تحديث بيانات الجروب والمشرف');
+      showToast('تم حفظ بيانات الجروب والمشرفين');
     }
 
     function deleteGroup(groupId) {
       const group = db.groups.find(g => g.id === groupId);
       if (!group) return;
-      if (!confirm(`هل أنت متأكد من حذف "${group.name}" (للمشرف ${group.supervisorName}) وجميع أعضائه نهائياً؟`)) return;
+      if (!confirm(`هل أنت متأكد من حذف "${group.name}" وجميع أعضائه نهائياً؟`)) return;
+
+      const delMembers = db.members.filter(m => m.groupId === groupId).map(m => m.id);
+      const delPartners = db.partnerships.filter(p => p.groupId === groupId).map(p => p.id);
 
       db.groups = db.groups.filter(g => g.id !== groupId);
       db.members = db.members.filter(m => m.groupId !== groupId);
       db.partnerships = db.partnerships.filter(p => p.groupId !== groupId);
-      saveDB();
+      cloudDeleteGroup(groupId, delMembers, delPartners);
       renderHeadDashboard();
       showToast('تم حذف الجروب بنجاح');
     }
@@ -1293,12 +1638,12 @@
       if (!name || !pass) return showToast('اكتب الاسم وكلمة المرور');
       db.headSupervisor.name = name;
       db.headSupervisor.password = pass;
-      saveDB();
+      cloudSaveHead();
       renderHeadDashboard();
       showToast('تم تحديث بيانات المشرف الرئيسي');
     }
 
-    // ================= WEEKLY STARS (مثابرات الإسبوع) =================
+    // ================= WEEKLY STARS (مثابرات الإسبوع: تسميع واستماع معاً) =================
     function openWeeklyStarsModal() {
       const d = new Date(currentDate + 'T00:00:00');
       const daysSinceSat = (d.getDay() + 1) % 7;
@@ -1320,7 +1665,6 @@
     function renderWeeklyStars() {
       const start = document.getElementById('week-start-input').value;
       const end = document.getElementById('week-end-input').value;
-      const mode = document.getElementById('week-mode-select').value;
       const members = getGroupMembers();
 
       const summaryEl = document.getElementById('weekly-stars-summary');
@@ -1348,37 +1692,24 @@
         return memberIds.some(id => Boolean(rec[id]));
       });
 
-      const checkListening = mode === 'both' || mode === 'listening';
-      const checkRecitation = mode === 'both' || mode === 'recitation';
-
-      const totalRelevantDays = new Set([
-        ...(checkListening ? activeListeningDays : []),
-        ...(checkRecitation ? activeRecitationDays : [])
-      ]).size;
-
-      if (totalRelevantDays === 0) {
-        summaryEl.textContent = 'لم يتم تسجيل حضور لهذا الجروب خلال هذا الأسبوع بعد.';
-        currentWeeklyMessage = '🤍 مثابرات الإسبوع 🤍\n\nلا توجد أيام مسجلة في هذا الأسبوع بعد.';
+      if (activeListeningDays.length === 0 || activeRecitationDays.length === 0) {
+        summaryEl.textContent = `أيام الاستماع المسجلة: ${activeListeningDays.length} • أيام التسميع المسجلة: ${activeRecitationDays.length} (يجب تسجيل الاستماع والتسميع خلال الأسبوع)`;
+        currentWeeklyMessage = '🤍 مثابرات الإسبوع 🤍\n\nلم يكتمل تسجيل التسميع والاستماع لهذا الأسبوع بعد.';
         outputEl.textContent = currentWeeklyMessage;
         return;
       }
 
+      // Strictly committed in BOTH Listening AND Recitation on all recorded days of the week
       const stars = members.filter(m => {
-        if (checkListening && activeListeningDays.length > 0) {
-          const okL = activeListeningDays.every(d => db.attendance[d]?.listening?.[m.id] === 'present');
-          if (!okL) return false;
-        }
-        if (checkRecitation && activeRecitationDays.length > 0) {
-          const okR = activeRecitationDays.every(d => db.attendance[d]?.recitation?.[m.id] === 'present');
-          if (!okR) return false;
-        }
-        return true;
+        const okL = activeListeningDays.every(d => db.attendance[d]?.listening?.[m.id] === 'present');
+        const okR = activeRecitationDays.every(d => db.attendance[d]?.recitation?.[m.id] === 'present');
+        return okL && okR;
       });
 
-      summaryEl.textContent = `الأيام المسجلة هذا الأسبوع: ${totalRelevantDays} يوم • عدد المثابرات: ${stars.length} من ${members.length}`;
+      summaryEl.textContent = `أيام الاستماع: ${activeListeningDays.length} • أيام التسميع: ${activeRecitationDays.length} • المثابرات: ${stars.length} من ${members.length}`;
 
       if (stars.length === 0) {
-        currentWeeklyMessage = '🤍 مثابرات الإسبوع 🤍\n\nلا يوجد أعضاء ملتزمون بجميع أيام الأسبوع المحددة.';
+        currentWeeklyMessage = '🤍 مثابرات الإسبوع 🤍\n\nلا يوجد أعضاء ملتزمون في الاستماع والتسميع معاً طوال هذا الأسبوع.';
       } else {
         const lines = stars.map(m => `🌻 الجميلة / ${m.name} 👑`);
         currentWeeklyMessage = `🤍 مثابرات الإسبوع 🤍\n\n${lines.join('\n\n')}`;
@@ -1433,16 +1764,18 @@
 
     function markRemainingAbsent(type) {
       const day = ensureDayRecord();
+      const patch = {};
       let changed = 0;
       getGroupMembers().forEach(m => {
         if (!day[type][m.id]) {
           day[type][m.id] = 'absent';
+          patch[m.id] = 'absent';
           changed++;
         }
       });
-      saveDB();
-      renderAll();
       if (changed > 0) {
+        cloudPatchAttendance(currentDate, type, patch);
+        renderAll();
         showToast(`تم تسجيل ${changed} عضو غير مسجل كـ "غائب"`);
       } else {
         showToast('جميع الأعضاء مسجلون بالفعل لهذا اليوم');
@@ -1451,10 +1784,12 @@
 
     function clearDayType(type) {
       const day = ensureDayRecord();
+      const patch = {};
       getGroupMembers().forEach(m => {
         delete day[type][m.id];
+        patch[m.id] = null;
       });
-      saveDB();
+      cloudPatchAttendance(currentDate, type, patch);
       renderAll();
       showToast('تم مسح تسجيل اليوم');
     }
@@ -1500,7 +1835,16 @@
       if (!group) return logout();
 
       document.getElementById('header-group-name').textContent = group.name;
-      document.getElementById('header-supervisor-name').textContent = group.supervisorName;
+
+      const supNames = (group.supervisors || []).map(s => s.name);
+      let supLabel = supNames.join(' ، ');
+      if (session && session.role === 'supervisor' && session.supervisorName) {
+        const others = supNames.filter(n => n !== session.supervisorName);
+        supLabel = others.length > 0
+          ? `${session.supervisorName} (مشترك مع: ${others.join('، ')})`
+          : session.supervisorName;
+      }
+      document.getElementById('header-supervisor-name').textContent = supLabel;
       document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
 
       renderStats();
@@ -1568,12 +1912,11 @@
 
     function setListening(memberId, status) {
       const day = ensureDayRecord();
-      if (day.listening[memberId] === status) {
-        delete day.listening[memberId];
-      } else {
-        day.listening[memberId] = status;
-      }
-      saveDB();
+      const nextStatus = day.listening[memberId] === status ? null : status;
+      if (nextStatus) day.listening[memberId] = nextStatus;
+      else delete day.listening[memberId];
+
+      cloudSetAttendance(currentDate, 'listening', memberId, nextStatus);
       renderStats();
       renderListening();
       renderManage();
@@ -1581,11 +1924,17 @@
 
     function markAllListening(status) {
       const day = ensureDayRecord();
+      const patch = {};
       getGroupMembers().forEach(m => {
-        if (status === null) delete day.listening[m.id];
-        else day.listening[m.id] = status;
+        if (status === null) {
+          delete day.listening[m.id];
+          patch[m.id] = null;
+        } else {
+          day.listening[m.id] = status;
+          patch[m.id] = status;
+        }
       });
-      saveDB();
+      cloudPatchAttendance(currentDate, 'listening', patch);
       renderStats();
       renderListening();
       renderManage();
@@ -1650,13 +1999,14 @@
       }
       const existing = getGroupPartnerships();
       const maxNum = existing.reduce((max, p) => Math.max(max, Number(p.number) || 0), 0);
-      db.partnerships.push({
+      const newP = {
         id: uid('p'),
         groupId: currentGroupId,
         number: maxNum + 1,
         memberIds: [...selectedForPartner]
-      });
-      saveDB();
+      };
+      db.partnerships.push(newP);
+      cloudSavePartnership(newP);
       togglePartnerBuilder(false);
       renderRecitation();
       showToast(`تم ربط رفقاء رقم ${maxNum + 1} بنجاح`);
@@ -1669,7 +2019,7 @@
       const p = db.partnerships.find(x => x.id === partnerId);
       if (p) {
         p.number = val;
-        saveDB();
+        cloudSavePartnership(p);
       }
       editingPartnerNumId = null;
       renderRecitation();
@@ -1679,7 +2029,7 @@
     function dissolvePartnership(partnerId) {
       if (!confirm('هل تريد فك ارتباط هؤلاء الرفقاء لإعادة توزيعهم؟')) return;
       db.partnerships = db.partnerships.filter(p => p.id !== partnerId);
-      saveDB();
+      cloudDeletePartnership(partnerId);
       renderRecitation();
       showToast('تم فك الارتباط');
     }
@@ -1777,11 +2127,17 @@
       const p = db.partnerships.find(x => x.id === partnerId);
       if (!p) return;
       const day = ensureDayRecord();
+      const patch = {};
       p.memberIds.forEach(id => {
-        if (markPresent) day.recitation[id] = 'present';
-        else delete day.recitation[id];
+        if (markPresent) {
+          day.recitation[id] = 'present';
+          patch[id] = 'present';
+        } else {
+          delete day.recitation[id];
+          patch[id] = null;
+        }
       });
-      saveDB();
+      cloudPatchAttendance(currentDate, 'recitation', patch);
       renderStats();
       renderRecitation();
       renderManage();
@@ -1789,12 +2145,11 @@
 
     function setRecitationMember(memberId, status) {
       const day = ensureDayRecord();
-      if (day.recitation[memberId] === status) {
-        delete day.recitation[memberId];
-      } else {
-        day.recitation[memberId] = status;
-      }
-      saveDB();
+      const nextStatus = day.recitation[memberId] === status ? null : status;
+      if (nextStatus) day.recitation[memberId] = nextStatus;
+      else delete day.recitation[memberId];
+
+      cloudSetAttendance(currentDate, 'recitation', memberId, nextStatus);
       renderStats();
       renderRecitation();
       renderManage();
@@ -1806,8 +2161,9 @@
       const name = input.value.trim();
       if (!name) return showToast('اكتب اسم العضو أولاً');
 
-      db.members.push({ id: uid('m'), groupId: currentGroupId, name });
-      saveDB();
+      const m = { id: uid('m'), groupId: currentGroupId, name };
+      db.members.push(m);
+      cloudSaveMember(m);
       input.value = '';
       renderAll();
       showToast('تمت إضافة العضو');
@@ -1818,10 +2174,9 @@
       const lines = area.value.split('\n').map(s => s.trim()).filter(Boolean);
       if (lines.length === 0) return showToast('اكتب الأسماء أولاً');
 
-      lines.forEach(name => {
-        db.members.push({ id: uid('m'), groupId: currentGroupId, name });
-      });
-      saveDB();
+      const newOnes = lines.map(name => ({ id: uid('m'), groupId: currentGroupId, name }));
+      db.members.push(...newOnes);
+      cloudSaveBulkMembers(newOnes);
       area.value = '';
       renderAll();
       showToast(`تمت إضافة ${lines.length} عضو بنجاح`);
@@ -1832,11 +2187,18 @@
       if (!m || !confirm(`هل تريد حذف "${m.name}" من الجروب نهائياً؟`)) return;
 
       db.members = db.members.filter(x => x.id !== memberId);
+      const updatedPartners = [];
+      const deletedPartnerIds = [];
+
       db.partnerships.forEach(p => {
-        p.memberIds = p.memberIds.filter(id => id !== memberId);
+        if (p.memberIds.includes(memberId)) {
+          p.memberIds = p.memberIds.filter(id => id !== memberId);
+          if (p.memberIds.length >= 2) updatedPartners.push(p);
+          else deletedPartnerIds.push(p.id);
+        }
       });
       db.partnerships = db.partnerships.filter(p => p.memberIds.length >= 2);
-      saveDB();
+      cloudDeleteMember(memberId, updatedPartners, deletedPartnerIds);
       renderAll();
       showToast('تم حذف العضو');
     }
@@ -1845,7 +2207,7 @@
       if (!confirm('هل تريد بدء حساب عداد الغياب (🔴) من تاريخ هذا اليوم (' + currentDate + ') وتجاهل الغياب السابق؟')) return;
       const group = getCurrentGroup();
       group.absenceStartDate = currentDate;
-      saveDB();
+      cloudSaveGroup(group);
       renderAll();
       showToast('تم تصفير عداد الغياب ليبدأ من ' + currentDate);
     }
@@ -2027,18 +2389,31 @@
       }[s]));
     }
 
-    // ================= INIT =================
-    if (session && session.role === 'head') {
-      if (session.groupId && db.groups.some(g => g.id === session.groupId)) {
+    // ================= INIT & AUTO-SYNC =================
+    (async function initApp() {
+      if (session && session.role === 'head') {
+        if (session.groupId && db.groups.some(g => g.id === session.groupId)) {
+          openGroupScreen(session.groupId);
+        } else {
+          openHeadDashboard();
+        }
+      } else if (session && session.role === 'supervisor' && session.groupId && db.groups.some(g => g.id === session.groupId)) {
         openGroupScreen(session.groupId);
       } else {
-        openHeadDashboard();
+        renderLogin();
       }
-    } else if (session && session.role === 'supervisor' && session.groupId && db.groups.some(g => g.id === session.groupId)) {
-      openGroupScreen(session.groupId);
-    } else {
-      renderLogin();
-    }
+
+      await syncFromCloud(true);
+
+      if (CLOUD_BASE) {
+        // Auto-sync every 5 seconds & when switching back to the tab
+        setInterval(() => syncFromCloud(true), 5000);
+        window.addEventListener('focus', () => syncFromCloud(true));
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) syncFromCloud(true);
+        });
+      }
+    })();
   </script>
 </body>
 </html>
