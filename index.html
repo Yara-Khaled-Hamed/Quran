@@ -337,6 +337,20 @@
         </div>
         <div id="head-groups-list"></div>
       </div>
+
+      <div class="card" style="background:#fffbeb; border-color:#fde68a;">
+        <h3 style="font-size:15.5px; color:#92400e; margin-bottom:6px;">⚡ تفعيل القارئ الذكي (Gemini AI) لجميع الجروبات</h3>
+        <p style="font-size:12.5px; color:#78350f; margin-bottom:10px;">
+          ضعي مفتاح Gemini المجاني (من <strong>aistudio.google.com</strong>) هنا مرة واحدة، وسيعمل تلقائياً عند جميع المشرفات لقراءة صور الواتساب بدقة 99% دون الحاجة لإضافته على كل موبايل.
+        </p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <input type="password" id="head-ai-key-input" class="input" style="padding:8px 11px; font-size:13.5px; flex:1; min-width:190px;" placeholder="الصقي المفتاح هنا (AIza...)..." />
+          <button class="btn btn-gold btn-sm" onclick="saveHeadAiKey()">💾 حفظ وتفعيل للجميع</button>
+          <button class="btn btn-outline btn-sm" onclick="clearHeadAiKey()">إيقاف</button>
+        </div>
+        <div id="head-ai-status" style="font-size:12px; font-weight:700; margin-top:6px;"></div>
+      </div>
+
       <div class="card">
         <details>
           <summary style="cursor:pointer; font-weight:700; font-size:14.5px; color:var(--primary);">🔐 تغيير اسم أو كلمة مرور المشرف الرئيسي</summary>
@@ -417,7 +431,6 @@
         <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء والتقرير</button>
       </div>
 
-      <!-- تبويب الاستماع: يدعم الصور المتعددة + فلتر الغائبين -->
       <div id="tab-listening" class="tab-panel">
         <div class="card" style="padding:13px;">
           <div style="display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px;">
@@ -439,7 +452,6 @@
         <div id="listening-list"></div>
       </div>
 
-      <!-- تبويب التسميع: تسجيل بالأرقام أو بالأسماء + فلتر الغائبين -->
       <div id="tab-recitation" class="tab-panel hidden">
         <div class="card" style="padding:13px;">
           <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">
@@ -550,14 +562,12 @@
         اختاري صورة أو عدة صور، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
       </p>
 
-      <!-- خيار القارئ الذكي فائق الدقة (Gemini AI) -->
       <details class="ocr-ai-box">
         <summary style="cursor:pointer; font-weight:800; color:#92400e;">
-          ⚡ القارئ الذكي فائق الدقة (Gemini AI — يقرأ 100% بدون تخطي أسماء): <span id="gemini-status-badge">غير مفعّل</span>
+          ⚡ القارئ الذكي فائق الدقة (Gemini AI): <span id="gemini-status-badge">غير مفعّل</span>
         </summary>
         <p style="margin-top:6px; color:#78350f; line-height:1.6;">
-          للحصول على دقة 99% مع صور الواتساب المظلمة والمزدحمة: احصلي على مفتاح مجاني من
-          <strong>aistudio.google.com</strong> والصقيه هنا مرة واحدة فقط:
+          يمكنكِ لصق مفتاح Gemini المجاني (من <strong>aistudio.google.com</strong>) هنا لهذا الجهاز، أو إضافته من <strong>لوحة المشرف الرئيسي</strong> ليشتغل تلقائياً عند الجميع:
         </p>
         <div style="display:flex; gap:6px; margin-top:6px;">
           <input type="password" id="gemini-key-input" class="input" style="padding:7px 10px; font-size:13px;" placeholder="AIza..." />
@@ -681,6 +691,7 @@
 
     const defaultData = {
       headSupervisor: { name: 'المشرف الرئيسي', password: '123' },
+      aiKey: '',
       groups: [
         { id: 'g1', name: 'جروب الفجر - تعاهدوا القرءان', supervisors: [{ id: 's1', name: 'أحمد', password: '123' }, { id: 's2', name: 'محمود', password: '123' }], absenceStartDate: '' },
         { id: 'g2', name: 'جروب الهمة - تعاهدوا القرءان', supervisors: [{ id: 's3', name: 'سارة', password: '123' }], absenceStartDate: '' }
@@ -724,7 +735,7 @@
     let deferredPrompt = null;
     let lastCloudSnapshot = '';
 
-    let ocrFiles = []; // { id, file, url, status, lines, rawLines }
+    let ocrFiles = [];
     let ocrIsProcessing = false;
     let ocrSelectedMemberIds = new Set();
     let ocrMatchedReasons = {};
@@ -833,6 +844,7 @@
     function normalizeDB(data) {
       const out = {
         headSupervisor: data.headSupervisor || { name: 'المشرف الرئيسي', password: '123' },
+        aiKey: data.aiKey ? String(data.aiKey).trim() : '',
         groups: objToArray(data.groups).map(g => ({
           id: g.id, name: g.name,
           supervisors: g.supervisors ? objToArray(g.supervisors) : [{ id: uid('s'), name: g.supervisorName || 'مشرف', password: (g.password !== undefined && g.password !== '') ? String(g.password) : '123' }],
@@ -855,7 +867,7 @@
       });
       localDb.members.forEach(m => { membersMap[m.id] = m; });
       localDb.partnerships.forEach(p => { partsMap[p.id] = p; });
-      return { headSupervisor: localDb.headSupervisor, groups: groupsMap, members: membersMap, partnerships: partsMap, attendance: localDb.attendance || {} };
+      return { headSupervisor: localDb.headSupervisor, aiKey: localDb.aiKey || '', groups: groupsMap, members: membersMap, partnerships: partsMap, attendance: localDb.attendance || {} };
     }
 
     function loadLocalDB() {
@@ -944,6 +956,7 @@
     }
     function cloudPatchAttendance(date, type, patch) { cloudExec(() => cloudRequest(`/attendance/${date}/${type}`, 'PATCH', patch)); }
     function cloudSaveHead() { cloudExec(() => cloudRequest('/headSupervisor', 'PUT', db.headSupervisor)); }
+    function cloudSaveAiKey() { cloudExec(() => cloudRequest('/aiKey', 'PUT', db.aiKey || '')); }
 
     function loadSession() { try { const r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
     function saveSession(s) { session = s; if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); }
@@ -1179,6 +1192,15 @@
       document.getElementById('head-today-date').textContent = formatArabicDate(currentDate);
       document.getElementById('head-edit-name').value = db.headSupervisor.name;
       document.getElementById('head-edit-pass').value = db.headSupervisor.password;
+
+      const aiInp = document.getElementById('head-ai-key-input');
+      const aiStatus = document.getElementById('head-ai-status');
+      if (aiInp) aiInp.value = db.aiKey || '';
+      if (aiStatus) {
+        aiStatus.textContent = db.aiKey ? 'الحالة: مفعّل للجميع ✅' : 'الحالة: غير مفعّل بعد (يعمل بالمحرك المدمج)';
+        aiStatus.style.color = db.aiKey ? '#059669' : '#92400e';
+      }
+
       const list = document.getElementById('head-groups-list');
       if (db.groups.length === 0) { list.innerHTML = `<div class="empty-state">لا توجد جروبات مسجلة بعد.</div>`; return; }
       const dayRecord = db.attendance[currentDate] || { listening: {}, recitation: {} };
@@ -1234,6 +1256,22 @@
             </div>
           </div>`;
       }).join('');
+    }
+
+    function saveHeadAiKey() {
+      const val = (document.getElementById('head-ai-key-input').value || '').trim();
+      if (!val) return showToast('الصقي مفتاح Gemini أولاً');
+      db.aiKey = val;
+      cloudSaveAiKey();
+      renderHeadDashboard();
+      showToast('✅ تم تفعيل القارئ الذكي لجميع الجروبات والمشرفات!');
+    }
+
+    function clearHeadAiKey() {
+      db.aiKey = '';
+      cloudSaveAiKey();
+      renderHeadDashboard();
+      showToast('تم إيقاف مفتاح Gemini العام');
     }
 
     function headCreateGroup() {
@@ -1751,18 +1789,28 @@
       }
     }
 
-    // ==================== قراءة أسماء الاستماع من الصور (Gemini AI الاختياري + Tesseract 4.0.0_best المحسّن) ====================
-    function getGeminiKey() { return (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim(); }
+    // ==================== قراءة أسماء الاستماع من الصور (Gemini AI العام/المحلي + Tesseract 4.0.0_best) ====================
+    function getGeminiKey() {
+      const localK = (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
+      const cloudK = (db.aiKey || '').trim();
+      return localK || cloudK;
+    }
+
     function updateGeminiStatusUI() {
-      const k = getGeminiKey();
+      const localK = (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
+      const cloudK = (db.aiKey || '').trim();
+      const activeK = localK || cloudK;
       const badge = document.getElementById('gemini-status-badge');
       const inp = document.getElementById('gemini-key-input');
       if (badge) {
-        badge.textContent = k ? 'مفعّل ✅ (دقة فائقة)' : 'غير مفعّل (يعمل بالمحرك المدمج)';
-        badge.style.color = k ? '#059669' : '#b45309';
+        if (cloudK && !localK) badge.textContent = 'مفعّل لجميع الجروبات ✅';
+        else if (activeK) badge.textContent = 'مفعّل ✅ (دقة فائقة)';
+        else badge.textContent = 'غير مفعّل (يعمل بالمحرك المدمج)';
+        badge.style.color = activeK ? '#059669' : '#b45309';
       }
-      if (inp) inp.value = k;
+      if (inp) inp.value = localK;
     }
+
     function saveGeminiKey() {
       const val = (document.getElementById('gemini-key-input').value || '').trim();
       if (!val) return showToast('الصقي مفتاح Gemini أولاً');
@@ -1771,10 +1819,11 @@
       showToast('✅ تم تفعيل القارئ الذكي (Gemini AI)');
       if (ocrFiles.length > 0 && !ocrIsProcessing) reprocessAllOcrImages();
     }
+
     function clearGeminiKey() {
       localStorage.removeItem(GEMINI_KEY_STORAGE);
       updateGeminiStatusUI();
-      showToast('تم إيقاف القارئ الذكي والعودة للقارئ المدمج');
+      showToast('تم مسح المفتاح المحلي');
     }
 
     function openOcrModal() {
@@ -1899,7 +1948,6 @@
       processPendingOcrFiles();
     }
 
-    // تقطيع الصورة بدون تشويه للذكاء الاصطناعي (Gemini)
     function sliceImageCrispForAI(file) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -1929,28 +1977,42 @@
       });
     }
 
+    async function callGeminiVisionModel(model, apiKey, prompt, base64Data) {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: 'image/jpeg', data: base64Data } }
+            ]
+          }],
+          generationConfig: { temperature: 0.1 }
+        })
+      });
+      return res;
+    }
+
     async function recognizeWithGemini(file, apiKey, onProgress) {
       const base64Parts = await sliceImageCrispForAI(file);
       if (base64Parts.length === 0) throw new Error('Image read error');
 
       const allLines = [];
+      const models = ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-2.5-flash'];
       const prompt = 'اقرأ جميع أسماء الأشخاص العرب الموجودين في هذه الصورة بدقة تامة دون تخطي أي اسم. تجاهل تماماً الأوقات والتواريخ والأرقام الإنجليزية مثل Today و minutes ago و We و OTU وكلمة تعاهدوا وأرقام الأصوات. أعد الأسماء فقط (سطر لكل اسم، وأول اسمين فقط من كل اسم، وإذا احتوى الاسم على كلمة عبد فاذكر الاسم الذي بعدها ليبقى الاسم كاملاً مثل نوران عبد الجواد). بدون أي ترقيم أو مقدمات أو شرح.';
 
+      let chosenModel = models[0];
       for (let i = 0; i < base64Parts.length; i++) {
         onProgress((i + 0.5) / base64Parts.length);
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: prompt },
-                { inline_data: { mime_type: 'image/jpeg', data: base64Parts[i] } }
-              ]
-            }],
-            generationConfig: { temperature: 0.1 }
-          })
-        });
+        let res = await callGeminiVisionModel(chosenModel, apiKey, prompt, base64Parts[i]);
+        if (!res.ok && res.status === 404) {
+          for (const alt of models) {
+            if (alt === chosenModel) continue;
+            const tryRes = await callGeminiVisionModel(alt, apiKey, prompt, base64Parts[i]);
+            if (tryRes.ok) { chosenModel = alt; res = tryRes; break; }
+          }
+        }
         if (!res.ok) throw new Error('Gemini API error: ' + res.status);
         const json = await res.json();
         const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -1959,7 +2021,6 @@
       return allLines;
     }
 
-    // تقطيع الصورة وتجهيزها مع هوامش بيضاء لقارئ Tesseract 4.0.0_best
     function sliceAndPreprocessImageForOcr(file, forceInvert) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -2150,7 +2211,6 @@
           }
         }
 
-        // القارئ المدمج المحسّن (Tesseract 4.0.0_best + PSM 4)
         const remainingPending = ocrFiles.filter(f => f.status === 'pending');
         const forceInvert = document.getElementById('ocr-invert-check').checked;
         let curFileIdx = 0, curSliceIdx = 0, curSliceCount = 1;
@@ -2183,7 +2243,6 @@
             for (let sIdx = 0; sIdx < slices.length; sIdx++) {
               curSliceIdx = sIdx;
               const { data } = await worker.recognize(slices[sIdx]);
-              // قراءة جميع السطور دون حذف السطور ضعيفة الثقة حتى لا يتخطى أسماء
               if (data && Array.isArray(data.lines) && data.lines.length > 0) {
                 data.lines.forEach(lineObj => { if (lineObj.text) rawLines.push(lineObj.text); });
               } else {
@@ -2299,7 +2358,6 @@
         }
       });
 
-      // مطابقة ذكية بالنوافذ المتحركة داخل السطور الأصلية لإنقاذ أي اسم سبقته كلمة مشوشة من صورة البروفايل
       const allRawLines = [];
       ocrFiles.forEach(f => (f.rawLines || []).forEach(rl => allRawLines.push(rl)));
       allRawLines.forEach(rawLine => {
