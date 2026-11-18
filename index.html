@@ -31,14 +31,8 @@
     body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; padding-bottom: 90px; }
     button, input, select, textarea { font-family: inherit; outline: none; }
 
-    @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes modalPop {
-      from { opacity: 0; transform: scale(0.95) translateY(10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes modalPop { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
     .container { max-width: 780px; margin: 0 auto; padding: 14px; }
     .card {
@@ -416,11 +410,10 @@
         <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء والتقرير</button>
       </div>
 
-      <!-- تبويب الاستماع: يدعم الصور المتعددة + فلتر الغائبين -->
       <div id="tab-listening" class="tab-panel">
         <div class="card" style="padding:13px;">
           <div style="display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px;">
-            <button class="btn btn-gold btn-block" onclick="openOcrModal()">
+            <button class="btn btn-gold btn-block" onclick="openOcrModal('listening')">
               📸 أخذ حضور/غياب الاستماع من صورة أو عدة صور
             </button>
             <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('listening')">
@@ -438,12 +431,16 @@
         <div id="listening-list"></div>
       </div>
 
-      <!-- تبويب التسميع: تسجيل بالأرقام أو بالأسماء + فلتر الغائبين -->
       <div id="tab-recitation" class="tab-panel hidden">
         <div class="card" style="padding:13px;">
-          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">
-            🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
-          </button>
+          <div style="display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px;">
+            <button class="btn btn-gold btn-block" onclick="openOcrModal('recitation')">
+              📸 أخذ حضور/غياب التسميع من صورة أو عدة صور
+            </button>
+            <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('recitation')">
+              🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
+            </button>
+          </div>
 
           <div class="quick-num-box">
             <div class="mode-switch-bar">
@@ -451,7 +448,6 @@
               <button type="button" id="recit-mode-btn-names" class="mode-tab-btn" onclick="setRecitationQuickMode('names')">✍️ تسجيل بالأسماء</button>
             </div>
 
-            <!-- الوضع 1: تسجيل بالأرقام -->
             <div id="recit-quick-numbers-panel">
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
                 <input type="text" id="recitation-numbers-input" class="input" style="padding:9px 12px; font-size:14px; flex:1; min-width:190px;" placeholder="أدخل أرقام الرفقاء (مثال: 1 3 5 أو ١، ٣، ٥)..." oninput="previewRecitationNumbers()" onkeypress="if(event.key==='Enter') applyRecitationByNumbers()" />
@@ -460,7 +456,6 @@
               <div id="recitation-numbers-preview" class="quick-num-preview hidden"></div>
             </div>
 
-            <!-- الوضع 2: تسجيل بكتابة الأسماء (غياب أو حضور) -->
             <div id="recit-quick-names-panel" class="hidden">
               <textarea id="recitation-names-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="اكتبي أو الصقي الأسماء (كل اسم في سطر أو بينهم فاصلة ،)..." oninput="previewRecitationNames()"></textarea>
               <div id="recitation-names-preview" class="quick-num-preview hidden"></div>
@@ -540,16 +535,18 @@
     </div>
   </div>
 
-  <!-- نافذة قراءة أسماء الاستماع من صورة أو عدة صور -->
+  <!-- نافذة قراءة الأسماء من الصور (تدعم الاستماع والتسميع + معالجة ذكية لصور واتساب + خيار AI) -->
   <div id="ocr-modal" class="modal-backdrop" onclick="if(event.target===this) closeOcrModal()">
     <div class="modal">
       <div class="modal-header">
-        <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة أسماء الاستماع من الصور</h3>
+        <h3 id="ocr-modal-title" style="color:var(--primary); font-size:17.5px;">📸 قراءة الأسماء من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
-      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
-        يمكنكِ اختيار <strong>صورة أو عدة صور معاً</strong> (أو إضافة صور أخرى تباعاً)، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
-      </p>
+
+      <div class="mode-switch-bar" style="margin-bottom:8px;">
+        <button type="button" id="ocr-target-btn-listening" class="mode-tab-btn active" onclick="setOcrTargetType('listening')">🎧 تسجيل في: الاستماع</button>
+        <button type="button" id="ocr-target-btn-recitation" class="mode-tab-btn" onclick="setOcrTargetType('recitation')">📖 تسجيل في: التسميع</button>
+      </div>
 
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
@@ -565,17 +562,49 @@
         </div>
       </div>
 
+      <div style="background:#f9fafb; border:1px solid var(--border); border-radius:12px; padding:9px 11px; margin-bottom:10px; font-size:12.5px;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+          <span style="font-weight:800; color:var(--primary);">قص صور استطلاع واتساب:</span>
+          <select id="ocr-crop-mode" class="input" style="padding:5px 8px; font-size:12.5px; width:auto; flex:1;" onchange="reprocessAllOcrImages()">
+            <option value="auto" selected>تلقائي (إزالة الصور الشخصية والتوقيت)</option>
+            <option value="left">استطلاع واتساب إنجليزي (الأيقونات يسار)</option>
+            <option value="right">استطلاع واتساب عربي (الأيقونات يمين)</option>
+            <option value="none">بدون قص (صورة عادية)</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <label style="display:inline-flex; align-items:center; gap:5px; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="ocr-best-model" checked />
+            <span>نموذج الدقة العالية للعربي (4.0_best)</span>
+          </label>
+          <label style="display:inline-flex; align-items:center; gap:5px; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" />
+            <span>فرض الوضع الليلي</span>
+          </label>
+        </div>
+      </div>
+
+      <details style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:8px 11px; margin-bottom:10px; font-size:12.5px;">
+        <summary style="cursor:pointer; font-weight:800; color:#92400e;">✨ القراءة الفائقة بالذكاء الاصطناعي (اختياري - دقة 99%)</summary>
+        <p style="color:#78350f; margin:6px 0; line-height:1.5;">لو وضعتِ مفتاح <strong>Google Gemini API</strong> المجاني (من Google AI Studio)، سيقرأ اللقطات الطويلة بدقة شبه كاملة. اتركيه فارغاً للقراءة المحلية المجانية.</p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+          <input type="password" id="gemini-api-key-input" class="input" style="padding:6px 10px; font-size:12.5px; flex:1; min-width:160px;" placeholder="AIza... (يُحفظ في جهازك فقط)" oninput="saveGeminiKey()" />
+          <select id="gemini-model-select" class="input" style="padding:6px 8px; font-size:12px; width:auto;">
+            <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+            <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+          </select>
+        </div>
+      </details>
+
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
         <label class="btn btn-primary btn-sm" style="flex:1; cursor:pointer;">
           🖼️ اختيار صور (صورة أو أكثر)
           <input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" />
         </label>
-        <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles(true)">🗑️ مسح الصور</button>
+        <button id="ocr-reprocess-btn" class="btn btn-soft btn-sm hidden" onclick="reprocessAllOcrImages()">🔄 إعادة القراءة</button>
+        <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles(true)">🗑️ مسح</button>
       </div>
-      <label style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px;">
-        <input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" />
-        <span>فرض الوضع الليلي (عكس الألوان للصور الداكنة)</span>
-      </label>
 
       <div id="ocr-files-meta" class="hidden" style="font-size:12.5px; font-weight:700; color:var(--primary); margin-top:4px;"></div>
       <div id="ocr-thumbs-wrap" class="ocr-thumbs-wrap hidden"></div>
@@ -587,7 +616,7 @@
 
       <div id="ocr-result-box" class="hidden">
         <label style="display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-top:8px;">
-          الأسماء المستخرجة من كل الصور (أول اسمين + إكمال اسم عبد) — يمكنكِ التعديل ثم إعادة المطابقة:
+          الأسماء المستخرجة من كل الصور — يمكنكِ التعديل ثم إعادة المطابقة:
         </label>
         <textarea id="ocr-extracted-text" dir="rtl" class="input" rows="4" style="font-size:13.5px; padding:8px 10px; margin-top:4px;"></textarea>
         <button class="btn btn-soft btn-xs" style="margin-top:6px;" onclick="matchOcrLinesToMembers()">🔄 إعادة مطابقة الأسماء</button>
@@ -604,7 +633,6 @@
     </div>
   </div>
 
-  <!-- نافذة تبديل الجروب للمشرف متعدد الجروبات -->
   <div id="switch-group-modal" class="modal-backdrop" onclick="if(event.target===this) closeSwitchGroupModal()">
     <div class="modal">
       <div class="modal-header">
@@ -661,6 +689,7 @@
     const CLOUD_DB_URL = "https://quran-attendence-default-rtdb.firebaseio.com";
     const STORAGE_KEY = 'taahadu_qoran_app_v1';
     const SESSION_KEY = 'taahadu_session_v1';
+    const GEMINI_KEY_STORAGE = 'taahadu_gemini_key';
     const CLOUD_BASE = CLOUD_DB_URL.trim().replace(/\/+$/, '');
 
     const defaultData = {
@@ -708,6 +737,7 @@
     let deferredPrompt = null;
     let lastCloudSnapshot = '';
 
+    let ocrTargetType = 'listening';
     let ocrFiles = [];
     let ocrIsProcessing = false;
     let ocrSelectedMemberIds = new Set();
@@ -767,9 +797,7 @@
         .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     }
 
-    function normalizePassword(pw) {
-      return toEnglishDigits(String(pw || ''));
-    }
+    function normalizePassword(pw) { return toEnglishDigits(String(pw || '')); }
 
     function normalizeArabicText(s) {
       return String(s || '')
@@ -781,6 +809,22 @@
         .replace(/ؤ/g, 'و')
         .replace(/ئ/g, 'ي')
         .replace(/\s+/g, ' ');
+    }
+
+    // رسم الحروف العربية بدون نقط للتغلب على أخطاء تشابه النقط في OCR
+    function toArabicRasm(s) {
+      return normalizeArabicText(s)
+        .replace(/[بتثنيى]/g, 'ٮ')
+        .replace(/[جحخ]/g, 'ح')
+        .replace(/[دذ]/g, 'د')
+        .replace(/[رز]/g, 'ر')
+        .replace(/[سش]/g, 'س')
+        .replace(/[صض]/g, 'ص')
+        .replace(/[طظ]/g, 'ط')
+        .replace(/[عغ]/g, 'ع')
+        .replace(/[فق]/g, 'ڡ')
+        .replace(/ة/g, 'ه')
+        .replace(/\s+/g, '');
     }
 
     function compareArabic(a, b) {
@@ -934,7 +978,7 @@
     function dateToStr(d) { const off = d.getTimezoneOffset(); return new Date(d.getTime() - off * 60000).toISOString().split('T')[0]; }
     function getTodayStr() { return dateToStr(new Date()); }
     function uid(prefix) { return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.display = 'none'; }, 3200); }
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.display = 'none'; }, 3400); }
     function togglePwVisibility(id, btn) { const i = document.getElementById(id); if (i.type === 'password') { i.type = 'text'; btn.textContent = '🙈'; } else { i.type = 'password'; btn.textContent = '👁️'; } }
 
     function isSupervisorNameInSameGroup(name, groupId, excludeSupId = null) {
@@ -1026,9 +1070,7 @@
           if (sup) matchedEntries.push({ group: g, sup });
         });
 
-        if (matchedEntries.length === 0) {
-          return showToast('❌ كلمة المرور غير صحيحة');
-        }
+        if (matchedEntries.length === 0) return showToast('❌ كلمة المرور غير صحيحة');
 
         if (quickSelectedGroupId) {
           const clicked = matchedEntries.find(e => e.group.id === quickSelectedGroupId);
@@ -1447,10 +1489,7 @@
         .filter(m => m.name.toLowerCase().includes(q) && matchesStatusFilter(day.listening[m.id], listeningFilter))
         .sort((a, b) => compareArabic(a.name, b.name));
 
-      if (allListen.length === 0) {
-        list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`;
-        return;
-      }
+      if (allListen.length === 0) { list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`; return; }
       if (members.length === 0) {
         list.innerHTML = `<div class="card empty-state">${listeningFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في الاستماع اليوم!' : 'لا يوجد أعضاء مطابقون للتصفية الحالية.'}</div>`;
         return;
@@ -1492,7 +1531,6 @@
       renderStats(); renderRecitation(); renderManage(); showToast('تم تحضير الجميع في التسميع');
     }
 
-    // ==================== تسجيل التسميع بأرقام الرفقاء ====================
     function parsePartnershipNumbersFromInput() {
       const raw = document.getElementById('recitation-numbers-input').value;
       const matches = toEnglishDigits(raw).match(/\d+/g) || [];
@@ -1507,19 +1545,13 @@
     function previewRecitationNumbers() {
       const box = document.getElementById('recitation-numbers-preview');
       const nums = parsePartnershipNumbersFromInput();
-      if (nums.length === 0) {
-        box.classList.add('hidden');
-        box.innerHTML = '';
-        return;
-      }
-      const partnerships = getGroupPartnerships();
-      const members = getGroupMembers();
+      if (nums.length === 0) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+      const partnerships = getGroupPartnerships(), members = getGroupMembers();
       const memberMap = Object.fromEntries(members.map(m => [m.id, m]));
       const byNum = {};
       partnerships.forEach((p, idx) => { byNum[p.number || (idx + 1)] = p; });
 
-      const foundLines = [];
-      const missingNums = [];
+      const foundLines = [], missingNums = [];
       let totalFoundMembers = 0;
 
       nums.forEach(n => {
@@ -1528,16 +1560,12 @@
           const names = p.memberIds.map(id => memberMap[id]?.name).filter(Boolean);
           totalFoundMembers += names.length;
           foundLines.push(`<div>✅ <strong>رقم ${n}:</strong> ${names.map(escapeHtml).join(' ، ')}</div>`);
-        } else {
-          missingNums.push(n);
-        }
+        } else missingNums.push(n);
       });
 
       let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">سيتم تسجيل (${totalFoundMembers}) اسم في التسميع:</div>`;
       html += foundLines.join('');
-      if (missingNums.length > 0) {
-        html += `<div style="color:var(--danger); font-weight:700; margin-top:4px;">⚠️ أرقام غير موجودة بالجروب: ${missingNums.join(' ، ')}</div>`;
-      }
+      if (missingNums.length > 0) html += `<div style="color:var(--danger); font-weight:700; margin-top:4px;">⚠️ أرقام غير موجودة بالجروب: ${missingNums.join(' ، ')}</div>`;
       box.innerHTML = html;
       box.classList.remove('hidden');
     }
@@ -1545,30 +1573,15 @@
     function applyRecitationByNumbers() {
       const nums = parsePartnershipNumbersFromInput();
       if (nums.length === 0) return showToast('اكتب أرقام الرفقاء أولاً (مثال: 1 3 5)');
-
-      const partnerships = getGroupPartnerships();
-      const members = getGroupMembers();
-      const memberSet = new Set(members.map(m => m.id));
+      const partnerships = getGroupPartnerships(), members = getGroupMembers(), memberSet = new Set(members.map(m => m.id));
       const byNum = {};
       partnerships.forEach((p, idx) => { byNum[p.number || (idx + 1)] = p; });
-
       const matchedMemberIds = new Set();
-      nums.forEach(n => {
-        const p = byNum[n];
-        if (p) {
-          p.memberIds.forEach(id => { if (memberSet.has(id)) matchedMemberIds.add(id); });
-        }
-      });
-
+      nums.forEach(n => { const p = byNum[n]; if (p) p.memberIds.forEach(id => { if (memberSet.has(id)) matchedMemberIds.add(id); }); });
       if (matchedMemberIds.size === 0) return showToast('لم يتم العثور على أعضاء مطابقين لهذه الأرقام');
 
-      const day = ensureDayRecord();
-      const patch = {};
-      matchedMemberIds.forEach(id => {
-        day.recitation[id] = 'present';
-        patch[id] = 'present';
-      });
-
+      const day = ensureDayRecord(), patch = {};
+      matchedMemberIds.forEach(id => { day.recitation[id] = 'present'; patch[id] = 'present'; });
       cloudPatchAttendance(currentDate, 'recitation', patch);
       document.getElementById('recitation-numbers-input').value = '';
       previewRecitationNumbers();
@@ -1576,7 +1589,6 @@
       showToast(`✅ تم تسجيل ${matchedMemberIds.size} عضو في التسميع`);
     }
 
-    // ==================== تسجيل التسميع بكتابة الأسماء (غياب أو حضور) ====================
     function cleanTypedMemberToken(raw) {
       return toEnglishDigits(String(raw || ''))
         .replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳]/g, ' ')
@@ -1588,33 +1600,18 @@
     }
 
     function previewRecitationNames() {
-      const inputEl = document.getElementById('recitation-names-input');
-      const box = document.getElementById('recitation-names-preview');
+      const inputEl = document.getElementById('recitation-names-input'), box = document.getElementById('recitation-names-preview');
       if (!inputEl || !box) return;
-
       const raw = inputEl.value;
-      if (!raw.trim()) {
-        recitationMatchedMemberIds = [];
-        box.classList.add('hidden');
-        box.innerHTML = '';
-        return;
-      }
+      if (!raw.trim()) { recitationMatchedMemberIds = []; box.classList.add('hidden'); box.innerHTML = ''; return; }
 
-      const tokens = raw
-        .split(/[\r\n،,;؛\/]+/)
-        .map(cleanTypedMemberToken)
-        .filter(Boolean);
-
+      const tokens = raw.split(/[\r\n،,;؛\/]+/).map(cleanTypedMemberToken).filter(Boolean);
       const members = getGroupMembers();
-      const matchedSet = new Set();
-      const matchedList = [];
-      const ambiguousList = [];
-      const unmatchedList = [];
+      const matchedSet = new Set(), matchedList = [], ambiguousList = [], unmatchedList = [];
 
       tokens.forEach(entry => {
         const normEntry = normalizeArabicText(entry);
         const normWords = normEntry.split(' ').filter(Boolean);
-        const normEntryNoSpace = normEntry.replace(/\s+/g, '');
         if (!normEntry) return;
 
         if (normWords.length === 1) {
@@ -1626,99 +1623,39 @@
           if (startsMatches.length === 1) {
             const m = startsMatches[0];
             if (!matchedSet.has(m.id)) { matchedSet.add(m.id); matchedList.push(m); }
-          } else if (startsMatches.length > 1) {
-            ambiguousList.push({ entry, names: startsMatches.slice(0, 3).map(x => x.name) });
-          } else {
-            unmatchedList.push(entry);
-          }
+          } else if (startsMatches.length > 1) ambiguousList.push({ entry, names: startsMatches.slice(0, 3).map(x => x.name) });
+          else unmatchedList.push(entry);
           return;
         }
 
-        const entryShortNorm = normalizeArabicText(extractFirstTwoArabicNames(entry));
-        const entryShortNoSpace = entryShortNorm.replace(/\s+/g, '');
-        let bestM = null;
-        let bestScore = 0;
-
-        members.forEach(m => {
-          const mFullNorm = normalizeArabicText(m.name);
-          const mShortNorm = normalizeArabicText(extractFirstTwoArabicNames(m.name));
-          const mFullNoSpace = mFullNorm.replace(/\s+/g, '');
-          const mShortNoSpace = mShortNorm.replace(/\s+/g, '');
-
-          let score = 0;
-          if (normEntry === mFullNorm || normEntry === mShortNorm || normEntryNoSpace === mShortNoSpace || entryShortNoSpace === mShortNoSpace) {
-            score = 1.0;
-          } else if (mFullNorm.startsWith(normEntry) || mFullNoSpace.startsWith(normEntryNoSpace) || normEntry.startsWith(mShortNorm)) {
-            score = 0.94;
-          } else {
-            score = Math.max(
-              nameSimilarity(normEntry, mFullNorm),
-              nameSimilarity(normEntry, mShortNorm),
-              nameSimilarity(entryShortNorm, mShortNorm)
-            );
-          }
-
-          if (score > bestScore) {
-            bestScore = score;
-            bestM = m;
-          }
-        });
-
-        if (bestM && bestScore >= 0.74) {
-          if (!matchedSet.has(bestM.id)) { matchedSet.add(bestM.id); matchedList.push(bestM); }
-        } else {
-          unmatchedList.push(entry);
-        }
+        const res = findBestMemberMatch(entry, members);
+        if (res.member && res.score >= 0.71) {
+          if (!matchedSet.has(res.member.id)) { matchedSet.add(res.member.id); matchedList.push(res.member); }
+        } else unmatchedList.push(entry);
       });
 
       recitationMatchedMemberIds = matchedList.map(m => m.id);
-
       let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">الأسماء المطابقة (${matchedList.length}):</div>`;
-      if (matchedList.length > 0) {
-        html += `<div style="display:flex; flex-wrap:wrap; gap:3px;">` +
-          matchedList.map(m => `<span class="name-match-chip">✓ ${escapeHtml(m.name)}</span>`).join('') +
-          `</div>`;
-      } else {
-        html += `<div style="color:var(--muted);">لم تتم مطابقة أي اسم بعد.</div>`;
-      }
-
-      if (ambiguousList.length > 0) {
-        html += ambiguousList.map(a =>
-          `<div style="color:#b45309; font-weight:700; margin-top:4px;">⚠️ "${escapeHtml(a.entry)}" يطابق أكثر من عضو (${a.names.map(escapeHtml).join('، ')}...) — اكتبي الاسم الثنائي</div>`
-        ).join('');
-      }
-      if (unmatchedList.length > 0) {
-        html += `<div style="color:var(--danger); font-weight:700; margin-top:4px;">❌ أسماء غير موجودة بالجروب: ${unmatchedList.map(escapeHtml).join(' ، ')}</div>`;
-      }
-
+      if (matchedList.length > 0) html += `<div style="display:flex; flex-wrap:wrap; gap:3px;">` + matchedList.map(m => `<span class="name-match-chip">✓ ${escapeHtml(m.name)}</span>`).join('') + `</div>`;
+      else html += `<div style="color:var(--muted);">لم تتم مطابقة أي اسم بعد.</div>`;
+      if (ambiguousList.length > 0) html += ambiguousList.map(a => `<div style="color:#b45309; font-weight:700; margin-top:4px;">⚠️ "${escapeHtml(a.entry)}" يطابق أكثر من عضو (${a.names.map(escapeHtml).join('، ')}...) — اكتبي الاسم الثنائي</div>`).join('');
+      if (unmatchedList.length > 0) html += `<div style="color:var(--danger); font-weight:700; margin-top:4px;">❌ أسماء غير موجودة بالجروب: ${unmatchedList.map(escapeHtml).join(' ، ')}</div>`;
       box.innerHTML = html;
       box.classList.remove('hidden');
     }
 
     function applyRecitationByNames(status) {
-      if (recitationMatchedMemberIds.length === 0) {
-        return showToast('اكتبي أسماء صحيحة موجودة في الجروب أولاً');
-      }
-
+      if (recitationMatchedMemberIds.length === 0) return showToast('اكتبي أسماء صحيحة موجودة في الجروب أولاً');
       const autoRest = document.getElementById('recit-names-auto-rest').checked;
-      const members = getGroupMembers();
-      const matchedSet = new Set(recitationMatchedMemberIds);
-      const day = ensureDayRecord();
-      const patch = {};
-
-      matchedSet.forEach(id => {
-        day.recitation[id] = status;
-        patch[id] = status;
-      });
+      const members = getGroupMembers(), matchedSet = new Set(recitationMatchedMemberIds), day = ensureDayRecord(), patch = {};
+      matchedSet.forEach(id => { day.recitation[id] = status; patch[id] = status; });
 
       let restCount = 0;
       const oppositeStatus = status === 'absent' ? 'present' : 'absent';
       if (autoRest) {
         members.forEach(m => {
           if (!matchedSet.has(m.id) && !day.recitation[m.id]) {
-            day.recitation[m.id] = oppositeStatus;
-            patch[m.id] = oppositeStatus;
-            restCount++;
+            day.recitation[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++;
           }
         });
       }
@@ -1730,22 +1667,43 @@
 
       const statusLabel = status === 'absent' ? 'غائب' : 'حاضر (سمّع)';
       const restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
-      if (autoRest && restCount > 0) {
-        showToast(`✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})`);
-      } else {
-        showToast(`✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
-      }
+      showToast(autoRest && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
     }
 
-    // ==================== قراءة أسماء الاستماع من صورة أو عدة صور (OCR عربي) ====================
-    function openOcrModal() {
+    // ==================== قراءة الأسماء من الصور (الاستماع أو التسميع + معالجة واتساب الذكية + Gemini اختياري) ====================
+    function saveGeminiKey() {
+      const val = document.getElementById('gemini-api-key-input').value.trim();
+      if (val) localStorage.setItem(GEMINI_KEY_STORAGE, val);
+      else localStorage.removeItem(GEMINI_KEY_STORAGE);
+    }
+
+    function openOcrModal(targetType = 'listening') {
+      setOcrTargetType(targetType, false);
+      const savedKey = localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+      const keyInp = document.getElementById('gemini-api-key-input');
+      if (keyInp) keyInp.value = savedKey;
       clearOcrFiles(false);
       updateOcrApplyButtons();
       document.getElementById('ocr-modal').classList.add('open');
     }
 
-    function closeOcrModal() {
-      document.getElementById('ocr-modal').classList.remove('open');
+    function closeOcrModal() { document.getElementById('ocr-modal').classList.remove('open'); }
+
+    function setOcrTargetType(type, rematch = true) {
+      ocrTargetType = type === 'recitation' ? 'recitation' : 'listening';
+      document.getElementById('ocr-target-btn-listening').classList.toggle('active', ocrTargetType === 'listening');
+      document.getElementById('ocr-target-btn-recitation').classList.toggle('active', ocrTargetType === 'recitation');
+      document.getElementById('ocr-modal-title').textContent = ocrTargetType === 'recitation'
+        ? '📸 قراءة أسماء التسميع من الصور'
+        : '📸 قراءة أسماء الاستماع من الصور';
+      updateOcrApplyButtons();
+      if (rematch && document.getElementById('ocr-extracted-text').value.trim()) {
+        matchOcrLinesToMembers();
+      }
+    }
+
+    function getOcrTargetMembers() {
+      return ocrTargetType === 'recitation' ? getGroupMembers() : getListeningMembers();
     }
 
     function getOcrMode() {
@@ -1755,14 +1713,16 @@
 
     function updateOcrApplyButtons() {
       const mode = getOcrMode();
+      const label = ocrTargetType === 'recitation' ? 'في التسميع' : 'في الاستماع';
       const applyOnlyBtn = document.getElementById('ocr-apply-only-btn');
       const restAbsentBtn = document.getElementById('ocr-apply-rest-absent-btn');
       if (mode === 'present') {
-        applyOnlyBtn.textContent = '✅ اعتماد المحددين كـ حاضر فقط';
+        applyOnlyBtn.textContent = `✅ اعتماد المحددين كـ حاضر ${label}`;
         applyOnlyBtn.className = 'btn btn-primary btn-block';
+        restAbsentBtn.textContent = `✅ اعتماد المحددين حاضر + تسجيل الباقي غياب ❌ (${ocrTargetType === 'recitation' ? 'التسميع' : 'الاستماع'})`;
         restAbsentBtn.classList.remove('hidden');
       } else {
-        applyOnlyBtn.textContent = '❌ اعتماد المحددين كـ غائب';
+        applyOnlyBtn.textContent = `❌ اعتماد المحددين كـ غائب ${label}`;
         applyOnlyBtn.className = 'btn btn-danger-solid btn-block';
         restAbsentBtn.classList.add('hidden');
       }
@@ -1787,17 +1747,9 @@
     function onOcrFilesSelected(input) {
       const files = Array.from(input.files || []);
       if (files.length === 0) return;
-
       files.forEach(file => {
-        ocrFiles.push({
-          id: uid('img'),
-          file,
-          url: URL.createObjectURL(file),
-          status: 'pending',
-          lines: []
-        });
+        ocrFiles.push({ id: uid('img'), file, url: URL.createObjectURL(file), status: 'pending', lines: [] });
       });
-
       input.value = '';
       renderOcrThumbnails();
       processPendingOcrFiles();
@@ -1810,33 +1762,27 @@
       try { URL.revokeObjectURL(ocrFiles[idx].url); } catch (e) {}
       ocrFiles.splice(idx, 1);
       renderOcrThumbnails();
-      if (ocrFiles.length === 0) {
-        clearOcrFiles(false);
-      } else {
-        rebuildExtractedTextFromFiles();
-        matchOcrLinesToMembers();
-      }
+      if (ocrFiles.length === 0) clearOcrFiles(false);
+      else { rebuildExtractedTextFromFiles(); matchOcrLinesToMembers(); }
     }
 
     function renderOcrThumbnails() {
       const wrap = document.getElementById('ocr-thumbs-wrap');
       const meta = document.getElementById('ocr-files-meta');
       const clearBtn = document.getElementById('ocr-clear-files-btn');
+      const repBtn = document.getElementById('ocr-reprocess-btn');
 
       if (ocrFiles.length === 0) {
-        wrap.classList.add('hidden');
-        meta.classList.add('hidden');
-        clearBtn.classList.add('hidden');
-        wrap.innerHTML = '';
-        return;
+        wrap.classList.add('hidden'); meta.classList.add('hidden');
+        clearBtn.classList.add('hidden'); repBtn.classList.add('hidden');
+        wrap.innerHTML = ''; return;
       }
 
-      wrap.classList.remove('hidden');
-      meta.classList.remove('hidden');
-      clearBtn.classList.remove('hidden');
+      wrap.classList.remove('hidden'); meta.classList.remove('hidden');
+      clearBtn.classList.remove('hidden'); repBtn.classList.remove('hidden');
 
       const doneCount = ocrFiles.filter(f => f.status === 'done').length;
-      meta.textContent = `الصور المضافة: ${ocrFiles.length} ${ocrFiles.length === 1 ? 'صورة' : 'صور'} (تمت قراءة ${doneCount} من ${ocrFiles.length}) — يمكنكِ إضافة صور أخرى بالضغط على زر اختيار صور`;
+      meta.textContent = `الصور المضافة: ${ocrFiles.length} ${ocrFiles.length === 1 ? 'صورة' : 'صور'} (تمت قراءة ${doneCount} من ${ocrFiles.length})`;
 
       wrap.innerHTML = ocrFiles.map((item, idx) => {
         const statusIcon = item.status === 'done' ? '✅' : item.status === 'processing' ? '⚙️' : item.status === 'error' ? '⚠️' : '⏳';
@@ -1846,8 +1792,7 @@
             <span class="ocr-thumb-num">${idx + 1}</span>
             <span class="ocr-thumb-status">${statusIcon}</span>
             <button type="button" class="ocr-thumb-del" onclick="removeOcrFile('${item.id}')" title="حذف الصورة">✕</button>
-          </div>
-        `;
+          </div>`;
       }).join('');
     }
 
@@ -1858,89 +1803,189 @@
       processPendingOcrFiles();
     }
 
-    function sliceAndPreprocessImageForOcr(file, forceInvert) {
+    // الكشف التلقائي عن مكان الصور الشخصية + إزالة التوقيت الرمادي + قص عند الفراغات
+    function sliceAndPreprocessImageForOcr(file, forceInvert, cropMode) {
       return new Promise((resolve) => {
         const img = new Image();
+        const objUrl = URL.createObjectURL(file);
         img.onload = async () => {
-          const origW = img.naturalWidth || img.width;
-          const origH = img.naturalHeight || img.height;
+          try {
+            const origW = img.naturalWidth || img.width;
+            const origH = img.naturalHeight || img.height;
 
-          let targetW = origW;
-          if (origW < 950) targetW = Math.round(origW * Math.min(2.8, 1200 / Math.max(1, origW)));
-          else if (origW > 1700) targetW = 1600;
+            // فحص عينة من الصورة لتحديد: هل هي وضع ليلي؟ وهل الصور الشخصية يسار أم يمين؟
+            const probeW = Math.min(240, origW);
+            const probeH = Math.min(480, origH);
+            const probeCanvas = document.createElement('canvas');
+            probeCanvas.width = probeW;
+            probeCanvas.height = probeH;
+            const pCtx = probeCanvas.getContext('2d');
+            pCtx.drawImage(img, 0, 0, origW, Math.min(origH, Math.round(origW * 2.5)), 0, 0, probeW, probeH);
+            const pData = pCtx.getImageData(0, 0, probeW, probeH).data;
 
-          const scale = targetW / Math.max(1, origW);
-          const targetH = Math.round(origH * scale);
-
-          const probeCanvas = document.createElement('canvas');
-          const probeW = Math.min(200, origW);
-          const probeH = Math.min(400, origH);
-          probeCanvas.width = probeW;
-          probeCanvas.height = probeH;
-          const probeCtx = probeCanvas.getContext('2d');
-          probeCtx.drawImage(img, 0, 0, origW, Math.min(origH, Math.round(origW * 2)), 0, 0, probeW, probeH);
-          const pData = probeCtx.getImageData(0, 0, probeW, probeH).data;
-          let sumLum = 0, samples = 0;
-          for (let i = 0; i < pData.length; i += 16) {
-            sumLum += (0.299 * pData[i] + 0.587 * pData[i + 1] + 0.114 * pData[i + 2]);
-            samples++;
-          }
-          const avgLum = samples ? sumLum / samples : 255;
-          const shouldInvert = forceInvert || avgLum < 115;
-
-          const sliceTargetH = 1400;
-          const overlapTargetH = 150;
-          const blobs = [];
-
-          let curY = 0;
-          while (curY < targetH) {
-            const hSlice = Math.min(sliceTargetH, targetH - curY);
-            const srcY = curY / scale;
-            const srcH = hSlice / scale;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = targetW;
-            canvas.height = Math.max(1, Math.round(hSlice));
-            const ctx = canvas.getContext('2d');
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, 0, srcY, origW, srcH, 0, 0, canvas.width, canvas.height);
-
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const d = imgData.data;
-            for (let i = 0; i < d.length; i += 4) {
-              let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-              if (shouldInvert) lum = 255 - lum;
-              lum = Math.max(0, Math.min(255, (lum - 128) * 1.35 + 128));
-              d[i] = d[i + 1] = d[i + 2] = lum;
+            let sumLum = 0, samples = 0;
+            let leftColorScore = 0, rightColorScore = 0;
+            for (let y = 0; y < probeH; y += 2) {
+              for (let x = 0; x < probeW; x += 2) {
+                const idx = (y * probeW + x) * 4;
+                const r = pData[idx], g = pData[idx + 1], b = pData[idx + 2];
+                const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                const sat = Math.max(r, g, b) - Math.min(r, g, b);
+                sumLum += lum; samples++;
+                if (x < probeW * 0.17 && sat > 18) leftColorScore++;
+                if (x > probeW * 0.83 && sat > 18) rightColorScore++;
+              }
             }
-            ctx.putImageData(imgData, 0, 0);
+            const avgLum = samples ? sumLum / samples : 255;
+            const isDark = forceInvert || avgLum < 115;
 
-            const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
-            if (blob) blobs.push(blob);
+            let effectiveCrop = cropMode;
+            if (cropMode === 'auto') {
+              if (leftColorScore > rightColorScore * 1.4 && leftColorScore > 25) effectiveCrop = 'left';
+              else if (rightColorScore > leftColorScore * 1.4 && rightColorScore > 25) effectiveCrop = 'right';
+              else effectiveCrop = 'none';
+            }
 
-            if (curY + hSlice >= targetH) break;
-            curY += (sliceTargetH - overlapTargetH);
+            let srcX = 0, cropW = origW;
+            if (effectiveCrop === 'left') { srcX = Math.round(origW * 0.185); cropW = origW - srcX; }
+            else if (effectiveCrop === 'right') { srcX = 0; cropW = Math.round(origW * 0.815); }
+
+            const scale = Math.min(3.5, Math.max(1.6, 1750 / Math.max(1, cropW)));
+            const targetW = Math.round(cropW * scale);
+            const targetH = Math.round(origH * scale);
+
+            const sliceMaxH = 1350;
+            const pad = 26;
+            const blobs = [];
+            let curY = 0;
+
+            while (curY < targetH) {
+              const hSlice = Math.min(sliceMaxH, targetH - curY);
+              const srcY = curY / scale;
+              const srcH = hSlice / scale;
+
+              const rawCanvas = document.createElement('canvas');
+              rawCanvas.width = targetW;
+              rawCanvas.height = Math.max(1, Math.round(hSlice));
+              const rCtx = rawCanvas.getContext('2d');
+              rCtx.imageSmoothingEnabled = true;
+              rCtx.imageSmoothingQuality = 'high';
+              rCtx.drawImage(img, srcX, srcY, cropW, srcH, 0, 0, rawCanvas.width, rawCanvas.height);
+
+              const imgData = rCtx.getImageData(0, 0, rawCanvas.width, rawCanvas.height);
+              const d = imgData.data;
+
+              // بناء هستوجرام السطوع لفصل الأسماء الساطعة عن الخلفية والتوقيت الرمادي الخافت
+              const hist = new Uint32Array(256);
+              const totalPx = rawCanvas.width * rawCanvas.height;
+              for (let i = 0; i < d.length; i += 4) {
+                const lum = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+                hist[lum]++;
+              }
+
+              let acc = 0, bgLum = isDark ? 20 : 245, peakTextLum = isDark ? 225 : 25;
+              if (isDark) {
+                for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= totalPx * 0.45) { bgLum = v; break; } }
+                acc = 0;
+                for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= totalPx * 0.015) { peakTextLum = v; break; } }
+                const cutoff = Math.min(185, Math.max(bgLum + 48, bgLum + 0.58 * (peakTextLum - bgLum)));
+                const span = Math.max(24, peakTextLum - cutoff);
+                for (let i = 0; i < d.length; i += 4) {
+                  const lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+                  if (lum <= cutoff) {
+                    d[i] = d[i + 1] = d[i + 2] = 255;
+                  } else {
+                    const t = Math.min(1, (lum - cutoff) / span);
+                    const val = Math.round(255 * Math.max(0, 1 - Math.pow(t, 0.8) * 1.12));
+                    d[i] = d[i + 1] = d[i + 2] = val;
+                  }
+                }
+              } else {
+                for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= totalPx * 0.45) { bgLum = v; break; } }
+                acc = 0;
+                for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= totalPx * 0.015) { peakTextLum = v; break; } }
+                const cutoff = Math.max(70, Math.min(bgLum - 42, bgLum - 0.56 * (bgLum - peakTextLum)));
+                const span = Math.max(24, cutoff - peakTextLum);
+                for (let i = 0; i < d.length; i += 4) {
+                  const lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+                  if (lum >= cutoff) {
+                    d[i] = d[i + 1] = d[i + 2] = 255;
+                  } else {
+                    const t = Math.min(1, (cutoff - lum) / span);
+                    const val = Math.round(255 * Math.max(0, 1 - Math.pow(t, 0.8) * 1.12));
+                    d[i] = d[i + 1] = d[i + 2] = val;
+                  }
+                }
+              }
+              rCtx.putImageData(imgData, 0, 0);
+
+              // البحث عن فجوة بيضاء أفقية للقص بدون تقطيع أي اسم من المنتصف
+              let cutY = rawCanvas.height;
+              if (curY + hSlice < targetH) {
+                const minScanY = Math.floor(rawCanvas.height * 0.62);
+                let bestGapMid = rawCanvas.height, bestGapLen = 0, curGapLen = 0;
+                for (let y = rawCanvas.height - 8; y >= minScanY; y--) {
+                  let nonWhite = 0;
+                  const rowOffset = y * rawCanvas.width * 4;
+                  for (let x = 0; x < rawCanvas.width; x += 3) {
+                    if (d[rowOffset + x * 4] < 235) { nonWhite++; if (nonWhite > 4) break; }
+                  }
+                  if (nonWhite <= 4) {
+                    curGapLen++;
+                    if (curGapLen > bestGapLen) {
+                      bestGapLen = curGapLen;
+                      bestGapMid = y + Math.floor(curGapLen / 2);
+                    }
+                  } else {
+                    curGapLen = 0;
+                  }
+                }
+                if (bestGapLen >= 6) cutY = bestGapMid;
+              }
+
+              const outCanvas = document.createElement('canvas');
+              outCanvas.width = targetW + pad * 2;
+              outCanvas.height = cutY + pad * 2;
+              const oCtx = outCanvas.getContext('2d');
+              oCtx.fillStyle = '#ffffff';
+              oCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+              oCtx.drawImage(rawCanvas, 0, 0, targetW, cutY, pad, pad, targetW, cutY);
+
+              const blob = await new Promise(res => outCanvas.toBlob(b => res(b), 'image/png'));
+              if (blob) blobs.push(blob);
+
+              if (curY + hSlice >= targetH) break;
+              curY += Math.max(200, cutY - (cutY === rawCanvas.height ? 120 : 0));
+            }
+
+            URL.revokeObjectURL(objUrl);
+            resolve(blobs.length > 0 ? blobs : [file]);
+          } catch (e) {
+            URL.revokeObjectURL(objUrl);
+            resolve([file]);
           }
-
-          resolve(blobs.length > 0 ? blobs : [file]);
         };
-        img.onerror = () => resolve([file]);
-        img.src = URL.createObjectURL(file);
+        img.onerror = () => { URL.revokeObjectURL(objUrl); resolve([file]); };
+        img.src = objUrl;
       });
     }
 
     function cleanOcrLineToShortName(line) {
       let s = String(line || '')
         .replace(/\d{1,2}:\d{2}\s*(ص|م|AM|PM)?/gi, ' ')
-        .replace(/\+?\d[\d\s\-().]{6,}/g, ' ')
+        .replace(/\+?\d[\d\s\-().]{5,}/g, ' ')
         .replace(/[^\u0600-\u06FF\s]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
       if (!s) return '';
-      if (/^(نعم|لا|تصويت|أصوات|الآن|اليوم|أمس|منذ|تفاصيل|الاستطلاع)$/.test(s)) return '';
-      s = s.replace(/\s+تعاهدوا(\s+القر[ءاآ]ن)?$/g, '').trim();
 
+      // إزالة كلمات المجموعة والتشويهات الشائعة لـ "تعاهدوا" حتى لا تفسد المقارنة
+      s = s
+        .replace(/\b(تعاهدو[ا]?|تاهدو[ا]?|تعاعدو[ا]?|تعهدو[ا]?|تعودو[ا]?|تعاودو[ا]?|تعاهد|القر[ءاآ]ن|نعم|لا|تصويت|أصوات|اصوات|الآن|الان|اليوم|أمس|امس|منذ|تفاصيل|الاستطلاع|جارتي|خالتو|خالو|اخي|أخي|اختي|أختي|رواد|تسميع|فقط)\b/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (!s) return '';
       const words = s.split(' ').filter(w => w.length >= 2);
       if (words.length === 0) return '';
 
@@ -1948,35 +1993,97 @@
       const finalWords = shortName.split(' ').filter(Boolean);
       const totalChars = finalWords.join('').length;
 
-      if (finalWords.length === 1 && totalChars < 4) return '';
-      if (finalWords.length >= 2 && (totalChars < 5 || !finalWords.some(w => w.length >= 3))) return '';
-
+      if (finalWords.length === 1 && totalChars < 3) return '';
+      if (finalWords.length >= 2 && totalChars < 4) return '';
       return shortName;
     }
 
     function rebuildExtractedTextFromFiles() {
-      const uniqueLines = [];
-      const seenNorm = new Set();
+      const uniqueLines = [], seenNorm = new Set();
       ocrFiles.forEach(item => {
         (item.lines || []).forEach(l => {
           const norm = normalizeArabicText(l);
-          if (norm && !seenNorm.has(norm)) {
-            seenNorm.add(norm);
-            uniqueLines.push(l);
-          }
+          if (norm && !seenNorm.has(norm)) { seenNorm.add(norm); uniqueLines.push(l); }
         });
       });
       document.getElementById('ocr-extracted-text').value = uniqueLines.join('\n');
     }
 
+    function fileToResizedJpegBase64(file, maxW = 1400) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          try {
+            const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+            const scale = w > maxW ? (maxW / w) : 1;
+            const c = document.createElement('canvas');
+            c.width = Math.round(w * scale);
+            c.height = Math.round(h * scale);
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            const dataUrl = c.toDataURL('image/jpeg', 0.9);
+            URL.revokeObjectURL(url);
+            resolve(dataUrl.split(',')[1]);
+          } catch (err) { URL.revokeObjectURL(url); reject(err); }
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+        img.src = url;
+      });
+    }
+
+    async function extractWithGemini(pendingItems, apiKey, model) {
+      const members = getOcrTargetMembers().map(m => m.name);
+      const prompt = `أمامك لقطة شاشة من استطلاع أو قائمة واتساب. استخرج أسماء الأشخاص المصوّتين/الموجودين فقط (تجاهل التوقيت مثل Today/pm وعدد الأصوات وعنوان الاستطلاع ولاحقة تعاهدوا/We/OTU).
+قائمة أسماء أعضاء المجموعة المرجعية للمساعدة في قراءة الأسماء الصعبة بدقة:
+${members.join('\n')}
+
+أعد النتيجة كقائمة أسماء فقط، كل اسم في سطر منفصل بدون ترقيم أو رموز.`;
+
+      const statusEl = document.getElementById('ocr-status-text');
+      const barEl = document.getElementById('ocr-progress-bar');
+
+      for (let i = 0; i < pendingItems.length; i++) {
+        const item = pendingItems[i];
+        item.status = 'processing';
+        renderOcrThumbnails();
+        statusEl.textContent = `✨ جاري القراءة الفائقة بالذكاء الاصطناعي (${i + 1}/${pendingItems.length})...`;
+        barEl.style.width = Math.round(((i + 0.3) / pendingItems.length) * 100) + '%';
+
+        const b64 = await fileToResizedJpegBase64(item.file, 1500);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                { inline_data: { mime_type: 'image/jpeg', data: b64 } }
+              ]
+            }]
+          })
+        });
+
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}));
+          throw new Error(errJson?.error?.message || `HTTP ${res.status}`);
+        }
+        const json = await res.json();
+        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        item.lines = text.split(/\r?\n/).map(cleanOcrLineToShortName).filter(Boolean);
+        item.status = 'done';
+        renderOcrThumbnails();
+        barEl.style.width = Math.round(((i + 1) / pendingItems.length) * 100) + '%';
+      }
+    }
+
     async function processPendingOcrFiles() {
       if (ocrIsProcessing) return;
-      if (typeof Tesseract === 'undefined') {
-        return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
-      }
-
       const pendingItems = ocrFiles.filter(f => f.status === 'pending');
       if (pendingItems.length === 0) return;
+
+      const geminiKey = (document.getElementById('gemini-api-key-input')?.value || '').trim();
+      const geminiModel = document.getElementById('gemini-model-select')?.value || 'gemini-3.5-flash-lite';
 
       ocrIsProcessing = true;
       const progBox = document.getElementById('ocr-progress-box');
@@ -1985,74 +2092,91 @@
       const resBox = document.getElementById('ocr-result-box');
 
       progBox.classList.remove('hidden');
-      barEl.style.width = '5%';
-      statusEl.textContent = 'جاري تجهيز الصور للقراءة...';
+      barEl.style.width = '6%';
 
       try {
-        const forceInvert = document.getElementById('ocr-invert-check').checked;
-        let curFileIdx = 0;
-        let curSliceIdx = 0;
-        let curSliceCount = 1;
-
-        const worker = await Tesseract.createWorker('ara', 1, {
-          logger: m => {
-            if (m && m.status === 'recognizing text') {
-              const fileFrac = (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount);
-              const overall = ((curFileIdx + fileFrac) / pendingItems.length) * 100;
-              const pct = Math.max(8, Math.min(99, Math.round(overall)));
-              barEl.style.width = pct + '%';
-              statusEl.textContent = pendingItems.length > 1
-                ? `جاري قراءة صورة ${curFileIdx + 1} من ${pendingItems.length}... (${pct}%)`
-                : `جاري استخراج الأسماء من الصورة... (${pct}%)`;
-            } else if (m && m.status) {
-              statusEl.textContent = 'جاري تجهيز القاموس العربي...';
-            }
+        if (geminiKey) {
+          await extractWithGemini(pendingItems, geminiKey, geminiModel);
+        } else {
+          if (typeof Tesseract === 'undefined') {
+            throw new Error('تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
           }
-        });
+          statusEl.textContent = 'جاري تجهيز الصور وقص الأيقونات...';
+          const forceInvert = document.getElementById('ocr-invert-check').checked;
+          const cropMode = document.getElementById('ocr-crop-mode').value || 'auto';
+          const useBest = document.getElementById('ocr-best-model').checked;
 
-        for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
-          const item = pendingItems[fIdx];
-          curFileIdx = fIdx;
-          item.status = 'processing';
-          renderOcrThumbnails();
-
-          try {
-            const slices = await sliceAndPreprocessImageForOcr(item.file, forceInvert);
-            curSliceCount = slices.length;
-            const rawLines = [];
-            for (let sIdx = 0; sIdx < slices.length; sIdx++) {
-              curSliceIdx = sIdx;
-              const { data } = await worker.recognize(slices[sIdx]);
-              if (data && Array.isArray(data.lines) && data.lines.length > 0) {
-                const highConf = data.lines.filter(lineObj => lineObj.confidence === undefined || lineObj.confidence >= 35);
-                const chosen = highConf.length > 0 ? highConf : data.lines;
-                chosen.forEach(lineObj => rawLines.push(lineObj.text));
-              } else {
-                String((data && data.text) || '').split(/\r?\n/).forEach(l => rawLines.push(l));
+          let curFileIdx = 0, curSliceIdx = 0, curSliceCount = 1;
+          const workerOpts = {
+            logger: m => {
+              if (m && m.status === 'recognizing text') {
+                const fileFrac = (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount);
+                const overall = ((curFileIdx + fileFrac) / pendingItems.length) * 100;
+                const pct = Math.max(8, Math.min(99, Math.round(overall)));
+                barEl.style.width = pct + '%';
+                statusEl.textContent = pendingItems.length > 1
+                  ? `جاري قراءة صورة ${curFileIdx + 1} من ${pendingItems.length}... (${pct}%)`
+                  : `جاري استخراج الأسماء... (${pct}%)`;
+              } else if (m && m.status) {
+                statusEl.textContent = useBest ? 'جاري تحميل النموذج العربي عالي الدقة...' : 'جاري تجهيز القاموس العربي...';
               }
             }
-            item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean);
-            item.status = 'done';
-          } catch (e) {
-            item.status = 'error';
+          };
+          if (useBest) {
+            workerOpts.langPath = 'https://tessdata.projectnaptha.com/4.0.0_best';
           }
-          renderOcrThumbnails();
-        }
 
-        await worker.terminate();
+          const worker = await Tesseract.createWorker('ara', 1, workerOpts);
+          await worker.setParameters({
+            tessedit_pageseg_mode: Tesseract.PSM ? Tesseract.PSM.SINGLE_BLOCK : '6',
+            preserve_interword_spaces: '1'
+          });
+
+          for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
+            const item = pendingItems[fIdx];
+            curFileIdx = fIdx;
+            item.status = 'processing';
+            renderOcrThumbnails();
+
+            try {
+              const slices = await sliceAndPreprocessImageForOcr(item.file, forceInvert, cropMode);
+              curSliceCount = slices.length;
+              const rawLines = [];
+              for (let sIdx = 0; sIdx < slices.length; sIdx++) {
+                curSliceIdx = sIdx;
+                const { data } = await worker.recognize(slices[sIdx]);
+                if (data && Array.isArray(data.lines) && data.lines.length > 0) {
+                  data.lines.forEach(lineObj => {
+                    if (lineObj.confidence === undefined || lineObj.confidence >= 25) {
+                      rawLines.push(lineObj.text);
+                    }
+                  });
+                } else {
+                  String((data && data.text) || '').split(/\r?\n/).forEach(l => rawLines.push(l));
+                }
+              }
+              item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean);
+              item.status = 'done';
+            } catch (e) {
+              item.status = 'error';
+            }
+            renderOcrThumbnails();
+          }
+          await worker.terminate();
+        }
 
         rebuildExtractedTextFromFiles();
         progBox.classList.add('hidden');
         resBox.classList.remove('hidden');
         matchOcrLinesToMembers();
       } catch (err) {
+        pendingItems.forEach(it => { if (it.status === 'processing') it.status = 'error'; });
+        renderOcrThumbnails();
         progBox.classList.add('hidden');
-        showToast('❌ حدث خطأ أثناء قراءة الصور، تأكدي من وضوح الصور');
+        showToast('❌ ' + (err && err.message ? err.message : 'حدث خطأ أثناء قراءة الصور'));
       } finally {
         ocrIsProcessing = false;
-        if (ocrFiles.some(f => f.status === 'pending')) {
-          processPendingOcrFiles();
-        }
+        if (ocrFiles.some(f => f.status === 'pending')) processPendingOcrFiles();
       }
     }
 
@@ -2072,22 +2196,76 @@
       return dp[m][n];
     }
 
-    function nameSimilarity(a, b) {
-      const s1 = normalizeArabicText(a).replace(/\s+/g, '');
-      const s2 = normalizeArabicText(b).replace(/\s+/g, '');
+    function strSimilarity(s1, s2) {
       if (!s1 || !s2) return 0;
       if (s1 === s2) return 1;
-      const maxLen = Math.max(s1.length, s2.length);
-      return 1 - (levenshtein(s1, s2) / maxLen);
+      return 1 - (levenshtein(s1, s2) / Math.max(s1.length, s2.length));
+    }
+
+    function nameSimilarity(a, b) {
+      return strSimilarity(normalizeArabicText(a).replace(/\s+/g, ''), normalizeArabicText(b).replace(/\s+/g, ''));
+    }
+
+    function rasmSimilarity(a, b) {
+      return strSimilarity(toArabicRasm(a), toArabicRasm(b));
+    }
+
+    // مطابقة ذكية تجمع بين التطابق الدقيق + رسم الحروف العربية بدون نقط + تطابق الكلمات
+    function findBestMemberMatch(line, targetMembers) {
+      const normLine = normalizeArabicText(line);
+      const normLineWords = normLine.split(' ').filter(Boolean);
+      const normLineNoSpace = normLine.replace(/\s+/g, '');
+      const lineSecondPart = normLineWords.slice(1).join(' ');
+
+      let bestMember = null;
+      let bestScore = 0;
+
+      targetMembers.forEach(m => {
+        const mShort = extractFirstTwoArabicNames(m.name);
+        const normMShort = normalizeArabicText(mShort);
+        const normMFull = normalizeArabicText(m.name);
+        const normMShortNoSpace = normMShort.replace(/\s+/g, '');
+        const normMFullNoSpace = normMFull.replace(/\s+/g, '');
+        const mWords = normMShort.split(' ').filter(Boolean);
+        const mSecondPart = mWords.slice(1).join(' ');
+
+        let score = 0;
+        if (normLine === normMShort || normLine === normMFull || normLineNoSpace === normMShortNoSpace) {
+          score = 1.0;
+        } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort) || normMFullNoSpace.startsWith(normLineNoSpace)) {
+          score = 0.95;
+        } else {
+          const simExact = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+          const simRasm = Math.max(rasmSimilarity(normLine, normMShort), rasmSimilarity(normLine, normMFull));
+          const mixedFull = 0.50 * simExact + 0.50 * simRasm;
+
+          let wordBased = 0;
+          if (normLineWords.length >= 2 && mWords.length >= 2) {
+            const w1 = 0.45 * nameSimilarity(normLineWords[0], mWords[0]) + 0.55 * rasmSimilarity(normLineWords[0], mWords[0]);
+            const w2 = 0.45 * nameSimilarity(lineSecondPart, mSecondPart) + 0.55 * rasmSimilarity(lineSecondPart, mSecondPart);
+            wordBased = 0.44 * w1 + 0.56 * w2;
+            if (w2 >= 0.88 && w1 >= 0.45) wordBased = Math.max(wordBased, 0.74);
+          }
+
+          score = Math.max(simExact, mixedFull, wordBased);
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMember = m;
+        }
+      });
+
+      return { member: bestMember, score: bestScore };
     }
 
     function matchOcrLinesToMembers() {
       const rawLines = document.getElementById('ocr-extracted-text').value
         .split(/\r?\n/)
-        .map(l => extractFirstTwoArabicNames(l.trim()))
+        .map(l => cleanOcrLineToShortName(l.trim()))
         .filter(Boolean);
 
-      const targetMembers = getListeningMembers();
+      const targetMembers = getOcrTargetMembers();
       ocrSelectedMemberIds = new Set();
       ocrMatchedReasons = {};
       ocrUnmatchedLines = [];
@@ -2101,48 +2279,28 @@
       rawLines.forEach(line => {
         const normLine = normalizeArabicText(line);
         const normLineWords = normLine.split(' ').filter(Boolean);
-        const normLineNoSpace = normLine.replace(/\s+/g, '');
-        let bestMember = null;
-        let bestScore = 0;
+        let bestMember = null, bestScore = 0;
 
         if (normLineWords.length === 1) {
           const fw = normLineWords[0];
           if (firstWordCounts[fw] === 1) {
             const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
-            if (uniqueM) {
-              bestMember = uniqueM;
-              bestScore = 0.9;
-            }
+            if (uniqueM) { bestMember = uniqueM; bestScore = 0.9; }
+          } else {
+            // البحث في الأسماء الأولى الفريدة بتشابه الرسم أيضاً
+            const fuzzyFirst = targetMembers.filter(m => {
+              const mFw = normalizeArabicText(m.name).split(' ')[0];
+              return (0.5 * nameSimilarity(fw, mFw) + 0.5 * rasmSimilarity(fw, mFw)) >= 0.78;
+            });
+            if (fuzzyFirst.length === 1) { bestMember = fuzzyFirst[0]; bestScore = 0.82; }
           }
         } else {
-          targetMembers.forEach(m => {
-            const mShort = extractFirstTwoArabicNames(m.name);
-            const normMShort = normalizeArabicText(mShort);
-            const normMFull = normalizeArabicText(m.name);
-            const normMShortNoSpace = normMShort.replace(/\s+/g, '');
-            const normMFullNoSpace = normMFull.replace(/\s+/g, '');
-
-            let score = 0;
-            if (normLine === normMShort || normLineNoSpace === normMShortNoSpace) {
-              score = 1.0;
-            } else if (
-              normMFull.startsWith(normLine) ||
-              normLine.startsWith(normMShort) ||
-              normMFullNoSpace.startsWith(normLineNoSpace)
-            ) {
-              score = 0.95;
-            } else {
-              score = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
-            }
-
-            if (score > bestScore) {
-              bestScore = score;
-              bestMember = m;
-            }
-          });
+          const res = findBestMemberMatch(line, targetMembers);
+          bestMember = res.member;
+          bestScore = res.score;
         }
 
-        if (bestMember && bestScore >= 0.72) {
+        if (bestMember && bestScore >= 0.70) {
           ocrSelectedMemberIds.add(bestMember.id);
           ocrMatchedReasons[bestMember.id] = line;
         } else {
@@ -2154,7 +2312,7 @@
     }
 
     function renderOcrChecklist() {
-      const targetMembers = getListeningMembers();
+      const targetMembers = getOcrTargetMembers();
       const filterQ = (document.getElementById('ocr-filter-input').value || '').trim().toLowerCase();
 
       const sorted = [...targetMembers]
@@ -2182,8 +2340,7 @@
               <span>${escapeHtml(m.name)}</span>
             </div>
             <span style="font-size:11.5px; color:var(--muted);">${reason ? `طابق: ${escapeHtml(reason)}` : escapeHtml(shortName)}</span>
-          </label>
-        `;
+          </label>`;
       }).join('');
     }
 
@@ -2191,7 +2348,7 @@
       if (checked) ocrSelectedMemberIds.add(mId);
       else ocrSelectedMemberIds.delete(mId);
       const summaryEl = document.getElementById('ocr-match-summary');
-      const total = getListeningMembers().length;
+      const total = getOcrTargetMembers().length;
       const firstLine = summaryEl.querySelector('strong');
       if (firstLine) firstLine.textContent = ocrSelectedMemberIds.size;
       else summaryEl.innerHTML = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${total}`;
@@ -2199,40 +2356,41 @@
 
     function applyOcrSelection(markRestAbsent) {
       const mode = getOcrMode();
-      const targetMembers = getListeningMembers();
+      const field = ocrTargetType === 'recitation' ? 'recitation' : 'listening';
+      const targetMembers = getOcrTargetMembers();
       if (ocrSelectedMemberIds.size === 0 && !markRestAbsent) {
         return showToast('حددي اسماً واحداً على الأقل للاعتماد');
       }
 
       const day = ensureDayRecord();
       const patch = {};
-      let markedCount = 0;
-      let restAbsentCount = 0;
+      let markedCount = 0, restAbsentCount = 0;
 
       ocrSelectedMemberIds.forEach(id => {
-        day.listening[id] = mode;
+        day[field][id] = mode;
         patch[id] = mode;
         markedCount++;
       });
 
       if (mode === 'present' && markRestAbsent) {
         targetMembers.forEach(m => {
-          if (!ocrSelectedMemberIds.has(m.id) && !day.listening[m.id]) {
-            day.listening[m.id] = 'absent';
+          if (!ocrSelectedMemberIds.has(m.id) && !day[field][m.id]) {
+            day[field][m.id] = 'absent';
             patch[m.id] = 'absent';
             restAbsentCount++;
           }
         });
       }
 
-      cloudPatchAttendance(currentDate, 'listening', patch);
+      cloudPatchAttendance(currentDate, field, patch);
       closeOcrModal();
       renderAll();
 
+      const areaName = field === 'recitation' ? 'التسميع' : 'الاستماع';
       if (mode === 'present' && markRestAbsent) {
-        showToast(`✅ تم تسجيل ${markedCount} حاضر و ${restAbsentCount} غياب`);
+        showToast(`✅ تم تسجيل ${markedCount} حاضر و ${restAbsentCount} غياب في ${areaName}`);
       } else {
-        showToast(mode === 'present' ? `✅ تم تسجيل ${markedCount} حاضر من الصور` : `❌ تم تسجيل ${markedCount} غياب من الصور`);
+        showToast(mode === 'present' ? `✅ تم تسجيل ${markedCount} حاضر في ${areaName}` : `❌ تم تسجيل ${markedCount} غياب في ${areaName}`);
       }
     }
 
@@ -2305,11 +2463,7 @@
         if (isNumSearch) {
           visiblePartnerships = visiblePartnerships
             .filter(item => String(item.pNum).startsWith(normQ))
-            .sort((a, b) => {
-              const aExact = a.pNum === Number(normQ) ? 0 : 1;
-              const bExact = b.pNum === Number(normQ) ? 0 : 1;
-              return (aExact - bExact) || (a.pNum - b.pNum);
-            });
+            .sort((a, b) => ((a.pNum === Number(normQ) ? 0 : 1) - (b.pNum === Number(normQ) ? 0 : 1)) || (a.pNum - b.pNum));
         } else {
           visiblePartnerships = visiblePartnerships.filter(item =>
             item.p.memberIds.some(id => memberMap[id] && memberMap[id].name.toLowerCase().includes(normQ))
@@ -2317,17 +2471,13 @@
         }
       }
 
-      let html = '';
-      let renderedPartnerCards = 0;
-
+      let html = '', renderedPartnerCards = 0;
       visiblePartnerships.forEach(({ p, pNum }) => {
         const allValid = p.memberIds.map(id => memberMap[id]).filter(Boolean);
         if (allValid.length === 0) return;
 
         let shownMembers = allValid.filter(m => matchesStatusFilter(day.recitation[m.id], recitationFilter));
-        if (recitationFilter === 'all' && normQ && !isNumSearch) {
-          shownMembers = allValid;
-        }
+        if (recitationFilter === 'all' && normQ && !isNumSearch) shownMembers = allValid;
         if (shownMembers.length === 0) return;
 
         renderedPartnerCards++;
@@ -2358,9 +2508,7 @@
 
       const paired = getPairedMemberIds();
       let unpaired = members.filter(m => !paired.has(m.id) && matchesStatusFilter(day.recitation[m.id], recitationFilter));
-      if (normQ) {
-        unpaired = isNumSearch ? [] : unpaired.filter(m => m.name.toLowerCase().includes(normQ));
-      }
+      if (normQ) unpaired = isNumSearch ? [] : unpaired.filter(m => m.name.toLowerCase().includes(normQ));
 
       if (unpaired.length > 0) {
         html += `
@@ -2370,18 +2518,12 @@
           </div>`;
       }
 
-      if (members.length === 0) {
-        html = `<div class="card empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`;
-      } else if (renderedPartnerCards === 0 && unpaired.length === 0) {
-        if (recitationFilter === 'absent') {
-          html = `<div class="card empty-state">✨ ما شاء الله، لا يوجد غياب في التسميع اليوم!</div>`;
-        } else if (normQ && isNumSearch) {
-          html = `<div class="card empty-state">لا توجد مجموعة رفقاء برقم "${escapeHtml(rawQ)}".</div>`;
-        } else {
-          html = `<div class="card empty-state">لا توجد نتائج مطابقة للبحث أو التصفية الحالية.</div>`;
-        }
+      if (members.length === 0) html = `<div class="card empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`;
+      else if (renderedPartnerCards === 0 && unpaired.length === 0) {
+        if (recitationFilter === 'absent') html = `<div class="card empty-state">✨ ما شاء الله، لا يوجد غياب في التسميع اليوم!</div>`;
+        else if (normQ && isNumSearch) html = `<div class="card empty-state">لا توجد مجموعة رفقاء برقم "${escapeHtml(rawQ)}".</div>`;
+        else html = `<div class="card empty-state">لا توجد نتائج مطابقة للبحث أو التصفية الحالية.</div>`;
       }
-
       container.innerHTML = html;
     }
 
@@ -2474,25 +2616,19 @@
     }
 
     function startEditMember(mId) {
-      editingMemberId = mId;
-      renderManage();
+      editingMemberId = mId; renderManage();
       const inp = document.getElementById(`edit-member-name-${mId}`);
       if (inp) { inp.focus(); inp.select(); }
     }
 
     function saveMemberEdit(mId) {
-      const inp = document.getElementById(`edit-member-name-${mId}`);
-      if (!inp) return;
+      const inp = document.getElementById(`edit-member-name-${mId}`); if (!inp) return;
       const parsed = parseMemberNameAndFlags(inp.value);
       if (!parsed.name) return showToast('اكتب الاسم الجديد للعضو');
-      const m = db.members.find(x => x.id === mId);
-      if (!m) return;
+      const m = db.members.find(x => x.id === mId); if (!m) return;
       m.name = parsed.name;
       if (parsed.recitationOnly) m.recitationOnly = true;
-      cloudSaveMember(m);
-      editingMemberId = null;
-      renderAll();
-      showToast('✅ تم تعديل الاسم بنجاح');
+      cloudSaveMember(m); editingMemberId = null; renderAll(); showToast('✅ تم تعديل الاسم بنجاح');
     }
 
     function toggleRecitationOnly(mId) {
@@ -2516,16 +2652,14 @@
       if (members.length === 0) return showToast('القائمة فارغة بالفعل');
       const group = getCurrentGroup();
       if (!confirm(`هل أنت متأكد من مسح جميع الأسماء في "${group.name}" (${members.length} عضو) مع رفقاء التسميع نهائياً؟`)) return;
-      const delM = members.map(m => m.id);
-      const delP = getGroupPartnerships().map(p => p.id);
+      const delM = members.map(m => m.id), delP = getGroupPartnerships().map(p => p.id);
       db.members = db.members.filter(m => m.groupId !== currentGroupId);
       db.partnerships = db.partnerships.filter(p => p.groupId !== currentGroupId);
       cloudExec(async () => {
         if (delM.length) { const p = {}; delM.forEach(id => p[id] = null); await cloudRequest('/members', 'PATCH', p); }
         if (delP.length) { const p = {}; delP.forEach(id => p[id] = null); await cloudRequest('/partnerships', 'PATCH', p); }
       });
-      renderAll();
-      showToast('تم مسح جميع الأسماء في المجموعة');
+      renderAll(); showToast('تم مسح جميع الأسماء في المجموعة');
     }
 
     function resetAbsenceCounter() {
@@ -2581,9 +2715,7 @@
       const absentList = members
         .filter(m => day[type][m.id] === 'absent')
         .map(m => ({ name: m.name, count: getAbsenceCount(m.id, type, currentDate) }))
-        .sort((a, b) => type === 'listening'
-          ? (a.count - b.count) || compareArabic(a.name, b.name)
-          : (a.count - b.count));
+        .sort((a, b) => type === 'listening' ? (a.count - b.count) || compareArabic(a.name, b.name) : (a.count - b.count));
       if (absentList.length === 0) return `${title}\n\n✨ ما شاء الله، لا يوجد غياب اليوم!`;
       return `${title}\n\n${absentList.map(it => `🥀${it.name} ${'🔴'.repeat(Math.max(1, it.count))}${it.count > 2 ? ' إنذار بالحذف' : ''}`).join('\n')}`;
     }
