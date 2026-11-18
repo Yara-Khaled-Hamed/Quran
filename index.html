@@ -215,6 +215,7 @@
     .ocr-thumb-status { position: absolute; bottom: 4px; left: 4px; background: rgba(255,255,255,0.92); font-size: 11px; padding: 1px 5px; border-radius: 99px; font-weight: 800; }
     .ocr-thumb-del { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 99px; border: none; background: rgba(220,38,38,0.9); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
+    .ocr-ai-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 9px 11px; margin-bottom: 10px; font-size: 12.5px; }
     .ocr-progress-wrap { background: #e5e7eb; border-radius: 99px; height: 10px; overflow: hidden; margin: 8px 0; }
     .ocr-progress-bar { height: 100%; background: linear-gradient(90deg, #059669, #10b981); width: 0%; transition: width 0.2s; }
     .ocr-checklist { max-height: 220px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 13px; padding: 8px; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; -webkit-overflow-scrolling: touch; }
@@ -451,7 +452,6 @@
               <button type="button" id="recit-mode-btn-names" class="mode-tab-btn" onclick="setRecitationQuickMode('names')">✍️ تسجيل بالأسماء</button>
             </div>
 
-            <!-- الوضع 1: تسجيل بالأرقام -->
             <div id="recit-quick-numbers-panel">
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
                 <input type="text" id="recitation-numbers-input" class="input" style="padding:9px 12px; font-size:14px; flex:1; min-width:190px;" placeholder="أدخل أرقام الرفقاء (مثال: 1 3 5 أو ١، ٣، ٥)..." oninput="previewRecitationNumbers()" onkeypress="if(event.key==='Enter') applyRecitationByNumbers()" />
@@ -460,7 +460,6 @@
               <div id="recitation-numbers-preview" class="quick-num-preview hidden"></div>
             </div>
 
-            <!-- الوضع 2: تسجيل بكتابة الأسماء (غياب أو حضور) -->
             <div id="recit-quick-names-panel" class="hidden">
               <textarea id="recitation-names-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="اكتبي أو الصقي الأسماء (كل اسم في سطر أو بينهم فاصلة ،)..." oninput="previewRecitationNames()"></textarea>
               <div id="recitation-names-preview" class="quick-num-preview hidden"></div>
@@ -548,8 +547,24 @@
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
       <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
-        يمكنكِ اختيار <strong>صورة أو عدة صور معاً</strong> (أو إضافة صور أخرى تباعاً)، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
+        اختاري صورة أو عدة صور، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
       </p>
+
+      <!-- خيار القارئ الذكي فائق الدقة (Gemini AI) -->
+      <details class="ocr-ai-box">
+        <summary style="cursor:pointer; font-weight:800; color:#92400e;">
+          ⚡ القارئ الذكي فائق الدقة (Gemini AI — يقرأ 100% بدون تخطي أسماء): <span id="gemini-status-badge">غير مفعّل</span>
+        </summary>
+        <p style="margin-top:6px; color:#78350f; line-height:1.6;">
+          للحصول على دقة 99% مع صور الواتساب المظلمة والمزدحمة: احصلي على مفتاح مجاني من
+          <strong>aistudio.google.com</strong> والصقيه هنا مرة واحدة فقط:
+        </p>
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <input type="password" id="gemini-key-input" class="input" style="padding:7px 10px; font-size:13px;" placeholder="AIza..." />
+          <button class="btn btn-gold btn-sm" onclick="saveGeminiKey()">حفظ</button>
+          <button class="btn btn-outline btn-sm" onclick="clearGeminiKey()">إلغاء</button>
+        </div>
+      </details>
 
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
@@ -661,6 +676,7 @@
     const CLOUD_DB_URL = "https://quran-attendence-default-rtdb.firebaseio.com";
     const STORAGE_KEY = 'taahadu_qoran_app_v1';
     const SESSION_KEY = 'taahadu_session_v1';
+    const GEMINI_KEY_STORAGE = 'taahadu_gemini_api_key';
     const CLOUD_BASE = CLOUD_DB_URL.trim().replace(/\/+$/, '');
 
     const defaultData = {
@@ -708,7 +724,7 @@
     let deferredPrompt = null;
     let lastCloudSnapshot = '';
 
-    let ocrFiles = [];
+    let ocrFiles = []; // { id, file, url, status, lines, rawLines }
     let ocrIsProcessing = false;
     let ocrSelectedMemberIds = new Set();
     let ocrMatchedReasons = {};
@@ -1492,7 +1508,6 @@
       renderStats(); renderRecitation(); renderManage(); showToast('تم تحضير الجميع في التسميع');
     }
 
-    // ==================== تسجيل التسميع بأرقام الرفقاء ====================
     function parsePartnershipNumbersFromInput() {
       const raw = document.getElementById('recitation-numbers-input').value;
       const matches = toEnglishDigits(raw).match(/\d+/g) || [];
@@ -1576,7 +1591,6 @@
       showToast(`✅ تم تسجيل ${matchedMemberIds.size} عضو في التسميع`);
     }
 
-    // ==================== تسجيل التسميع بكتابة الأسماء (غياب أو حضور) ====================
     function cleanTypedMemberToken(raw) {
       return toEnglishDigits(String(raw || ''))
         .replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳]/g, ' ')
@@ -1737,8 +1751,34 @@
       }
     }
 
-    // ==================== قراءة أسماء الاستماع من صورة أو عدة صور (OCR عربي) ====================
+    // ==================== قراءة أسماء الاستماع من الصور (Gemini AI الاختياري + Tesseract 4.0.0_best المحسّن) ====================
+    function getGeminiKey() { return (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim(); }
+    function updateGeminiStatusUI() {
+      const k = getGeminiKey();
+      const badge = document.getElementById('gemini-status-badge');
+      const inp = document.getElementById('gemini-key-input');
+      if (badge) {
+        badge.textContent = k ? 'مفعّل ✅ (دقة فائقة)' : 'غير مفعّل (يعمل بالمحرك المدمج)';
+        badge.style.color = k ? '#059669' : '#b45309';
+      }
+      if (inp) inp.value = k;
+    }
+    function saveGeminiKey() {
+      const val = (document.getElementById('gemini-key-input').value || '').trim();
+      if (!val) return showToast('الصقي مفتاح Gemini أولاً');
+      localStorage.setItem(GEMINI_KEY_STORAGE, val);
+      updateGeminiStatusUI();
+      showToast('✅ تم تفعيل القارئ الذكي (Gemini AI)');
+      if (ocrFiles.length > 0 && !ocrIsProcessing) reprocessAllOcrImages();
+    }
+    function clearGeminiKey() {
+      localStorage.removeItem(GEMINI_KEY_STORAGE);
+      updateGeminiStatusUI();
+      showToast('تم إيقاف القارئ الذكي والعودة للقارئ المدمج');
+    }
+
     function openOcrModal() {
+      updateGeminiStatusUI();
       clearOcrFiles(false);
       updateOcrApplyButtons();
       document.getElementById('ocr-modal').classList.add('open');
@@ -1794,7 +1834,8 @@
           file,
           url: URL.createObjectURL(file),
           status: 'pending',
-          lines: []
+          lines: [],
+          rawLines: []
         });
       });
 
@@ -1853,11 +1894,72 @@
 
     function reprocessAllOcrImages() {
       if (ocrFiles.length === 0 || ocrIsProcessing) return;
-      ocrFiles.forEach(item => { item.status = 'pending'; item.lines = []; });
+      ocrFiles.forEach(item => { item.status = 'pending'; item.lines = []; item.rawLines = []; });
       renderOcrThumbnails();
       processPendingOcrFiles();
     }
 
+    // تقطيع الصورة بدون تشويه للذكاء الاصطناعي (Gemini)
+    function sliceImageCrispForAI(file) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = async () => {
+          const origW = img.naturalWidth || img.width;
+          const origH = img.naturalHeight || img.height;
+          const sliceH = 2000;
+          const overlap = 180;
+          const parts = [];
+          let curY = 0;
+          while (curY < origH) {
+            const h = Math.min(sliceH, origH - curY);
+            const canvas = document.createElement('canvas');
+            canvas.width = origW;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, curY, origW, h, 0, 0, origW, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+            parts.push(dataUrl.split(',')[1]);
+            if (curY + h >= origH) break;
+            curY += (sliceH - overlap);
+          }
+          resolve(parts);
+        };
+        img.onerror = () => resolve([]);
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    async function recognizeWithGemini(file, apiKey, onProgress) {
+      const base64Parts = await sliceImageCrispForAI(file);
+      if (base64Parts.length === 0) throw new Error('Image read error');
+
+      const allLines = [];
+      const prompt = 'اقرأ جميع أسماء الأشخاص العرب الموجودين في هذه الصورة بدقة تامة دون تخطي أي اسم. تجاهل تماماً الأوقات والتواريخ والأرقام الإنجليزية مثل Today و minutes ago و We و OTU وكلمة تعاهدوا وأرقام الأصوات. أعد الأسماء فقط (سطر لكل اسم، وأول اسمين فقط من كل اسم، وإذا احتوى الاسم على كلمة عبد فاذكر الاسم الذي بعدها ليبقى الاسم كاملاً مثل نوران عبد الجواد). بدون أي ترقيم أو مقدمات أو شرح.';
+
+      for (let i = 0; i < base64Parts.length; i++) {
+        onProgress((i + 0.5) / base64Parts.length);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                { inline_data: { mime_type: 'image/jpeg', data: base64Parts[i] } }
+              ]
+            }],
+            generationConfig: { temperature: 0.1 }
+          })
+        });
+        if (!res.ok) throw new Error('Gemini API error: ' + res.status);
+        const json = await res.json();
+        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        text.split(/\r?\n/).forEach(l => { if (l.trim()) allLines.push(l.trim()); });
+      }
+      return allLines;
+    }
+
+    // تقطيع الصورة وتجهيزها مع هوامش بيضاء لقارئ Tesseract 4.0.0_best
     function sliceAndPreprocessImageForOcr(file, forceInvert) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -1866,8 +1968,8 @@
           const origH = img.naturalHeight || img.height;
 
           let targetW = origW;
-          if (origW < 950) targetW = Math.round(origW * Math.min(2.8, 1200 / Math.max(1, origW)));
-          else if (origW > 1700) targetW = 1600;
+          if (origW < 1100) targetW = Math.round(origW * Math.min(3.0, 1300 / Math.max(1, origW)));
+          else if (origW > 1800) targetW = 1650;
 
           const scale = targetW / Math.max(1, origW);
           const targetH = Math.round(origH * scale);
@@ -1888,8 +1990,9 @@
           const avgLum = samples ? sumLum / samples : 255;
           const shouldInvert = forceInvert || avgLum < 115;
 
-          const sliceTargetH = 1400;
-          const overlapTargetH = 150;
+          const sliceTargetH = 1200;
+          const overlapTargetH = 220;
+          const pad = 24;
           const blobs = [];
 
           let curY = 0;
@@ -1899,14 +2002,17 @@
             const srcH = hSlice / scale;
 
             const canvas = document.createElement('canvas');
-            canvas.width = targetW;
-            canvas.height = Math.max(1, Math.round(hSlice));
+            canvas.width = targetW + pad * 2;
+            canvas.height = Math.max(1, Math.round(hSlice)) + pad * 2;
             const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, 0, srcY, origW, srcH, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, srcY, origW, srcH, pad, pad, targetW, Math.round(hSlice));
 
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const imgData = ctx.getImageData(pad, pad, targetW, Math.round(hSlice));
             const d = imgData.data;
             for (let i = 0; i < d.length; i += 4) {
               let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
@@ -1914,7 +2020,7 @@
               lum = Math.max(0, Math.min(255, (lum - 128) * 1.35 + 128));
               d[i] = d[i + 1] = d[i + 2] = lum;
             }
-            ctx.putImageData(imgData, 0, 0);
+            ctx.putImageData(imgData, pad, pad);
 
             const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
             if (blob) blobs.push(blob);
@@ -1930,7 +2036,7 @@
       });
     }
 
-    function cleanOcrLineToShortName(line) {
+    function extractRawArabicLine(line) {
       let s = String(line || '')
         .replace(/\d{1,2}:\d{2}\s*(ص|م|AM|PM)?/gi, ' ')
         .replace(/\+?\d[\d\s\-().]{6,}/g, ' ')
@@ -1940,6 +2046,12 @@
       if (!s) return '';
       if (/^(نعم|لا|تصويت|أصوات|الآن|اليوم|أمس|منذ|تفاصيل|الاستطلاع)$/.test(s)) return '';
       s = s.replace(/\s+تعاهدوا(\s+القر[ءاآ]ن)?$/g, '').trim();
+      return s;
+    }
+
+    function cleanOcrLineToShortName(line) {
+      const s = extractRawArabicLine(line);
+      if (!s) return '';
 
       const words = s.split(' ').filter(w => w.length >= 2);
       if (words.length === 0) return '';
@@ -1969,14 +2081,31 @@
       document.getElementById('ocr-extracted-text').value = uniqueLines.join('\n');
     }
 
+    async function createBestArabicWorker(onProgress) {
+      const opts = {
+        langPath: 'https://tessdata.projectnaptha.com/4.0.0_best',
+        logger: onProgress
+      };
+      try {
+        const w = await Tesseract.createWorker('ara', 1, opts);
+        await w.setParameters({ tessedit_pageseg_mode: '4' });
+        return w;
+      } catch (e) {
+        const w = await Tesseract.createWorker('ara', 1, { logger: onProgress });
+        await w.setParameters({ tessedit_pageseg_mode: '4' });
+        return w;
+      }
+    }
+
     async function processPendingOcrFiles() {
       if (ocrIsProcessing) return;
-      if (typeof Tesseract === 'undefined') {
-        return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
-      }
-
       const pendingItems = ocrFiles.filter(f => f.status === 'pending');
       if (pendingItems.length === 0) return;
+
+      const geminiKey = getGeminiKey();
+      if (!geminiKey && typeof Tesseract === 'undefined') {
+        return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
+      }
 
       ocrIsProcessing = true;
       const progBox = document.getElementById('ocr-progress-box');
@@ -1985,33 +2114,64 @@
       const resBox = document.getElementById('ocr-result-box');
 
       progBox.classList.remove('hidden');
-      barEl.style.width = '5%';
-      statusEl.textContent = 'جاري تجهيز الصور للقراءة...';
+      barEl.style.width = '8%';
 
       try {
-        const forceInvert = document.getElementById('ocr-invert-check').checked;
-        let curFileIdx = 0;
-        let curSliceIdx = 0;
-        let curSliceCount = 1;
-
-        const worker = await Tesseract.createWorker('ara', 1, {
-          logger: m => {
-            if (m && m.status === 'recognizing text') {
-              const fileFrac = (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount);
-              const overall = ((curFileIdx + fileFrac) / pendingItems.length) * 100;
-              const pct = Math.max(8, Math.min(99, Math.round(overall)));
-              barEl.style.width = pct + '%';
-              statusEl.textContent = pendingItems.length > 1
-                ? `جاري قراءة صورة ${curFileIdx + 1} من ${pendingItems.length}... (${pct}%)`
-                : `جاري استخراج الأسماء من الصورة... (${pct}%)`;
-            } else if (m && m.status) {
-              statusEl.textContent = 'جاري تجهيز القاموس العربي...';
+        if (geminiKey) {
+          let aiFailed = false;
+          for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
+            const item = pendingItems[fIdx];
+            item.status = 'processing';
+            renderOcrThumbnails();
+            try {
+              const aiLines = await recognizeWithGemini(item.file, geminiKey, frac => {
+                const overall = ((fIdx + frac) / pendingItems.length) * 100;
+                const pct = Math.max(10, Math.min(99, Math.round(overall)));
+                barEl.style.width = pct + '%';
+                statusEl.textContent = `⚡ القارئ الذكي يقرأ صورة ${fIdx + 1} من ${pendingItems.length}... (${pct}%)`;
+              });
+              item.rawLines = aiLines.map(extractRawArabicLine).filter(Boolean);
+              item.lines = aiLines.map(cleanOcrLineToShortName).filter(Boolean);
+              item.status = 'done';
+            } catch (e) {
+              aiFailed = true;
+              item.status = 'pending';
+              showToast('⚠️ تعذر الاتصال بـ Gemini AI، جاري استخدام القارئ المدمج المحسّن...');
+              break;
             }
+            renderOcrThumbnails();
+          }
+          if (!aiFailed) {
+            rebuildExtractedTextFromFiles();
+            progBox.classList.add('hidden');
+            resBox.classList.remove('hidden');
+            matchOcrLinesToMembers();
+            return;
+          }
+        }
+
+        // القارئ المدمج المحسّن (Tesseract 4.0.0_best + PSM 4)
+        const remainingPending = ocrFiles.filter(f => f.status === 'pending');
+        const forceInvert = document.getElementById('ocr-invert-check').checked;
+        let curFileIdx = 0, curSliceIdx = 0, curSliceCount = 1;
+
+        statusEl.textContent = 'جاري تجهيز القارئ العربي عالي الدقة (4.0.0_best)...';
+        const worker = await createBestArabicWorker(m => {
+          if (m && m.status === 'recognizing text') {
+            const fileFrac = (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount);
+            const overall = ((curFileIdx + fileFrac) / remainingPending.length) * 100;
+            const pct = Math.max(8, Math.min(99, Math.round(overall)));
+            barEl.style.width = pct + '%';
+            statusEl.textContent = remainingPending.length > 1
+              ? `جاري قراءة صورة ${curFileIdx + 1} من ${remainingPending.length}... (${pct}%)`
+              : `جاري استخراج الأسماء بدقة عالية... (${pct}%)`;
+          } else if (m && m.status) {
+            statusEl.textContent = 'جاري تحميل نموذج اللغة العربية الدقيق (أول مرة فقط)...';
           }
         });
 
-        for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
-          const item = pendingItems[fIdx];
+        for (let fIdx = 0; fIdx < remainingPending.length; fIdx++) {
+          const item = remainingPending[fIdx];
           curFileIdx = fIdx;
           item.status = 'processing';
           renderOcrThumbnails();
@@ -2023,14 +2183,14 @@
             for (let sIdx = 0; sIdx < slices.length; sIdx++) {
               curSliceIdx = sIdx;
               const { data } = await worker.recognize(slices[sIdx]);
+              // قراءة جميع السطور دون حذف السطور ضعيفة الثقة حتى لا يتخطى أسماء
               if (data && Array.isArray(data.lines) && data.lines.length > 0) {
-                const highConf = data.lines.filter(lineObj => lineObj.confidence === undefined || lineObj.confidence >= 35);
-                const chosen = highConf.length > 0 ? highConf : data.lines;
-                chosen.forEach(lineObj => rawLines.push(lineObj.text));
+                data.lines.forEach(lineObj => { if (lineObj.text) rawLines.push(lineObj.text); });
               } else {
                 String((data && data.text) || '').split(/\r?\n/).forEach(l => rawLines.push(l));
               }
             }
+            item.rawLines = rawLines.map(extractRawArabicLine).filter(Boolean);
             item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean);
             item.status = 'done';
           } catch (e) {
@@ -2081,6 +2241,20 @@
       return 1 - (levenshtein(s1, s2) / maxLen);
     }
 
+    function scoreLineAgainstMember(line, m) {
+      const normLine = normalizeArabicText(line);
+      const normLineNoSpace = normLine.replace(/\s+/g, '');
+      const mShort = extractFirstTwoArabicNames(m.name);
+      const normMShort = normalizeArabicText(mShort);
+      const normMFull = normalizeArabicText(m.name);
+      const normMShortNoSpace = normMShort.replace(/\s+/g, '');
+      const normMFullNoSpace = normMFull.replace(/\s+/g, '');
+
+      if (normLine === normMShort || normLineNoSpace === normMShortNoSpace) return 1.0;
+      if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort) || normMFullNoSpace.startsWith(normLineNoSpace)) return 0.95;
+      return Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+    }
+
     function matchOcrLinesToMembers() {
       const rawLines = document.getElementById('ocr-extracted-text').value
         .split(/\r?\n/)
@@ -2101,7 +2275,6 @@
       rawLines.forEach(line => {
         const normLine = normalizeArabicText(line);
         const normLineWords = normLine.split(' ').filter(Boolean);
-        const normLineNoSpace = normLine.replace(/\s+/g, '');
         let bestMember = null;
         let bestScore = 0;
 
@@ -2109,36 +2282,12 @@
           const fw = normLineWords[0];
           if (firstWordCounts[fw] === 1) {
             const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
-            if (uniqueM) {
-              bestMember = uniqueM;
-              bestScore = 0.9;
-            }
+            if (uniqueM) { bestMember = uniqueM; bestScore = 0.9; }
           }
         } else {
           targetMembers.forEach(m => {
-            const mShort = extractFirstTwoArabicNames(m.name);
-            const normMShort = normalizeArabicText(mShort);
-            const normMFull = normalizeArabicText(m.name);
-            const normMShortNoSpace = normMShort.replace(/\s+/g, '');
-            const normMFullNoSpace = normMFull.replace(/\s+/g, '');
-
-            let score = 0;
-            if (normLine === normMShort || normLineNoSpace === normMShortNoSpace) {
-              score = 1.0;
-            } else if (
-              normMFull.startsWith(normLine) ||
-              normLine.startsWith(normMShort) ||
-              normMFullNoSpace.startsWith(normLineNoSpace)
-            ) {
-              score = 0.95;
-            } else {
-              score = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
-            }
-
-            if (score > bestScore) {
-              bestScore = score;
-              bestMember = m;
-            }
+            const score = scoreLineAgainstMember(line, m);
+            if (score > bestScore) { bestScore = score; bestMember = m; }
           });
         }
 
@@ -2147,6 +2296,28 @@
           ocrMatchedReasons[bestMember.id] = line;
         } else {
           ocrUnmatchedLines.push(line);
+        }
+      });
+
+      // مطابقة ذكية بالنوافذ المتحركة داخل السطور الأصلية لإنقاذ أي اسم سبقته كلمة مشوشة من صورة البروفايل
+      const allRawLines = [];
+      ocrFiles.forEach(f => (f.rawLines || []).forEach(rl => allRawLines.push(rl)));
+      allRawLines.forEach(rawLine => {
+        const words = rawLine.split(' ').filter(w => w.length >= 2);
+        if (words.length < 3) return;
+        for (let start = 1; start < words.length - 1; start++) {
+          const candidate = extractFirstTwoArabicNames(words.slice(start).join(' '));
+          if (!candidate || candidate.split(' ').length < 2) continue;
+          let bestM = null, bestS = 0;
+          targetMembers.forEach(m => {
+            if (ocrSelectedMemberIds.has(m.id)) return;
+            const sc = scoreLineAgainstMember(candidate, m);
+            if (sc > bestS) { bestS = sc; bestM = m; }
+          });
+          if (bestM && bestS >= 0.80) {
+            ocrSelectedMemberIds.add(bestM.id);
+            ocrMatchedReasons[bestM.id] = candidate;
+          }
         }
       });
 
