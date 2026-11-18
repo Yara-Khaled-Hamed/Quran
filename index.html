@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="تعاهدوا القرءان" />
   <title>تعاهدوا القرءان - متابعة الحضور</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link id="favicon-link" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23065f46'/%3E%3Crect x='8' y='8' width='112' height='112' rx='22' fill='none' stroke='%23fbbf24' stroke-width='3' opacity='0.6'/%3E%3Cpath d='M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z' fill='%23ffffff'/%3E%3Cpath d='M64 42 L64 92' stroke='%23d97706' stroke-width='3'/%3E%3Ccircle cx='64' cy='24' r='5' fill='%23fbbf24'/%3E%3C/svg%3E" />
   <link id="apple-icon-link" rel="apple-touch-icon" href="" />
   <link id="manifest-link" rel="manifest" href="" />
@@ -15,107 +18,212 @@
   <style>
     :root {
       --primary: #065f46; --primary-light: #059669; --primary-soft: #ecfdf5;
-      --accent: #d97706; --accent-soft: #fef3c7; --bg: #f6f8f7;
-      --card: #ffffff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb;
-      --danger: #dc2626; --danger-soft: #fef2f2; --shadow: 0 4px 16px rgba(6, 95, 70, 0.08);
-      --radius: 16px;
+      --accent: #d97706; --accent-soft: #fef3c7; --bg: #f3f7f5;
+      --card: #ffffff; --text: #111827; --muted: #6b7280; --border: #e5e7eb;
+      --danger: #dc2626; --danger-soft: #fef2f2;
+      --shadow: 0 6px 22px rgba(6, 95, 70, 0.07);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --radius: 18px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; padding-bottom: 80px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; padding-bottom: 90px; }
     button, input, select, textarea { font-family: inherit; outline: none; }
-    .container { max-width: 780px; margin: 0 auto; padding: 16px; }
-    .card { background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 14px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; transition: transform 0.1s; }
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-soft { background: var(--primary-soft); color: var(--primary); }
-    .btn-gold { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .container { max-width: 780px; margin: 0 auto; padding: 14px; }
+    .card {
+      background: var(--card); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow); border: 1px solid rgba(6, 95, 70, 0.08);
+      margin-bottom: 14px; transition: box-shadow 0.2s var(--ease);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 16px; border-radius: 13px; border: none; cursor: pointer;
+      font-weight: 700; font-size: 14px;
+      transition: transform 0.14s var(--ease), background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: linear-gradient(135deg, #065f46, #047857); color: #fff; box-shadow: 0 4px 12px rgba(6,95,70,0.2); }
+    .btn-primary:hover { box-shadow: 0 6px 16px rgba(6,95,70,0.28); }
+    .btn-soft { background: var(--primary-soft); color: var(--primary); border: 1px solid #a7f3d0; }
+    .btn-soft:hover { background: #d1fae5; }
+    .btn-gold { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 4px 12px rgba(217,119,6,0.22); }
     .btn-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
-    .btn-danger-solid { background: var(--danger); color: #fff; }
+    .btn-danger-solid { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; box-shadow: 0 4px 12px rgba(220,38,38,0.2); }
     .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
-    .btn-sm { padding: 7px 12px; font-size: 13px; border-radius: 10px; }
-    .btn-xs { padding: 4px 8px; font-size: 12px; border-radius: 8px; }
+    .btn-outline:hover { background: #f9fafb; }
+    .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 11px; }
+    .btn-xs { padding: 5px 9px; font-size: 12px; border-radius: 9px; }
     .btn-block { width: 100%; }
-    .input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 15px; background: #fff; }
-    .input:focus { border-color: var(--primary-light); }
+
+    .input {
+      width: 100%; padding: 11px 14px; border-radius: 13px; border: 1.5px solid var(--border);
+      font-size: 15px; background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12); }
     .pw-wrap { position: relative; display: flex; align-items: center; }
     .pw-toggle { position: absolute; left: 10px; background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px; }
-    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(160deg, #065f46 0%, #047857 45%, #f6f8f7 45%); }
-    .login-box { width: 100%; max-width: 450px; background: #fff; border-radius: 22px; padding: 28px 22px; box-shadow: 0 18px 40px rgba(0,0,0,0.12); }
+
+    .login-wrap {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px;
+      background: linear-gradient(160deg, #064e3b 0%, #059669 44%, #f3f7f5 44%);
+    }
+    .login-box {
+      width: 100%; max-width: 470px; background: #fff; border-radius: 24px; padding: 28px 22px;
+      box-shadow: 0 22px 50px rgba(6, 78, 59, 0.16); animation: fadeSlideUp 0.35s var(--ease);
+    }
     .logo-badge { width: 76px; height: 76px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
-    .quick-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; max-height: 180px; overflow-y: auto; padding: 2px; }
-    .chip { padding: 7px 12px; border-radius: 99px; background: #f3f4f6; border: 1px solid var(--border); font-size: 13px; cursor: pointer; font-weight: 600; color: var(--text); }
-    .chip:hover { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); }
-    .chip-head { background: var(--accent-soft); border-color: #fcd34d; color: #92400e; }
-    .app-header { background: linear-gradient(135deg, #065f46, #047857); color: #fff; padding: 18px 16px 22px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 6px 20px rgba(6,95,70,0.18); }
+    .quick-chips { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; max-height: 230px; overflow-y: auto; padding: 2px; -webkit-overflow-scrolling: touch; }
+    .quick-group-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 11px; border-radius: 13px; background: #f8faf9; border: 1px solid var(--border); }
+    .quick-group-title { font-size: 13px; font-weight: 800; color: var(--primary); margin-left: 4px; }
+    .chip { padding: 5px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.15s; }
+    .chip:hover, .chip:active { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); transform: translateY(-1px); }
+    .chip-head { background: var(--accent-soft); border-color: #fcd34d; color: #92400e; align-self: flex-start; padding: 7px 14px; font-size: 13px; }
+
+    .app-header {
+      background: linear-gradient(135deg, #064e3b, #047857); color: #fff;
+      padding: 16px 16px 22px; border-bottom-left-radius: 26px; border-bottom-right-radius: 26px;
+      box-shadow: 0 8px 24px rgba(6,95,70,0.2);
+    }
     .header-top { max-width: 780px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .header-brand { display: flex; align-items: center; gap: 10px; }
-    .header-title h1 { font-size: 19px; font-weight: 800; }
-    .header-title p { font-size: 13px; opacity: 0.9; }
+    .header-title h1 { font-size: 19px; font-weight: 800; line-height: 1.3; }
+    .header-title p { font-size: 13px; opacity: 0.92; }
     .header-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .header-btn { background: rgba(255,255,255,0.16); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 7px 10px; border-radius: 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .header-btn {
+      background: rgba(255,255,255,0.16); backdrop-filter: blur(6px);
+      color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 7px 11px;
+      border-radius: 11px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .header-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.26); }
+
     .date-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
     .date-controls { display: flex; align-items: center; gap: 6px; }
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
-    .stat-box { background: var(--primary-soft); border-radius: 12px; padding: 10px; text-align: center; }
-    .stat-box.amber { background: var(--accent-soft); }
-    .stat-box.gray { background: #f3f4f6; }
-    .stat-num { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .stat-box { background: var(--primary-soft); border-radius: 14px; padding: 10px 8px; text-align: center; border: 1px solid #d1fae5; }
+    .stat-box.amber { background: var(--accent-soft); border-color: #fde68a; }
+    .stat-box.gray { background: #f3f4f6; border-color: #e5e7eb; }
+    .stat-num { font-size: 19px; font-weight: 800; color: var(--primary); }
     .stat-box.amber .stat-num { color: #b45309; }
     .stat-box.gray .stat-num { color: #374151; }
-    .stat-label { font-size: 12px; color: var(--muted); font-weight: 600; }
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #e5e7eb; padding: 5px; border-radius: 14px; margin-bottom: 14px; }
-    .tab-btn { padding: 10px 6px; border: none; border-radius: 10px; background: transparent; font-weight: 700; font-size: 13.5px; color: #4b5563; cursor: pointer; }
-    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .member-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px; border-radius: 14px; border: 1.5px solid var(--border); background: #fff; margin-bottom: 10px; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .stat-mini-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .stat-mini-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.4s var(--ease); border-radius: 99px; }
+    .stat-box.amber .stat-mini-fill { background: var(--accent); }
+
+    .tabs {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+      background: #e5e7eb; padding: 5px; border-radius: 16px; margin-bottom: 14px;
+      position: sticky; top: 8px; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .tab-btn {
+      padding: 10px 6px; border: none; border-radius: 12px; background: transparent;
+      font-weight: 800; font-size: 13.5px; color: #4b5563; cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+    .tab-panel { animation: fadeSlideUp 0.22s var(--ease); }
+
+    .member-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 14px; border-radius: 15px; border: 1.5px solid var(--border);
+      background: #fff; margin-bottom: 10px; box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+    }
     .status-present { border-color: #6ee7b7 !important; background: #f0fdf4 !important; }
     .status-absent { border-color: #fca5a5 !important; background: #fef2f2 !important; }
     .status-excused { border-color: #fcd34d !important; background: #fffbeb !important; }
     .member-info { display: flex; flex-direction: column; gap: 2px; }
-    .member-name { font-weight: 700; font-size: 15.5px; }
+    .member-name { font-weight: 800; font-size: 15.5px; }
     .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; }
-    .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-right: 4px; }
-    .status-pills { display: flex; gap: 5px; flex-wrap: wrap; }
-    .pill { padding: 7px 10px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--muted); }
-    .pill.active-present { background: #059669; border-color: #059669; color: #fff; }
-    .pill.active-absent { background: #dc2626; border-color: #dc2626; color: #fff; }
-    .pill.active-excused { background: #d97706; border-color: #d97706; color: #fff; }
-    .partner-card { border: 1.5px solid var(--border); border-radius: 16px; padding: 14px; background: #fff; margin-bottom: 12px; }
+    .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 99px; margin-right: 4px; }
+
+    .status-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      padding: 8px 11px; border-radius: 11px; border: 1.5px solid var(--border);
+      background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--muted);
+      transition: all 0.15s var(--ease);
+    }
+    .pill:active { transform: scale(0.95); }
+    .pill.active-present { background: #059669; border-color: #059669; color: #fff; box-shadow: 0 3px 8px rgba(5,150,105,0.25); }
+    .pill.active-absent { background: #dc2626; border-color: #dc2626; color: #fff; box-shadow: 0 3px 8px rgba(220,38,38,0.22); }
+    .pill.active-excused { background: #d97706; border-color: #d97706; color: #fff; box-shadow: 0 3px 8px rgba(217,119,6,0.22); }
+
+    .partner-card { border: 1.5px solid var(--border); border-radius: 16px; padding: 14px; background: #fff; margin-bottom: 12px; box-shadow: var(--shadow-sm); transition: all 0.2s; }
     .partner-card.all-done { border-color: #6ee7b7; background: #f0fdf4; }
     .partner-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
     .partner-num-pill { background: var(--primary); color: #fff; padding: 4px 11px; border-radius: 99px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
     .partner-type-pill { background: var(--primary-soft); color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
     .partner-members-list { display: flex; flex-direction: column; gap: 8px; }
-    .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(255,255,255,0.9); padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--border); }
+    .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(255,255,255,0.92); padding: 9px 12px; border-radius: 12px; border: 1.5px solid var(--border); transition: all 0.15s; }
+
     .select-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; margin: 10px 0; }
-    .select-item { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; background: #fff; font-size: 14px; font-weight: 600; }
+    .select-item { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 11px; border: 1.5px solid var(--border); cursor: pointer; background: #fff; font-size: 14px; font-weight: 600; transition: all 0.15s; }
     .select-item.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
-    .group-manage-card { border: 1.5px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; background: #fff; }
+
+    .group-manage-card { border: 1.5px solid var(--border); border-radius: 15px; padding: 14px; margin-bottom: 10px; background: #fff; box-shadow: var(--shadow-sm); }
     .sup-badge { display: inline-flex; align-items: center; gap: 4px; background: #f3f4f6; border: 1px solid var(--border); padding: 3px 9px; border-radius: 99px; font-size: 12.5px; font-weight: 600; }
     .sup-edit-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
     .stars-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; white-space: pre-wrap; font-size: 14.5px; line-height: 1.65; max-height: 300px; overflow-y: auto; margin: 12px 0; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 1000; }
+
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.55); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; padding: 14px; z-index: 1000; }
     .modal-backdrop.open { display: flex; }
-    .modal { background: #fff; width: 100%; max-width: 520px; border-radius: 20px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; }
-    .empty-state { text-align: center; padding: 30px 14px; color: var(--muted); }
+    .modal { background: #fff; width: 100%; max-width: 540px; border-radius: 22px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); animation: modalPop 0.22s var(--ease); -webkit-overflow-scrolling: touch; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 11px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; z-index: 2000; display: none; box-shadow: 0 12px 30px rgba(0,0,0,0.25); white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; }
+    .empty-state { text-align: center; padding: 30px 14px; color: var(--muted); font-weight: 600; }
     .hidden { display: none !important; }
-    .ocr-preview-img { max-width: 100%; max-height: 180px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 8px auto; object-fit: contain; background: #f9fafb; }
+
+    /* معرض الصور المتعددة في OCR */
+    .ocr-thumbs-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 8px 4px; margin: 6px 0; -webkit-overflow-scrolling: touch; }
+    .ocr-thumb-card { position: relative; flex: 0 0 auto; width: 78px; height: 104px; border-radius: 12px; overflow: hidden; border: 2px solid var(--border); background: #f3f4f6; box-shadow: var(--shadow-sm); }
+    .ocr-thumb-card.done { border-color: #10b981; }
+    .ocr-thumb-card.processing { border-color: #f59e0b; }
+    .ocr-thumb-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ocr-thumb-num { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.72); color: #fff; font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 99px; }
+    .ocr-thumb-status { position: absolute; bottom: 4px; left: 4px; background: rgba(255,255,255,0.92); font-size: 11px; padding: 1px 5px; border-radius: 99px; font-weight: 800; }
+    .ocr-thumb-del { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 99px; border: none; background: rgba(220,38,38,0.9); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
     .ocr-progress-wrap { background: #e5e7eb; border-radius: 99px; height: 10px; overflow: hidden; margin: 8px 0; }
-    .ocr-progress-bar { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.2s; }
-    .ocr-checklist { max-height: 210px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-    .ocr-check-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13.5px; font-weight: 600; }
+    .ocr-progress-bar { height: 100%; background: linear-gradient(90deg, #059669, #10b981); width: 0%; transition: width 0.2s; }
+    .ocr-checklist { max-height: 220px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 13px; padding: 8px; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; -webkit-overflow-scrolling: touch; }
+    .ocr-check-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13.5px; font-weight: 700; transition: background 0.15s; }
     .ocr-check-item.matched { background: var(--primary-soft); border-color: #6ee7b7; color: var(--primary); }
-    .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+
+    .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
     .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 130px; overflow-y: auto; }
-    .group-pick-btn { width: 100%; text-align: right; justify-content: space-between; padding: 12px 14px; margin-bottom: 8px; background: var(--primary-soft); border: 1.5px solid #a7f3d0; color: var(--primary); border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; }
+    .group-pick-btn { width: 100%; text-align: right; justify-content: space-between; padding: 13px 15px; margin-bottom: 8px; background: var(--primary-soft); border: 1.5px solid #a7f3d0; color: var(--primary); border-radius: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; transition: background 0.15s; }
     .group-pick-btn:hover { background: #d1fae5; }
+
+    .scroll-top-btn {
+      position: fixed; bottom: 20px; left: 18px; width: 44px; height: 44px; border-radius: 99px;
+      background: var(--primary); color: #fff; border: none; box-shadow: 0 6px 18px rgba(6,95,70,0.3);
+      font-size: 18px; cursor: pointer; z-index: 900; display: none; align-items: center; justify-content: center;
+      transition: transform 0.15s;
+    }
+    .scroll-top-btn.show { display: flex; }
+    .scroll-top-btn:active { transform: scale(0.9); }
+
     @media (max-width: 520px) {
       .member-row, .partner-member-item { flex-direction: column; align-items: stretch; }
       .status-pills { justify-content: space-between; }
-      .pill { flex: 1; text-align: center; }
+      .pill { flex: 1; text-align: center; padding: 9px 6px; }
+      .tabs { top: 4px; }
+      .tab-btn { font-size: 12.5px; padding: 9px 4px; }
     }
   </style>
 </head>
@@ -132,7 +240,7 @@
           <circle cx="64" cy="24" r="5" fill="#fbbf24"/>
         </svg>
       </div>
-      <h2 style="text-align:center; color:var(--primary); font-size:22px; margin-bottom:4px;">جروبات تعاهدوا القرءان</h2>
+      <h2 style="text-align:center; color:var(--primary); font-size:23px; font-weight:800; margin-bottom:4px;">جروبات تعاهدوا القرءان</h2>
       <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:18px;">متابعة حضور الاستماع والتسميع لحفظة كتاب الله</p>
       <div id="login-step-1">
         <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم المشرف / المشرفة</label>
@@ -142,7 +250,7 @@
           <input type="password" id="password-input" class="input" style="padding-left:40px;" placeholder="أدخل كلمة المرور (أرقام عربي أو إنجليزي)..." onkeypress="if(event.key==='Enter') handleLogin()" />
           <button type="button" class="pw-toggle" onclick="togglePwVisibility('password-input', this)">👁️</button>
         </div>
-        <button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="handleLogin()">دخول</button>
+        <button class="btn btn-primary btn-block" style="margin-top:14px; padding:12px;" onclick="handleLogin()">دخول</button>
         <div id="existing-supervisors-wrap" style="margin-top:16px;">
           <p style="font-size:13px; color:var(--primary); font-weight:700;">أسماء المشرفين المسجلين (اضغط لاختيار اسمك):</p>
           <div id="quick-supervisors" class="quick-chips"></div>
@@ -258,7 +366,7 @@
         <div class="date-bar">
           <div>
             <span style="font-size:13px; color:var(--muted); font-weight:600;">تاريخ المتابعة:</span>
-            <div style="font-weight:800; font-size:15px;" id="date-readable"></div>
+            <div style="font-weight:800; font-size:15.5px;" id="date-readable"></div>
           </div>
           <div class="date-controls">
             <button class="btn btn-outline btn-sm" onclick="changeDate(-1)">السابق</button>
@@ -267,9 +375,20 @@
           </div>
         </div>
         <div class="stats-grid">
-          <div class="stat-box"><div class="stat-num" id="stat-listening">0 / 0</div><div class="stat-label">حضور الاستماع</div></div>
-          <div class="stat-box amber"><div class="stat-num" id="stat-recitation">0 / 0</div><div class="stat-label">حضور التسميع</div></div>
-          <div class="stat-box gray"><div class="stat-num" id="stat-total">0</div><div class="stat-label">إجمالي الأعضاء</div></div>
+          <div class="stat-box">
+            <div class="stat-num" id="stat-listening">0 / 0</div>
+            <div class="stat-label">حضور الاستماع</div>
+            <div class="stat-mini-bar"><div id="stat-listening-bar" class="stat-mini-fill"></div></div>
+          </div>
+          <div class="stat-box amber">
+            <div class="stat-num" id="stat-recitation">0 / 0</div>
+            <div class="stat-label">حضور التسميع</div>
+            <div class="stat-mini-bar"><div id="stat-recitation-bar" class="stat-mini-fill"></div></div>
+          </div>
+          <div class="stat-box gray">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">إجمالي الأعضاء</div>
+          </div>
         </div>
       </div>
 
@@ -279,14 +398,16 @@
         <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء والتقرير</button>
       </div>
 
-      <div id="tab-listening">
-        <div class="card" style="padding:12px;">
-          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:8px;" onclick="copyAbsenceMessage('listening')">
-            🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)
-          </button>
-          <button class="btn btn-gold btn-block btn-sm" style="margin-bottom:10px;" onclick="openOcrModal('listening')">
-            📸 أخذ حضور/غياب الاستماع من صورة بالأسماء
-          </button>
+      <div id="tab-listening" class="tab-panel">
+        <div class="card" style="padding:13px;">
+          <div style="display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px;">
+            <button class="btn btn-gold btn-block" onclick="openOcrModal('listening')">
+              📸 أخذ حضور/غياب الاستماع من صورة أو عدة صور
+            </button>
+            <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('listening')">
+              🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)
+            </button>
+          </div>
           <input type="text" id="search-listening" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
@@ -297,11 +418,16 @@
         <div id="listening-list"></div>
       </div>
 
-      <div id="tab-recitation" class="hidden">
+      <div id="tab-recitation" class="tab-panel hidden">
         <div class="card" style="padding:14px;">
-          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">
-            🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
-          </button>
+          <div style="display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px;">
+            <button class="btn btn-gold btn-block" onclick="openOcrModal('recitation')">
+              📸 أخذ حضور/غياب التسميع من صورة أو عدة صور
+            </button>
+            <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('recitation')">
+              🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
+            </button>
+          </div>
 
           <div class="quick-num-box">
             <label style="display:block; font-size:13.5px; font-weight:800; color:var(--primary); margin-bottom:6px;">
@@ -340,7 +466,7 @@
         <div id="recitation-list"></div>
       </div>
 
-      <div id="tab-manage" class="hidden">
+      <div id="tab-manage" class="tab-panel hidden">
         <div class="card">
           <h3 style="font-size:16px; margin-bottom:10px;">🌹 رسائل الغياب ومثابرات الإسبوع</h3>
           <div style="display:flex; flex-direction:column; gap:8px;">
@@ -384,19 +510,19 @@
     </div>
   </div>
 
-  <!-- نافذة قراءة الأسماء من صورة -->
+  <!-- نافذة قراءة الأسماء من صورة أو عدة صور -->
   <div id="ocr-modal" class="modal-backdrop" onclick="if(event.target===this) closeOcrModal()">
     <div class="modal">
       <div class="modal-header">
-        <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة الأسماء من صورة</h3>
+        <h3 id="ocr-modal-title" style="color:var(--primary); font-size:17.5px;">📸 قراءة الأسماء من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
       <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
-        اختاري صورة (سكرين شوت) فيها الأسماء، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم (وإذا كان فيه كلمة <strong>عبد</strong> يأخذ الاسم الذي بعده ليكون كاملاً).
+        يمكنكِ اختيار <strong>صورة أو عدة صور معاً</strong> (أو إضافة صور أخرى تباعاً)، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
       </p>
 
-      <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px;">
-        <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصورة:</div>
+      <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
+        <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:700;">
             <input type="radio" name="ocr-mode" value="present" checked onchange="updateOcrApplyButtons()" />
@@ -411,30 +537,33 @@
 
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
         <label class="btn btn-primary btn-sm" style="flex:1; cursor:pointer;">
-          🖼️ اختيار صورة من الهاتف
-          <input type="file" id="ocr-file-input" accept="image/*" class="hidden" onchange="onOcrFileSelected(this)" />
+          🖼️ اختيار صور (صورة أو أكثر)
+          <input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" />
         </label>
-        <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer;">
-          <input type="checkbox" id="ocr-invert-check" onchange="reprocessCurrentOcrImage()" />
-          <span>خلفية داكنة (وضع ليلي)</span>
-        </label>
+        <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles()">🗑️ مسح الصور</button>
       </div>
+      <label style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px;">
+        <input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" />
+        <span>فرض الوضع الليلي (عكس الألوان للصور الداكنة)</span>
+      </label>
 
-      <img id="ocr-preview" class="ocr-preview-img hidden" alt="معاينة الصورة" />
+      <div id="ocr-files-meta" class="hidden" style="font-size:12.5px; font-weight:700; color:var(--primary); margin-top:4px;"></div>
+      <div id="ocr-thumbs-wrap" class="ocr-thumbs-wrap hidden"></div>
 
       <div id="ocr-progress-box" class="hidden" style="margin:10px 0;">
-        <div id="ocr-status-text" style="font-size:13px; font-weight:700; color:var(--primary);">جاري قراءة الصورة...</div>
+        <div id="ocr-status-text" style="font-size:13px; font-weight:700; color:var(--primary);">جاري قراءة الصور...</div>
         <div class="ocr-progress-wrap"><div id="ocr-progress-bar" class="ocr-progress-bar"></div></div>
       </div>
 
       <div id="ocr-result-box" class="hidden">
         <label style="display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-top:8px;">
-          الأسماء المستخرجة (أول اسمين + إكمال اسم عبد) — يمكنكِ تعديلها يدوياً ثم إعادة المطابقة:
+          الأسماء المستخرجة من كل الصور (أول اسمين + إكمال اسم عبد) — يمكنكِ التعديل ثم إعادة المطابقة:
         </label>
         <textarea id="ocr-extracted-text" class="input" rows="4" style="font-size:13.5px; padding:8px 10px; margin-top:4px;"></textarea>
         <button class="btn btn-soft btn-xs" style="margin-top:6px;" onclick="matchOcrLinesToMembers()">🔄 إعادة مطابقة الأسماء</button>
 
         <div id="ocr-match-summary" style="font-size:13px; font-weight:800; color:var(--primary); margin-top:10px;"></div>
+        <input type="text" id="ocr-filter-input" class="input" style="padding:7px 10px; font-size:13px; margin-top:6px;" placeholder="🔍 ابحث في القائمة للتأكد أو التحديد اليدوي..." oninput="renderOcrChecklist()" />
         <div id="ocr-checklist" class="ocr-checklist"></div>
 
         <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
@@ -495,6 +624,7 @@
     </div>
   </div>
 
+  <button id="scroll-top-btn" class="scroll-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="العودة للأعلى">⬆️</button>
   <div id="toast" class="toast"></div>
 
   <script>
@@ -544,9 +674,18 @@
     let deferredPrompt = null;
     let lastCloudSnapshot = '';
 
+    // متغيرات تعدد الصور في OCR
     let ocrTargetType = 'listening';
-    let ocrCurrentFile = null;
+    let ocrFiles = []; // { id, file, url, status: 'pending'|'processing'|'done'|'error', lines: [] }
+    let ocrIsProcessing = false;
     let ocrSelectedMemberIds = new Set();
+    let ocrMatchedReasons = {};
+    let ocrUnmatchedLines = [];
+
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scroll-top-btn');
+      if (btn) btn.classList.toggle('show', window.scrollY > 320);
+    }, { passive: true });
 
     (function setupAppIconsAndManifest() {
       try {
@@ -578,7 +717,7 @@
         if (modalImg) { modalImg.src = icon192; modalImg.style.display = 'block'; }
         const manifest = {
           name: "جروبات تعاهدوا القرءان", short_name: "تعاهدوا القرءان", start_url: ".",
-          display: "standalone", background_color: "#f6f8f7", theme_color: "#065f46",
+          display: "standalone", background_color: "#f3f7f5", theme_color: "#065f46",
           icons: [{ src: icon192, sizes: "192x192", type: "image/png" }, { src: icon512, sizes: "512x512", type: "image/png" }]
         };
         document.getElementById('manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
@@ -785,15 +924,37 @@
     }
 
     function renderLogin() {
-      const wrap = document.getElementById('quick-supervisors'); wrap.innerHTML = '';
-      const headBtn = document.createElement('button'); headBtn.className = 'chip chip-head';
-      headBtn.textContent = `👑 ${db.headSupervisor.name}`; headBtn.onclick = () => selectQuickName(db.headSupervisor.name, null);
+      const wrap = document.getElementById('quick-supervisors');
+      wrap.innerHTML = '';
+
+      const headBtn = document.createElement('button');
+      headBtn.className = 'chip chip-head';
+      headBtn.textContent = `👑 ${db.headSupervisor.name}`;
+      headBtn.onclick = () => selectQuickName(db.headSupervisor.name, null);
       wrap.appendChild(headBtn);
-      db.groups.forEach(g => (g.supervisors || []).forEach(s => {
-        const btn = document.createElement('button'); btn.className = 'chip';
-        btn.textContent = `👤 ${s.name} (${g.name})`; btn.onclick = () => selectQuickName(s.name, g.id);
-        wrap.appendChild(btn);
-      }));
+
+      db.groups.forEach(g => {
+        const sups = g.supervisors || [];
+        if (sups.length === 0) return;
+
+        const row = document.createElement('div');
+        row.className = 'quick-group-row';
+
+        const title = document.createElement('span');
+        title.className = 'quick-group-title';
+        title.textContent = `🕌 ${g.name}:`;
+        row.appendChild(title);
+
+        sups.forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'chip';
+          btn.textContent = `👤 ${s.name}`;
+          btn.onclick = () => selectQuickName(s.name, g.id);
+          row.appendChild(btn);
+        });
+
+        wrap.appendChild(row);
+      });
     }
 
     function selectQuickName(name, groupId) {
@@ -1178,9 +1339,17 @@
 
     function renderStats() {
       const allM = getGroupMembers(), listenM = getListeningMembers(), day = ensureDayRecord();
-      document.getElementById('stat-listening').textContent = `${listenM.filter(m => day.listening[m.id] === 'present').length} / ${listenM.length}`;
-      document.getElementById('stat-recitation').textContent = `${allM.filter(m => day.recitation[m.id] === 'present').length} / ${allM.length}`;
+      const lPresent = listenM.filter(m => day.listening[m.id] === 'present').length;
+      const rPresent = allM.filter(m => day.recitation[m.id] === 'present').length;
+      document.getElementById('stat-listening').textContent = `${lPresent} / ${listenM.length}`;
+      document.getElementById('stat-recitation').textContent = `${rPresent} / ${allM.length}`;
       document.getElementById('stat-total').textContent = allM.length;
+      const lPct = listenM.length ? Math.round((lPresent / listenM.length) * 100) : 0;
+      const rPct = allM.length ? Math.round((rPresent / allM.length) * 100) : 0;
+      const lBar = document.getElementById('stat-listening-bar');
+      const rBar = document.getElementById('stat-recitation-bar');
+      if (lBar) lBar.style.width = lPct + '%';
+      if (rBar) rBar.style.width = rPct + '%';
     }
 
     function switchTab(tab) {
@@ -1333,16 +1502,16 @@
       }
     }
 
+    // ==================== قراءة الأسماء من صورة أو عدة صور (OCR) ====================
     function openOcrModal(type = 'listening') {
       ocrTargetType = type;
-      document.getElementById('ocr-file-input').value = '';
-      document.getElementById('ocr-preview').classList.add('hidden');
-      document.getElementById('ocr-progress-box').classList.add('hidden');
-      document.getElementById('ocr-result-box').classList.add('hidden');
-      document.getElementById('ocr-extracted-text').value = '';
-      document.getElementById('ocr-checklist').innerHTML = '';
-      ocrCurrentFile = null;
-      ocrSelectedMemberIds = new Set();
+      const titleEl = document.getElementById('ocr-modal-title');
+      if (titleEl) {
+        titleEl.textContent = type === 'listening'
+          ? '📸 قراءة أسماء الاستماع من الصور'
+          : '📸 قراءة أسماء التسميع من الصور';
+      }
+      clearOcrFiles(false);
       updateOcrApplyButtons();
       document.getElementById('ocr-modal').classList.add('open');
     }
@@ -1371,64 +1540,162 @@
       }
     }
 
-    function onOcrFileSelected(input) {
-      const file = input.files && input.files[0];
-      if (!file) return;
-      ocrCurrentFile = file;
-      const preview = document.getElementById('ocr-preview');
-      preview.src = URL.createObjectURL(file);
-      preview.classList.remove('hidden');
-      runOcrOnFile(file);
+    function clearOcrFiles(showMsg = false) {
+      ocrFiles.forEach(item => { try { URL.revokeObjectURL(item.url); } catch (e) {} });
+      ocrFiles = [];
+      ocrSelectedMemberIds = new Set();
+      ocrMatchedReasons = {};
+      ocrUnmatchedLines = [];
+      document.getElementById('ocr-file-input').value = '';
+      document.getElementById('ocr-filter-input').value = '';
+      document.getElementById('ocr-extracted-text').value = '';
+      document.getElementById('ocr-checklist').innerHTML = '';
+      document.getElementById('ocr-progress-box').classList.add('hidden');
+      document.getElementById('ocr-result-box').classList.add('hidden');
+      renderOcrThumbnails();
+      if (showMsg) showToast('تم مسح جميع الصور المختارة');
     }
 
-    function reprocessCurrentOcrImage() {
-      if (ocrCurrentFile) runOcrOnFile(ocrCurrentFile);
+    function onOcrFilesSelected(input) {
+      const files = Array.from(input.files || []);
+      if (files.length === 0) return;
+
+      files.forEach(file => {
+        ocrFiles.push({
+          id: uid('img'),
+          file,
+          url: URL.createObjectURL(file),
+          status: 'pending',
+          lines: []
+        });
+      });
+
+      input.value = '';
+      renderOcrThumbnails();
+      processPendingOcrFiles();
     }
 
-    function preprocessImageForOcr(file, forceInvert) {
+    function removeOcrFile(imgId) {
+      if (ocrIsProcessing) return showToast('انتظري حتى تنتهي القراءة الجارية أولاً');
+      const idx = ocrFiles.findIndex(x => x.id === imgId);
+      if (idx === -1) return;
+      try { URL.revokeObjectURL(ocrFiles[idx].url); } catch (e) {}
+      ocrFiles.splice(idx, 1);
+      renderOcrThumbnails();
+      if (ocrFiles.length === 0) {
+        clearOcrFiles(false);
+      } else {
+        rebuildExtractedTextFromFiles();
+        matchOcrLinesToMembers();
+      }
+    }
+
+    function renderOcrThumbnails() {
+      const wrap = document.getElementById('ocr-thumbs-wrap');
+      const meta = document.getElementById('ocr-files-meta');
+      const clearBtn = document.getElementById('ocr-clear-files-btn');
+
+      if (ocrFiles.length === 0) {
+        wrap.classList.add('hidden');
+        meta.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        wrap.innerHTML = '';
+        return;
+      }
+
+      wrap.classList.remove('hidden');
+      meta.classList.remove('hidden');
+      clearBtn.classList.remove('hidden');
+
+      const doneCount = ocrFiles.filter(f => f.status === 'done').length;
+      meta.textContent = `الصور المضافة: ${ocrFiles.length} ${ocrFiles.length === 1 ? 'صورة' : 'صور'} (تمت قراءة ${doneCount} من ${ocrFiles.length}) — يمكنكِ إضافة صور أخرى بالضغط على زر اختيار صور`;
+
+      wrap.innerHTML = ocrFiles.map((item, idx) => {
+        const statusIcon = item.status === 'done' ? '✅' : item.status === 'processing' ? '⚙️' : item.status === 'error' ? '⚠️' : '⏳';
+        return `
+          <div class="ocr-thumb-card ${item.status}">
+            <img src="${item.url}" alt="صورة ${idx + 1}" />
+            <span class="ocr-thumb-num">${idx + 1}</span>
+            <span class="ocr-thumb-status">${statusIcon}</span>
+            <button type="button" class="ocr-thumb-del" onclick="removeOcrFile('${item.id}')" title="حذف الصورة">✕</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function reprocessAllOcrImages() {
+      if (ocrFiles.length === 0 || ocrIsProcessing) return;
+      ocrFiles.forEach(item => { item.status = 'pending'; item.lines = []; });
+      renderOcrThumbnails();
+      processPendingOcrFiles();
+    }
+
+    function sliceAndPreprocessImageForOcr(file, forceInvert) {
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => {
-          let w = img.naturalWidth || img.width;
-          let h = img.naturalHeight || img.height;
-          if (w < 1000) {
-            const scale = Math.min(2.2, 1200 / Math.max(1, w));
-            w = Math.round(w * scale);
-            h = Math.round(h * scale);
-          } else if (w > 2200) {
-            const scale = 2200 / w;
-            w = 2200;
-            h = Math.round(h * scale);
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
+        img.onload = async () => {
+          const origW = img.naturalWidth || img.width;
+          const origH = img.naturalHeight || img.height;
 
-          const imgData = ctx.getImageData(0, 0, w, h);
-          const d = imgData.data;
+          let targetW = origW;
+          if (origW < 950) targetW = Math.round(origW * Math.min(2.5, 1100 / Math.max(1, origW)));
+          else if (origW > 1700) targetW = 1600;
 
-          let sumLum = 0;
-          const step = Math.max(4, Math.floor(d.length / 4000) * 4);
-          let samples = 0;
-          for (let i = 0; i < d.length; i += step) {
-            sumLum += (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+          const scale = targetW / Math.max(1, origW);
+          const targetH = Math.round(origH * scale);
+
+          const probeCanvas = document.createElement('canvas');
+          const probeW = Math.min(200, origW);
+          const probeH = Math.min(400, origH);
+          probeCanvas.width = probeW;
+          probeCanvas.height = probeH;
+          const probeCtx = probeCanvas.getContext('2d');
+          probeCtx.drawImage(img, 0, 0, origW, Math.min(origH, Math.round(origW * 2)), 0, 0, probeW, probeH);
+          const pData = probeCtx.getImageData(0, 0, probeW, probeH).data;
+          let sumLum = 0, samples = 0;
+          for (let i = 0; i < pData.length; i += 16) {
+            sumLum += (0.299 * pData[i] + 0.587 * pData[i + 1] + 0.114 * pData[i + 2]);
             samples++;
           }
           const avgLum = samples ? sumLum / samples : 255;
-          const shouldInvert = forceInvert || avgLum < 105;
+          const shouldInvert = forceInvert || avgLum < 115;
 
-          for (let i = 0; i < d.length; i += 4) {
-            let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-            if (shouldInvert) lum = 255 - lum;
-            lum = Math.max(0, Math.min(255, (lum - 128) * 1.35 + 128));
-            d[i] = d[i + 1] = d[i + 2] = lum;
+          const sliceTargetH = 1400;
+          const overlapTargetH = 150;
+          const blobs = [];
+
+          let curY = 0;
+          while (curY < targetH) {
+            const hSlice = Math.min(sliceTargetH, targetH - curY);
+            const srcY = curY / scale;
+            const srcH = hSlice / scale;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = targetW;
+            canvas.height = Math.max(1, Math.round(hSlice));
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, srcY, origW, srcH, 0, 0, canvas.width, canvas.height);
+
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+              let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+              if (shouldInvert) lum = 255 - lum;
+              lum = Math.max(0, Math.min(255, (lum - 128) * 1.45 + 128));
+              d[i] = d[i + 1] = d[i + 2] = lum;
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
+            if (blob) blobs.push(blob);
+
+            if (curY + hSlice >= targetH) break;
+            curY += (sliceTargetH - overlapTargetH);
           }
-          ctx.putImageData(imgData, 0, 0);
-          canvas.toBlob(blob => resolve(blob || file), 'image/png');
+
+          resolve(blobs.length > 0 ? blobs : [file]);
         };
-        img.onerror = () => resolve(file);
+        img.onerror = () => resolve([file]);
         img.src = URL.createObjectURL(file);
       });
     }
@@ -1441,59 +1708,107 @@
         .replace(/\s+/g, ' ')
         .trim();
       if (!s) return '';
+      if (/^(نعم|لا|تصويت|أصوات|الآن|اليوم|أمس|منذ)$/.test(s)) return '';
+      s = s.replace(/\s+تعاهدوا(\s+القر[ءاآ]ن)?$/g, '').trim();
+
       const words = s.split(' ').filter(w => w.length >= 2 || w === 'و');
       if (words.length === 0) return '';
       return extractFirstTwoArabicNames(words.join(' '));
     }
 
-    async function runOcrOnFile(file) {
+    function rebuildExtractedTextFromFiles() {
+      const uniqueLines = [];
+      const seenNorm = new Set();
+      ocrFiles.forEach(item => {
+        (item.lines || []).forEach(l => {
+          const norm = normalizeArabicText(l);
+          if (norm && !seenNorm.has(norm)) {
+            seenNorm.add(norm);
+            uniqueLines.push(l);
+          }
+        });
+      });
+      document.getElementById('ocr-extracted-text').value = uniqueLines.join('\n');
+    }
+
+    async function processPendingOcrFiles() {
+      if (ocrIsProcessing) return;
       if (typeof Tesseract === 'undefined') {
         return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
       }
+
+      const pendingItems = ocrFiles.filter(f => f.status === 'pending');
+      if (pendingItems.length === 0) return;
+
+      ocrIsProcessing = true;
       const progBox = document.getElementById('ocr-progress-box');
       const statusEl = document.getElementById('ocr-status-text');
       const barEl = document.getElementById('ocr-progress-bar');
       const resBox = document.getElementById('ocr-result-box');
 
       progBox.classList.remove('hidden');
-      resBox.classList.add('hidden');
       barEl.style.width = '5%';
-      statusEl.textContent = 'جاري تجهيز الصورة لقراءة الأسماء...';
+      statusEl.textContent = 'جاري تجهيز الصور للقراءة...';
 
       try {
         const forceInvert = document.getElementById('ocr-invert-check').checked;
-        const processedBlob = await preprocessImageForOcr(file, forceInvert);
+        let curFileIdx = 0;
+        let curSliceIdx = 0;
+        let curSliceCount = 1;
 
         const worker = await Tesseract.createWorker('ara', 1, {
           logger: m => {
             if (m && m.status === 'recognizing text') {
-              const pct = Math.max(10, Math.round((m.progress || 0) * 100));
+              const fileFrac = (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount);
+              const overall = ((curFileIdx + fileFrac) / pendingItems.length) * 100;
+              const pct = Math.max(8, Math.min(99, Math.round(overall)));
               barEl.style.width = pct + '%';
-              statusEl.textContent = `جاري استخراج الأسماء من الصورة... ${pct}%`;
+              statusEl.textContent = pendingItems.length > 1
+                ? `جاري قراءة صورة ${curFileIdx + 1} من ${pendingItems.length}... (${pct}%)`
+                : `جاري استخراج الأسماء من الصورة... (${pct}%)`;
             } else if (m && m.status) {
               statusEl.textContent = 'جاري تحميل قاموس اللغة العربية (أول مرة فقط)...';
             }
           }
         });
 
-        const { data: { text } } = await worker.recognize(processedBlob);
+        for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
+          const item = pendingItems[fIdx];
+          curFileIdx = fIdx;
+          item.status = 'processing';
+          renderOcrThumbnails();
+
+          try {
+            const slices = await sliceAndPreprocessImageForOcr(item.file, forceInvert);
+            curSliceCount = slices.length;
+            const rawLines = [];
+            for (let sIdx = 0; sIdx < slices.length; sIdx++) {
+              curSliceIdx = sIdx;
+              const { data: { text } } = await worker.recognize(slices[sIdx]);
+              String(text || '').split(/\r?\n/).forEach(l => rawLines.push(l));
+            }
+            item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean);
+            item.status = 'done';
+          } catch (e) {
+            item.status = 'error';
+          }
+          renderOcrThumbnails();
+        }
+
         await worker.terminate();
 
-        const lines = String(text || '')
-          .split(/\r?\n/)
-          .map(cleanOcrLineToShortName)
-          .filter(Boolean);
-
-        const uniqueLines = [];
-        lines.forEach(l => { if (!uniqueLines.includes(l)) uniqueLines.push(l); });
-
-        document.getElementById('ocr-extracted-text').value = uniqueLines.join('\n');
+        rebuildExtractedTextFromFiles();
         progBox.classList.add('hidden');
         resBox.classList.remove('hidden');
         matchOcrLinesToMembers();
       } catch (err) {
         progBox.classList.add('hidden');
-        showToast('❌ حدث خطأ أثناء قراءة الصورة، جربي صورة أوضح');
+        showToast('❌ حدث خطأ أثناء قراءة الصور، تأكدي من وضوح الصور');
+      } finally {
+        ocrIsProcessing = false;
+        if (ocrFiles.some(f => f.status === 'pending')) {
+          processPendingOcrFiles();
+        }
       }
     }
 
@@ -1530,63 +1845,86 @@
 
       const targetMembers = ocrTargetType === 'listening' ? getListeningMembers() : getGroupMembers();
       ocrSelectedMemberIds = new Set();
-      const matchedReasons = {};
-      const unmatchedLines = [];
+      ocrMatchedReasons = {};
+      ocrUnmatchedLines = [];
+
+      const firstWordCounts = {};
+      targetMembers.forEach(m => {
+        const fw = normalizeArabicText(m.name).split(' ')[0];
+        if (fw) firstWordCounts[fw] = (firstWordCounts[fw] || 0) + 1;
+      });
 
       rawLines.forEach(line => {
         const normLine = normalizeArabicText(line);
+        const normLineWords = normLine.split(' ').filter(Boolean);
         const normLineNoSpace = normLine.replace(/\s+/g, '');
         let bestMember = null;
         let bestScore = 0;
 
-        targetMembers.forEach(m => {
-          const mShort = extractFirstTwoArabicNames(m.name);
-          const normMShort = normalizeArabicText(mShort);
-          const normMFull = normalizeArabicText(m.name);
-
-          let score = 0;
-          if (normLine === normMShort || normLineNoSpace === normMShort.replace(/\s+/g, '')) {
-            score = 1.0;
-          } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort)) {
-            score = 0.95;
-          } else {
-            score = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+        if (normLineWords.length === 1) {
+          const fw = normLineWords[0];
+          if (firstWordCounts[fw] === 1) {
+            const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
+            if (uniqueM) {
+              bestMember = uniqueM;
+              bestScore = 0.9;
+            }
           }
+        } else {
+          targetMembers.forEach(m => {
+            const mShort = extractFirstTwoArabicNames(m.name);
+            const normMShort = normalizeArabicText(mShort);
+            const normMFull = normalizeArabicText(m.name);
 
-          if (score > bestScore) {
-            bestScore = score;
-            bestMember = m;
-          }
-        });
+            let score = 0;
+            if (normLine === normMShort || normLineNoSpace === normMShort.replace(/\s+/g, '')) {
+              score = 1.0;
+            } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort)) {
+              score = 0.95;
+            } else {
+              score = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+            }
+
+            if (score > bestScore) {
+              bestScore = score;
+              bestMember = m;
+            }
+          });
+        }
 
         if (bestMember && bestScore >= 0.72) {
           ocrSelectedMemberIds.add(bestMember.id);
-          matchedReasons[bestMember.id] = line;
+          ocrMatchedReasons[bestMember.id] = line;
         } else {
-          unmatchedLines.push(line);
+          ocrUnmatchedLines.push(line);
         }
       });
 
-      renderOcrChecklist(targetMembers, matchedReasons, unmatchedLines);
+      renderOcrChecklist();
     }
 
-    function renderOcrChecklist(targetMembers, matchedReasons = {}, unmatchedLines = []) {
-      const sorted = [...targetMembers].sort((a, b) => {
-        const aSel = ocrSelectedMemberIds.has(a.id) ? 0 : 1;
-        const bSel = ocrSelectedMemberIds.has(b.id) ? 0 : 1;
-        return (aSel - bSel) || compareArabic(a.name, b.name);
-      });
+    function renderOcrChecklist() {
+      const targetMembers = ocrTargetType === 'listening' ? getListeningMembers() : getGroupMembers();
+      const filterQ = (document.getElementById('ocr-filter-input').value || '').trim().toLowerCase();
+
+      const sorted = [...targetMembers]
+        .filter(m => !filterQ || m.name.toLowerCase().includes(filterQ))
+        .sort((a, b) => {
+          const aSel = ocrSelectedMemberIds.has(a.id) ? 0 : 1;
+          const bSel = ocrSelectedMemberIds.has(b.id) ? 0 : 1;
+          return (aSel - bSel) || compareArabic(a.name, b.name);
+        });
 
       let summaryHtml = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${targetMembers.length}`;
-      if (unmatchedLines.length > 0) {
-        summaryHtml += `<div style="font-size:12px; color:#b45309; font-weight:600; margin-top:4px;">أسطر لم تُطابق تلقائياً: ${unmatchedLines.map(escapeHtml).join(' • ')}</div>`;
+      if (ocrUnmatchedLines.length > 0) {
+        summaryHtml += `<div style="font-size:12px; color:#b45309; font-weight:600; margin-top:4px;">أسطر لم تُطابق تلقائياً: ${ocrUnmatchedLines.map(escapeHtml).join(' • ')}</div>`;
       }
       document.getElementById('ocr-match-summary').innerHTML = summaryHtml;
 
       document.getElementById('ocr-checklist').innerHTML = sorted.map(m => {
         const isChecked = ocrSelectedMemberIds.has(m.id);
         const shortName = extractFirstTwoArabicNames(m.name);
-        const reason = matchedReasons[m.id];
+        const reason = ocrMatchedReasons[m.id];
         return `
           <label class="ocr-check-item ${isChecked ? 'matched' : ''}">
             <div style="display:flex; align-items:center; gap:8px;">
@@ -1644,7 +1982,7 @@
       if (mode === 'present' && markRestAbsent) {
         showToast(`✅ تم تسجيل ${markedCount} حاضر و ${restAbsentCount} غياب`);
       } else {
-        showToast(mode === 'present' ? `✅ تم تسجيل ${markedCount} حاضر من الصورة` : `❌ تم تسجيل ${markedCount} غياب من الصورة`);
+        showToast(mode === 'present' ? `✅ تم تسجيل ${markedCount} حاضر من الصور` : `❌ تم تسجيل ${markedCount} غياب من الصور`);
       }
     }
 
@@ -2023,4 +2361,3 @@
   </script>
 </body>
 </html>
-```
