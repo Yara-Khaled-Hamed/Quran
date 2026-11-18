@@ -1,3 +1,6 @@
+إليك الكود كاملاً وجاهزاً للنسخ مباشرة (اضغطي على زر النسخ أعلى المربع):
+
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -11,6 +14,7 @@
   <link id="favicon-link" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23065f46'/%3E%3Crect x='8' y='8' width='112' height='112' rx='22' fill='none' stroke='%23fbbf24' stroke-width='3' opacity='0.6'/%3E%3Cpath d='M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z' fill='%23ffffff'/%3E%3Cpath d='M64 42 L64 92' stroke='%23d97706' stroke-width='3'/%3E%3Ccircle cx='64' cy='24' r='5' fill='%23fbbf24'/%3E%3C/svg%3E" />
   <link id="apple-icon-link" rel="apple-touch-icon" href="" />
   <link id="manifest-link" rel="manifest" href="" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
       --primary: #065f46; --primary-light: #059669; --primary-soft: #ecfdf5;
@@ -26,6 +30,7 @@
     .card { background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 14px; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; transition: transform 0.1s; }
     .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-soft { background: var(--primary-soft); color: var(--primary); }
     .btn-gold { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
@@ -95,11 +100,21 @@
     .stars-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; white-space: pre-wrap; font-size: 14.5px; line-height: 1.65; max-height: 300px; overflow-y: auto; margin: 12px 0; }
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 1000; }
     .modal-backdrop.open { display: flex; }
-    .modal { background: #fff; width: 100%; max-width: 490px; border-radius: 20px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+    .modal { background: #fff; width: 100%; max-width: 520px; border-radius: 20px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); white-space: nowrap; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; }
     .empty-state { text-align: center; padding: 30px 14px; color: var(--muted); }
     .hidden { display: none !important; }
+    .ocr-preview-img { max-width: 100%; max-height: 180px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 8px auto; object-fit: contain; background: #f9fafb; }
+    .ocr-progress-wrap { background: #e5e7eb; border-radius: 99px; height: 10px; overflow: hidden; margin: 8px 0; }
+    .ocr-progress-bar { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.2s; }
+    .ocr-checklist { max-height: 210px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .ocr-check-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13.5px; font-weight: 600; }
+    .ocr-check-item.matched { background: var(--primary-soft); border-color: #6ee7b7; color: var(--primary); }
+    .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+    .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 130px; overflow-y: auto; }
+    .group-pick-btn { width: 100%; text-align: right; justify-content: space-between; padding: 12px 14px; margin-bottom: 8px; background: var(--primary-soft); border: 1.5px solid #a7f3d0; color: var(--primary); border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; }
+    .group-pick-btn:hover { background: #d1fae5; }
     @media (max-width: 520px) {
       .member-row, .partner-member-item { flex-direction: column; align-items: stretch; }
       .status-pills { justify-content: space-between; }
@@ -124,10 +139,10 @@
       <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:18px;">متابعة حضور الاستماع والتسميع لحفظة كتاب الله</p>
       <div id="login-step-1">
         <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم المشرف / المشرفة</label>
-        <input type="text" id="supervisor-input" class="input" placeholder="اكتب اسمك أو اختره من الأسفل..." onkeypress="if(event.key==='Enter') document.getElementById('password-input').focus()" />
+        <input type="text" id="supervisor-input" class="input" placeholder="اكتب اسمك أو اختره من الأسفل..." oninput="quickSelectedGroupId=null" onkeypress="if(event.key==='Enter') document.getElementById('password-input').focus()" />
         <label style="display:block; font-weight:700; font-size:14px; margin:10px 0 6px;">كلمة المرور (الباسورد)</label>
         <div class="pw-wrap">
-          <input type="password" id="password-input" class="input" style="padding-left:40px;" placeholder="أدخل كلمة المرور..." onkeypress="if(event.key==='Enter') handleLogin()" />
+          <input type="password" id="password-input" class="input" style="padding-left:40px;" placeholder="أدخل كلمة المرور (أرقام عربي أو إنجليزي)..." onkeypress="if(event.key==='Enter') handleLogin()" />
           <button type="button" class="pw-toggle" onclick="togglePwVisibility('password-input', this)">👁️</button>
         </div>
         <button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="handleLogin()">دخول</button>
@@ -146,6 +161,13 @@
           <button class="btn btn-primary" style="flex:1;" onclick="createNewSupervisorGroup()">إنشاء الجروب والدخول</button>
           <button class="btn btn-outline" onclick="cancelNewSupervisor()">رجوع</button>
         </div>
+      </div>
+      <div id="login-step-pick-group" class="hidden">
+        <div style="background:var(--primary-soft); padding:12px; border-radius:12px; margin-bottom:12px; font-size:14px;">
+          أهلاً بك يا <strong id="pick-sup-display"></strong>! لديك أكثر من جروب، اختر الجروب الذي تريد فتحه:
+        </div>
+        <div id="login-pick-groups-list"></div>
+        <button class="btn btn-outline btn-block btn-sm" style="margin-top:8px;" onclick="cancelPickGroup()">رجوع</button>
       </div>
       <hr style="border:none; border-top:1px solid var(--border); margin:18px 0 12px;" />
       <button class="btn btn-soft btn-block btn-sm" onclick="openDownloadModal()">📲 تثبيت التطبيق على الموبايل</button>
@@ -226,6 +248,7 @@
           </div>
         </div>
         <div class="header-actions">
+          <button id="switch-group-btn" class="header-btn hidden" onclick="openSwitchGroupModal()">🔄 تبديل الجروب</button>
           <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
           <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
           <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
@@ -261,8 +284,11 @@
 
       <div id="tab-listening">
         <div class="card" style="padding:12px;">
-          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('listening')">
+          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:8px;" onclick="copyAbsenceMessage('listening')">
             🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)
+          </button>
+          <button class="btn btn-gold btn-block btn-sm" style="margin-bottom:10px;" onclick="openOcrModal('listening')">
+            📸 أخذ حضور/غياب الاستماع من صورة بالأسماء
           </button>
           <input type="text" id="search-listening" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -279,6 +305,19 @@
           <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">
             🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)
           </button>
+
+          <div class="quick-num-box">
+            <label style="display:block; font-size:13.5px; font-weight:800; color:var(--primary); margin-bottom:6px;">
+              🔢 تسجيل التسميع بأرقام الرفقاء التي أرسلت:
+            </label>
+            <textarea id="recitation-numbers-input" class="input" rows="2" style="padding:8px 10px; font-size:14px;" placeholder="اكتب أو الصق الأرقام (مثال: 1 3 5 12 أو ١، ٣، ٥)..." oninput="previewRecitationNumbers()"></textarea>
+            <div id="recitation-numbers-preview" class="quick-num-preview hidden"></div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="applyRecitationByNumbers(false)">✅ تسجيل المحددين (سمّع)</button>
+              <button class="btn btn-danger btn-sm" style="flex:1;" onclick="applyRecitationByNumbers(true)">✅ سمّع + الباقي غياب ❌</button>
+            </div>
+          </div>
+
           <input type="text" id="search-recitation" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
           <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
@@ -340,10 +379,83 @@
               <button class="btn btn-danger btn-sm" onclick="deleteAllGroupMembers()">🗑️ مسح جميع الأسماء</button>
             </div>
           </div>
+          <input type="text" id="search-manage" class="input" style="padding:8px 12px; margin-bottom:8px; font-size:14px;" placeholder="🔍 ابحث عن اسم لتعديله أو إدارته..." oninput="renderManage()" />
           <p id="reset-date-note" style="font-size:12px; color:var(--muted); margin-bottom:8px;"></p>
           <div id="manage-members-list"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- نافذة قراءة الأسماء من صورة -->
+  <div id="ocr-modal" class="modal-backdrop" onclick="if(event.target===this) closeOcrModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة الأسماء من صورة</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
+      </div>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
+        اختاري صورة (سكرين شوت) فيها الأسماء، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم (وإذا كان فيه كلمة <strong>عبد</strong> يأخذ الاسم الذي بعده ليكون كاملاً).
+      </p>
+
+      <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px;">
+        <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصورة:</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:700;">
+            <input type="radio" name="ocr-mode" value="present" checked onchange="updateOcrApplyButtons()" />
+            <span>✅ أسماء الحاضرين (سجلهم حاضر)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:700;">
+            <input type="radio" name="ocr-mode" value="absent" onchange="updateOcrApplyButtons()" />
+            <span>❌ أسماء الغائبين (سجلهم غياب)</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+        <label class="btn btn-primary btn-sm" style="flex:1; cursor:pointer;">
+          🖼️ اختيار صورة من الهاتف
+          <input type="file" id="ocr-file-input" accept="image/*" class="hidden" onchange="onOcrFileSelected(this)" />
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer;">
+          <input type="checkbox" id="ocr-invert-check" onchange="reprocessCurrentOcrImage()" />
+          <span>خلفية داكنة (وضع ليلي)</span>
+        </label>
+      </div>
+
+      <img id="ocr-preview" class="ocr-preview-img hidden" alt="معاينة الصورة" />
+
+      <div id="ocr-progress-box" class="hidden" style="margin:10px 0;">
+        <div id="ocr-status-text" style="font-size:13px; font-weight:700; color:var(--primary);">جاري قراءة الصورة...</div>
+        <div class="ocr-progress-wrap"><div id="ocr-progress-bar" class="ocr-progress-bar"></div></div>
+      </div>
+
+      <div id="ocr-result-box" class="hidden">
+        <label style="display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-top:8px;">
+          الأسماء المستخرجة (أول اسمين + إكمال اسم عبد) — يمكنكِ تعديلها يدوياً ثم إعادة المطابقة:
+        </label>
+        <textarea id="ocr-extracted-text" class="input" rows="4" style="font-size:13.5px; padding:8px 10px; margin-top:4px;"></textarea>
+        <button class="btn btn-soft btn-xs" style="margin-top:6px;" onclick="matchOcrLinesToMembers()">🔄 إعادة مطابقة الأسماء</button>
+
+        <div id="ocr-match-summary" style="font-size:13px; font-weight:800; color:var(--primary); margin-top:10px;"></div>
+        <div id="ocr-checklist" class="ocr-checklist"></div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+          <button id="ocr-apply-only-btn" class="btn btn-primary btn-block" onclick="applyOcrSelection(false)">✅ اعتماد المحددين فقط</button>
+          <button id="ocr-apply-rest-absent-btn" class="btn btn-danger btn-block btn-sm" onclick="applyOcrSelection(true)">✅ اعتماد المحددين كـ حاضر + تسجيل الباقي غياب ❌</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة تبديل الجروب للمشرف متعدد الجروبات -->
+  <div id="switch-group-modal" class="modal-backdrop" onclick="if(event.target===this) closeSwitchGroupModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="color:var(--primary); font-size:18px;">🔄 اختر الجروب</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeSwitchGroupModal()">✕</button>
+      </div>
+      <div id="switch-group-list"></div>
     </div>
   </div>
 
@@ -426,11 +538,18 @@
     let selectedForPartner = [];
     let pendingSupervisorName = '';
     let pendingSupervisorPassword = '';
+    let pendingMatchedGroups = [];
+    let quickSelectedGroupId = null;
     let editingGroupId = null;
     let editingPartnerNumId = null;
+    let editingMemberId = null;
     let currentWeeklyMessage = '';
     let deferredPrompt = null;
     let lastCloudSnapshot = '';
+
+    let ocrTargetType = 'listening';
+    let ocrCurrentFile = null;
+    let ocrSelectedMemberIds = new Set();
 
     (function setupAppIconsAndManifest() {
       try {
@@ -474,9 +593,51 @@
       document.getElementById('pwa-install-section').classList.remove('hidden');
     });
 
+    function toEnglishDigits(str) {
+      return String(str || '')
+        .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+        .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+    }
+
+    function normalizePassword(pw) {
+      return toEnglishDigits(String(pw || ''));
+    }
+
+    function normalizeArabicText(s) {
+      return String(s || '')
+        .trim()
+        .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+        .replace(/[أإآٱ]/g, 'ا')
+        .replace(/ى/g, 'ي')
+        .replace(/ة/g, 'ه')
+        .replace(/ؤ/g, 'و')
+        .replace(/ئ/g, 'ي')
+        .replace(/\s+/g, ' ');
+    }
+
     function compareArabic(a, b) {
       const norm = s => String(s || '').trim().replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي');
       return norm(a).localeCompare(norm(b), 'ar');
+    }
+
+    function extractFirstTwoArabicNames(rawName) {
+      const words = String(rawName || '').trim().split(/\s+/).filter(Boolean);
+      if (words.length === 0) return '';
+      const picked = [];
+      let logicalCount = 0;
+      let i = 0;
+      while (i < words.length && logicalCount < 2) {
+        const w = words[i];
+        picked.push(w);
+        i++;
+        const normW = w.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا');
+        if (normW === 'عبد' && i < words.length) {
+          picked.push(words[i]);
+          i++;
+        }
+        logicalCount++;
+      }
+      return picked.join(' ');
     }
 
     function objToArray(val) {
@@ -545,7 +706,7 @@
           if (loginVisible) { renderLogin(); }
           else {
             const tag = document.activeElement ? document.activeElement.tagName : '';
-            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT' && editingGroupId === null && editingPartnerNumId === null) {
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT' && editingGroupId === null && editingPartnerNumId === null && editingMemberId === null) {
               refreshCurrentView();
             }
           }
@@ -605,56 +766,131 @@
     function dateToStr(d) { const off = d.getTimezoneOffset(); return new Date(d.getTime() - off * 60000).toISOString().split('T')[0]; }
     function getTodayStr() { return dateToStr(new Date()); }
     function uid(prefix) { return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.display = 'none'; }, 3000); }
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.display = 'none'; }, 3200); }
     function togglePwVisibility(id, btn) { const i = document.getElementById(id); if (i.type === 'password') { i.type = 'text'; btn.textContent = '🙈'; } else { i.type = 'password'; btn.textContent = '👁️'; } }
 
-    function isSupervisorNameTaken(name, excludeSupId = null) {
+    function isSupervisorNameInSameGroup(name, groupId, excludeSupId = null) {
       const lower = name.trim().toLowerCase();
-      if (lower === db.headSupervisor.name.trim().toLowerCase()) return true;
-      for (const g of db.groups) for (const s of (g.supervisors || [])) if (s.id !== excludeSupId && s.name.trim().toLowerCase() === lower) return true;
-      return false;
+      const group = db.groups.find(g => g.id === groupId);
+      if (!group) return false;
+      return (group.supervisors || []).some(s => s.id !== excludeSupId && s.name.trim().toLowerCase() === lower);
+    }
+
+    function getSupervisorGroups(supName, supPass) {
+      const nameLower = String(supName || '').trim().toLowerCase();
+      const passNorm = normalizePassword(supPass);
+      return db.groups.filter(g =>
+        (g.supervisors || []).some(s =>
+          s.name.trim().toLowerCase() === nameLower &&
+          normalizePassword(s.password) === passNorm
+        )
+      );
     }
 
     function renderLogin() {
       const wrap = document.getElementById('quick-supervisors'); wrap.innerHTML = '';
       const headBtn = document.createElement('button'); headBtn.className = 'chip chip-head';
-      headBtn.textContent = `👑 ${db.headSupervisor.name}`; headBtn.onclick = () => selectQuickName(db.headSupervisor.name);
+      headBtn.textContent = `👑 ${db.headSupervisor.name}`; headBtn.onclick = () => selectQuickName(db.headSupervisor.name, null);
       wrap.appendChild(headBtn);
       db.groups.forEach(g => (g.supervisors || []).forEach(s => {
         const btn = document.createElement('button'); btn.className = 'chip';
-        btn.textContent = `👤 ${s.name} (${g.name})`; btn.onclick = () => selectQuickName(s.name);
+        btn.textContent = `👤 ${s.name} (${g.name})`; btn.onclick = () => selectQuickName(s.name, g.id);
         wrap.appendChild(btn);
       }));
     }
 
-    function selectQuickName(name) {
+    function selectQuickName(name, groupId) {
       document.getElementById('supervisor-input').value = name;
+      quickSelectedGroupId = groupId || null;
       const pw = document.getElementById('password-input'); pw.value = ''; pw.focus();
     }
 
     function handleLogin() {
-      const name = document.getElementById('supervisor-input').value.trim(), pass = document.getElementById('password-input').value;
+      const name = document.getElementById('supervisor-input').value.trim();
+      const rawPass = document.getElementById('password-input').value;
+      const passNorm = normalizePassword(rawPass);
       if (!name) return showToast('من فضلك أدخل اسم المشرف أولاً');
-      if (!pass) return showToast('من فضلك أدخل كلمة المرور');
-      if (name.toLowerCase() === db.headSupervisor.name.trim().toLowerCase()) {
-        if (pass === String(db.headSupervisor.password)) { saveSession({ role: 'head', groupId: null, supervisorName: db.headSupervisor.name }); openHeadDashboard(); return; }
+      if (!rawPass) return showToast('من فضلك أدخل كلمة المرور');
+
+      if (!quickSelectedGroupId && name.toLowerCase() === db.headSupervisor.name.trim().toLowerCase()) {
+        if (passNorm === normalizePassword(db.headSupervisor.password)) {
+          saveSession({ role: 'head', groupId: null, supervisorName: db.headSupervisor.name });
+          openHeadDashboard();
+          return;
+        }
         return showToast('❌ كلمة المرور غير صحيحة للمشرف الرئيسي');
       }
-      let matchedGroup = null, matchedSup = null;
-      for (const g of db.groups) {
-        const sup = (g.supervisors || []).find(s => s.name.trim().toLowerCase() === name.toLowerCase());
-        if (sup) { matchedGroup = g; matchedSup = sup; break; }
-      }
-      if (matchedGroup && matchedSup) {
-        if (pass === String(matchedSup.password)) { saveSession({ role: 'supervisor', groupId: matchedGroup.id, supervisorName: matchedSup.name }); openGroupScreen(matchedGroup.id); }
-        else return showToast('❌ كلمة المرور غير صحيحة');
+
+      const nameLower = name.toLowerCase();
+      const groupsWithSameName = db.groups.filter(g =>
+        (g.supervisors || []).some(s => s.name.trim().toLowerCase() === nameLower)
+      );
+
+      if (groupsWithSameName.length > 0) {
+        const matchedEntries = [];
+        groupsWithSameName.forEach(g => {
+          const sup = (g.supervisors || []).find(s =>
+            s.name.trim().toLowerCase() === nameLower &&
+            normalizePassword(s.password) === passNorm
+          );
+          if (sup) matchedEntries.push({ group: g, sup });
+        });
+
+        if (matchedEntries.length === 0) {
+          return showToast('❌ كلمة المرور غير صحيحة');
+        }
+
+        if (quickSelectedGroupId) {
+          const clicked = matchedEntries.find(e => e.group.id === quickSelectedGroupId);
+          if (clicked) {
+            saveSession({ role: 'supervisor', groupId: clicked.group.id, supervisorName: clicked.sup.name, supervisorPassword: passNorm });
+            openGroupScreen(clicked.group.id);
+            return;
+          }
+        }
+
+        if (matchedEntries.length === 1) {
+          const only = matchedEntries[0];
+          saveSession({ role: 'supervisor', groupId: only.group.id, supervisorName: only.sup.name, supervisorPassword: passNorm });
+          openGroupScreen(only.group.id);
+        } else {
+          pendingSupervisorName = matchedEntries[0].sup.name;
+          pendingSupervisorPassword = passNorm;
+          pendingMatchedGroups = matchedEntries.map(e => e.group);
+          showPickGroupStep();
+        }
       } else {
-        pendingSupervisorName = name; pendingSupervisorPassword = pass;
+        pendingSupervisorName = name;
+        pendingSupervisorPassword = passNorm;
         document.getElementById('new-sup-display').textContent = name;
         document.getElementById('login-step-1').classList.add('hidden');
         document.getElementById('login-step-2').classList.remove('hidden');
         document.getElementById('new-group-input').focus();
       }
+    }
+
+    function showPickGroupStep() {
+      document.getElementById('pick-sup-display').textContent = pendingSupervisorName;
+      const list = document.getElementById('login-pick-groups-list');
+      list.innerHTML = pendingMatchedGroups.map(g => `
+        <button class="group-pick-btn" onclick="pickLoginGroup('${g.id}')">
+          <span>🕌 ${escapeHtml(g.name)}</span>
+          <span>دخول ⬅️</span>
+        </button>
+      `).join('');
+      document.getElementById('login-step-1').classList.add('hidden');
+      document.getElementById('login-step-pick-group').classList.remove('hidden');
+    }
+
+    function pickLoginGroup(groupId) {
+      saveSession({ role: 'supervisor', groupId, supervisorName: pendingSupervisorName, supervisorPassword: pendingSupervisorPassword });
+      cancelPickGroup();
+      openGroupScreen(groupId);
+    }
+
+    function cancelPickGroup() {
+      document.getElementById('login-step-pick-group').classList.add('hidden');
+      document.getElementById('login-step-1').classList.remove('hidden');
     }
 
     function createNewSupervisorGroup() {
@@ -663,7 +899,7 @@
       const newGroup = { id: uid('g'), name: gName, supervisors: [{ id: uid('s'), name: pendingSupervisorName, password: pendingSupervisorPassword }], absenceStartDate: '' };
       db.groups.push(newGroup); cloudSaveGroup(newGroup);
       document.getElementById('new-group-input').value = ''; cancelNewSupervisor();
-      saveSession({ role: 'supervisor', groupId: newGroup.id, supervisorName: pendingSupervisorName });
+      saveSession({ role: 'supervisor', groupId: newGroup.id, supervisorName: pendingSupervisorName, supervisorPassword: pendingSupervisorPassword });
       openGroupScreen(newGroup.id); showToast('تم إنشاء الجروب بنجاح');
     }
 
@@ -674,22 +910,48 @@
 
     function openGroupScreen(groupId) {
       currentGroupId = groupId;
+      editingMemberId = null;
       if (session) saveSession({ ...session, groupId });
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('head-screen').classList.add('hidden');
       document.getElementById('app-screen').classList.remove('hidden');
       document.getElementById('date-picker').value = currentDate;
       document.getElementById('back-to-head-btn').classList.toggle('hidden', !(session && session.role === 'head'));
+      updateSwitchGroupBtn();
       renderAll();
     }
 
+    function updateSwitchGroupBtn() {
+      const btn = document.getElementById('switch-group-btn');
+      if (session && session.role === 'supervisor' && session.supervisorName && session.supervisorPassword !== undefined) {
+        const myGroups = getSupervisorGroups(session.supervisorName, session.supervisorPassword);
+        btn.classList.toggle('hidden', myGroups.length <= 1);
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+
+    function openSwitchGroupModal() {
+      if (!session || session.role !== 'supervisor') return;
+      const myGroups = getSupervisorGroups(session.supervisorName, session.supervisorPassword);
+      document.getElementById('switch-group-list').innerHTML = myGroups.map(g => `
+        <button class="group-pick-btn" onclick="openGroupScreen('${g.id}'); closeSwitchGroupModal();">
+          <span>🕌 ${escapeHtml(g.name)} ${g.id === currentGroupId ? '✅' : ''}</span>
+          <span>فتح</span>
+        </button>
+      `).join('');
+      document.getElementById('switch-group-modal').classList.add('open');
+    }
+    function closeSwitchGroupModal() { document.getElementById('switch-group-modal').classList.remove('open'); }
+
     function logout() {
-      currentGroupId = null; saveSession(null);
+      currentGroupId = null; quickSelectedGroupId = null; editingMemberId = null; saveSession(null);
       document.getElementById('app-screen').classList.add('hidden');
       document.getElementById('head-screen').classList.add('hidden');
       document.getElementById('login-screen').classList.remove('hidden');
       document.getElementById('supervisor-input').value = '';
       document.getElementById('password-input').value = '';
+      cancelPickGroup(); cancelNewSupervisor();
       renderLogin();
     }
 
@@ -767,9 +1029,10 @@
     }
 
     function headCreateGroup() {
-      const gName = document.getElementById('head-add-gname').value.trim(), sName = document.getElementById('head-add-sname').value.trim(), sPass = document.getElementById('head-add-spass').value.trim();
+      const gName = document.getElementById('head-add-gname').value.trim();
+      const sName = document.getElementById('head-add-sname').value.trim();
+      const sPass = normalizePassword(document.getElementById('head-add-spass').value.trim());
       if (!gName || !sName || !sPass) return showToast('أكمل اسم الجروب واسم المشرف وكلمة المرور');
-      if (isSupervisorNameTaken(sName)) return showToast('اسم المشرف مستخدم بالفعل، اختر اسماً مميزاً');
       const newGroup = { id: uid('g'), name: gName, supervisors: [{ id: uid('s'), name: sName, password: sPass }], absenceStartDate: '' };
       db.groups.push(newGroup); cloudSaveGroup(newGroup);
       document.getElementById('head-add-gname').value = ''; document.getElementById('head-add-sname').value = ''; document.getElementById('head-add-spass').value = '';
@@ -777,9 +1040,10 @@
     }
 
     function addCoSupervisor(groupId) {
-      const sName = document.getElementById(`add-cosup-name-${groupId}`).value.trim(), sPass = document.getElementById(`add-cosup-pass-${groupId}`).value.trim();
+      const sName = document.getElementById(`add-cosup-name-${groupId}`).value.trim();
+      const sPass = normalizePassword(document.getElementById(`add-cosup-pass-${groupId}`).value.trim());
       if (!sName || !sPass) return showToast('اكتب اسم المشرف المشارك وكلمة المرور');
-      if (isSupervisorNameTaken(sName)) return showToast('هذا الاسم مسجل لمشرف آخر، استخدم اسماً مميزاً');
+      if (isSupervisorNameInSameGroup(sName, groupId)) return showToast('هذا الاسم مسجل بالفعل في نفس هذا الجروب');
       const group = db.groups.find(g => g.id === groupId); if (!group) return;
       group.supervisors.push({ id: uid('s'), name: sName, password: sPass });
       cloudSaveGroup(group); renderHeadDashboard(); showToast(`تمت إضافة "${sName}" كمشرف مشارك`);
@@ -799,11 +1063,14 @@
       if (!gName) return showToast('اكتب اسم الجروب');
       const group = db.groups.find(g => g.id === groupId); if (!group) return;
       const updatedSups = [];
+      const seenNames = new Set();
       for (const s of group.supervisors) {
         const newName = document.querySelector(`[data-sup-name="${s.id}"]`).value.trim();
-        const newPass = document.querySelector(`[data-sup-pass="${s.id}"]`).value.trim();
+        const newPass = normalizePassword(document.querySelector(`[data-sup-pass="${s.id}"]`).value.trim());
         if (!newName || !newPass) return showToast('تأكد من كتابة اسم وباسورد كل مشرف');
-        if (isSupervisorNameTaken(newName, s.id)) return showToast(`الاسم "${newName}" مستخدم بالفعل لمشرف آخر`);
+        const lower = newName.toLowerCase();
+        if (seenNames.has(lower)) return showToast(`الاسم "${newName}" مكرر داخل نفس الجروب`);
+        seenNames.add(lower);
         updatedSups.push({ id: s.id, name: newName, password: newPass });
       }
       group.name = gName; group.supervisors = updatedSups;
@@ -822,7 +1089,8 @@
     }
 
     function saveHeadCredentials() {
-      const name = document.getElementById('head-edit-name').value.trim(), pass = document.getElementById('head-edit-pass').value.trim();
+      const name = document.getElementById('head-edit-name').value.trim();
+      const pass = normalizePassword(document.getElementById('head-edit-pass').value.trim());
       if (!name || !pass) return showToast('اكتب الاسم وكلمة المرور');
       db.headSupervisor.name = name; db.headSupervisor.password = pass;
       cloudSaveHead(); renderHeadDashboard(); showToast('تم تحديث بيانات المشرف الرئيسي');
@@ -906,7 +1174,9 @@
       }
       document.getElementById('header-supervisor-name').textContent = supLabel;
       document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
+      updateSwitchGroupBtn();
       renderStats(); renderListening(); renderRecitation(); renderManage();
+      previewRecitationNumbers();
     }
 
     function renderStats() {
@@ -967,6 +1237,420 @@
       renderStats(); renderRecitation(); renderManage(); showToast('تم تحضير الجميع في التسميع');
     }
 
+    function parsePartnershipNumbersFromInput() {
+      const raw = document.getElementById('recitation-numbers-input').value;
+      const matches = toEnglishDigits(raw).match(/\d+/g) || [];
+      const uniqueNums = [];
+      matches.forEach(nStr => {
+        const n = parseInt(nStr, 10);
+        if (n > 0 && !uniqueNums.includes(n)) uniqueNums.push(n);
+      });
+      return uniqueNums;
+    }
+
+    function previewRecitationNumbers() {
+      const box = document.getElementById('recitation-numbers-preview');
+      const nums = parsePartnershipNumbersFromInput();
+      if (nums.length === 0) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
+      const partnerships = getGroupPartnerships();
+      const members = getGroupMembers();
+      const memberMap = Object.fromEntries(members.map(m => [m.id, m]));
+      const byNum = {};
+      partnerships.forEach((p, idx) => { byNum[p.number || (idx + 1)] = p; });
+
+      const foundLines = [];
+      const missingNums = [];
+      let totalFoundMembers = 0;
+
+      nums.forEach(n => {
+        const p = byNum[n];
+        if (p) {
+          const names = p.memberIds.map(id => memberMap[id]?.name).filter(Boolean);
+          totalFoundMembers += names.length;
+          foundLines.push(`<div>✅ <strong>رقم ${n}:</strong> ${names.map(escapeHtml).join(' ، ')}</div>`);
+        } else {
+          missingNums.push(n);
+        }
+      });
+
+      let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">سيتم تسجيل (${totalFoundMembers}) اسم في التسميع:</div>`;
+      html += foundLines.join('');
+      if (missingNums.length > 0) {
+        html += `<div style="color:var(--danger); font-weight:700; margin-top:4px;">⚠️ أرقام غير موجودة بالجروب: ${missingNums.join(' ، ')}</div>`;
+      }
+      box.innerHTML = html;
+      box.classList.remove('hidden');
+    }
+
+    function applyRecitationByNumbers(markRestAbsent) {
+      const nums = parsePartnershipNumbersFromInput();
+      if (nums.length === 0) return showToast('اكتب أرقام الرفقاء أولاً (مثال: 1 3 5)');
+
+      const partnerships = getGroupPartnerships();
+      const members = getGroupMembers();
+      const memberSet = new Set(members.map(m => m.id));
+      const byNum = {};
+      partnerships.forEach((p, idx) => { byNum[p.number || (idx + 1)] = p; });
+
+      const matchedMemberIds = new Set();
+      nums.forEach(n => {
+        const p = byNum[n];
+        if (p) {
+          p.memberIds.forEach(id => { if (memberSet.has(id)) matchedMemberIds.add(id); });
+        }
+      });
+
+      if (matchedMemberIds.size === 0) return showToast('لم يتم العثور على أعضاء مطابقين لهذه الأرقام');
+
+      const day = ensureDayRecord();
+      const patch = {};
+      matchedMemberIds.forEach(id => {
+        day.recitation[id] = 'present';
+        patch[id] = 'present';
+      });
+
+      let absentCount = 0;
+      if (markRestAbsent) {
+        members.forEach(m => {
+          if (!matchedMemberIds.has(m.id) && !day.recitation[m.id]) {
+            day.recitation[m.id] = 'absent';
+            patch[m.id] = 'absent';
+            absentCount++;
+          }
+        });
+      }
+
+      cloudPatchAttendance(currentDate, 'recitation', patch);
+      document.getElementById('recitation-numbers-input').value = '';
+      previewRecitationNumbers();
+      renderAll();
+
+      if (markRestAbsent) {
+        showToast(`✅ تم تسجيل ${matchedMemberIds.size} (سمّع) و ${absentCount} (غائب)`);
+      } else {
+        showToast(`✅ تم تسجيل ${matchedMemberIds.size} عضو في التسميع`);
+      }
+    }
+
+    function openOcrModal(type = 'listening') {
+      ocrTargetType = type;
+      document.getElementById('ocr-file-input').value = '';
+      document.getElementById('ocr-preview').classList.add('hidden');
+      document.getElementById('ocr-progress-box').classList.add('hidden');
+      document.getElementById('ocr-result-box').classList.add('hidden');
+      document.getElementById('ocr-extracted-text').value = '';
+      document.getElementById('ocr-checklist').innerHTML = '';
+      ocrCurrentFile = null;
+      ocrSelectedMemberIds = new Set();
+      updateOcrApplyButtons();
+      document.getElementById('ocr-modal').classList.add('open');
+    }
+
+    function closeOcrModal() {
+      document.getElementById('ocr-modal').classList.remove('open');
+    }
+
+    function getOcrMode() {
+      const checked = document.querySelector('input[name="ocr-mode"]:checked');
+      return checked ? checked.value : 'present';
+    }
+
+    function updateOcrApplyButtons() {
+      const mode = getOcrMode();
+      const applyOnlyBtn = document.getElementById('ocr-apply-only-btn');
+      const restAbsentBtn = document.getElementById('ocr-apply-rest-absent-btn');
+      if (mode === 'present') {
+        applyOnlyBtn.textContent = '✅ اعتماد المحددين كـ حاضر فقط';
+        applyOnlyBtn.className = 'btn btn-primary btn-block';
+        restAbsentBtn.classList.remove('hidden');
+      } else {
+        applyOnlyBtn.textContent = '❌ اعتماد المحددين كـ غائب';
+        applyOnlyBtn.className = 'btn btn-danger-solid btn-block';
+        restAbsentBtn.classList.add('hidden');
+      }
+    }
+
+    function onOcrFileSelected(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      ocrCurrentFile = file;
+      const preview = document.getElementById('ocr-preview');
+      preview.src = URL.createObjectURL(file);
+      preview.classList.remove('hidden');
+      runOcrOnFile(file);
+    }
+
+    function reprocessCurrentOcrImage() {
+      if (ocrCurrentFile) runOcrOnFile(ocrCurrentFile);
+    }
+
+    function preprocessImageForOcr(file, forceInvert) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+          if (w < 1000) {
+            const scale = Math.min(2.2, 1200 / Math.max(1, w));
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          } else if (w > 2200) {
+            const scale = 2200 / w;
+            w = 2200;
+            h = Math.round(h * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const imgData = ctx.getImageData(0, 0, w, h);
+          const d = imgData.data;
+
+          let sumLum = 0;
+          const step = Math.max(4, Math.floor(d.length / 4000) * 4);
+          let samples = 0;
+          for (let i = 0; i < d.length; i += step) {
+            sumLum += (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+            samples++;
+          }
+          const avgLum = samples ? sumLum / samples : 255;
+          const shouldInvert = forceInvert || avgLum < 105;
+
+          for (let i = 0; i < d.length; i += 4) {
+            let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+            if (shouldInvert) lum = 255 - lum;
+            lum = Math.max(0, Math.min(255, (lum - 128) * 1.35 + 128));
+            d[i] = d[i + 1] = d[i + 2] = lum;
+          }
+          ctx.putImageData(imgData, 0, 0);
+          canvas.toBlob(blob => resolve(blob || file), 'image/png');
+        };
+        img.onerror = () => resolve(file);
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    function cleanOcrLineToShortName(line) {
+      let s = String(line || '')
+        .replace(/\d{1,2}:\d{2}\s*(ص|م|AM|PM)?/gi, ' ')
+        .replace(/\+?\d[\d\s\-().]{6,}/g, ' ')
+        .replace(/[^\u0600-\u06FF\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!s) return '';
+      const words = s.split(' ').filter(w => w.length >= 2 || w === 'و');
+      if (words.length === 0) return '';
+      return extractFirstTwoArabicNames(words.join(' '));
+    }
+
+    async function runOcrOnFile(file) {
+      if (typeof Tesseract === 'undefined') {
+        return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
+      }
+      const progBox = document.getElementById('ocr-progress-box');
+      const statusEl = document.getElementById('ocr-status-text');
+      const barEl = document.getElementById('ocr-progress-bar');
+      const resBox = document.getElementById('ocr-result-box');
+
+      progBox.classList.remove('hidden');
+      resBox.classList.add('hidden');
+      barEl.style.width = '5%';
+      statusEl.textContent = 'جاري تجهيز الصورة لقراءة الأسماء...';
+
+      try {
+        const forceInvert = document.getElementById('ocr-invert-check').checked;
+        const processedBlob = await preprocessImageForOcr(file, forceInvert);
+
+        const worker = await Tesseract.createWorker('ara', 1, {
+          logger: m => {
+            if (m && m.status === 'recognizing text') {
+              const pct = Math.max(10, Math.round((m.progress || 0) * 100));
+              barEl.style.width = pct + '%';
+              statusEl.textContent = `جاري استخراج الأسماء من الصورة... ${pct}%`;
+            } else if (m && m.status) {
+              statusEl.textContent = 'جاري تحميل قاموس اللغة العربية (أول مرة فقط)...';
+            }
+          }
+        });
+
+        const { data: { text } } = await worker.recognize(processedBlob);
+        await worker.terminate();
+
+        const lines = String(text || '')
+          .split(/\r?\n/)
+          .map(cleanOcrLineToShortName)
+          .filter(Boolean);
+
+        const uniqueLines = [];
+        lines.forEach(l => { if (!uniqueLines.includes(l)) uniqueLines.push(l); });
+
+        document.getElementById('ocr-extracted-text').value = uniqueLines.join('\n');
+        progBox.classList.add('hidden');
+        resBox.classList.remove('hidden');
+        matchOcrLinesToMembers();
+      } catch (err) {
+        progBox.classList.add('hidden');
+        showToast('❌ حدث خطأ أثناء قراءة الصورة، جربي صورة أوضح');
+      }
+    }
+
+    function levenshtein(a, b) {
+      const m = a.length, n = b.length;
+      if (m === 0) return n;
+      if (n === 0) return m;
+      const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        }
+      }
+      return dp[m][n];
+    }
+
+    function nameSimilarity(a, b) {
+      const s1 = normalizeArabicText(a).replace(/\s+/g, '');
+      const s2 = normalizeArabicText(b).replace(/\s+/g, '');
+      if (!s1 || !s2) return 0;
+      if (s1 === s2) return 1;
+      const maxLen = Math.max(s1.length, s2.length);
+      return 1 - (levenshtein(s1, s2) / maxLen);
+    }
+
+    function matchOcrLinesToMembers() {
+      const rawLines = document.getElementById('ocr-extracted-text').value
+        .split(/\r?\n/)
+        .map(l => extractFirstTwoArabicNames(l.trim()))
+        .filter(Boolean);
+
+      const targetMembers = ocrTargetType === 'listening' ? getListeningMembers() : getGroupMembers();
+      ocrSelectedMemberIds = new Set();
+      const matchedReasons = {};
+      const unmatchedLines = [];
+
+      rawLines.forEach(line => {
+        const normLine = normalizeArabicText(line);
+        const normLineNoSpace = normLine.replace(/\s+/g, '');
+        let bestMember = null;
+        let bestScore = 0;
+
+        targetMembers.forEach(m => {
+          const mShort = extractFirstTwoArabicNames(m.name);
+          const normMShort = normalizeArabicText(mShort);
+          const normMFull = normalizeArabicText(m.name);
+
+          let score = 0;
+          if (normLine === normMShort || normLineNoSpace === normMShort.replace(/\s+/g, '')) {
+            score = 1.0;
+          } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort)) {
+            score = 0.95;
+          } else {
+            score = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+          }
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestMember = m;
+          }
+        });
+
+        if (bestMember && bestScore >= 0.72) {
+          ocrSelectedMemberIds.add(bestMember.id);
+          matchedReasons[bestMember.id] = line;
+        } else {
+          unmatchedLines.push(line);
+        }
+      });
+
+      renderOcrChecklist(targetMembers, matchedReasons, unmatchedLines);
+    }
+
+    function renderOcrChecklist(targetMembers, matchedReasons = {}, unmatchedLines = []) {
+      const sorted = [...targetMembers].sort((a, b) => {
+        const aSel = ocrSelectedMemberIds.has(a.id) ? 0 : 1;
+        const bSel = ocrSelectedMemberIds.has(b.id) ? 0 : 1;
+        return (aSel - bSel) || compareArabic(a.name, b.name);
+      });
+
+      let summaryHtml = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${targetMembers.length}`;
+      if (unmatchedLines.length > 0) {
+        summaryHtml += `<div style="font-size:12px; color:#b45309; font-weight:600; margin-top:4px;">أسطر لم تُطابق تلقائياً: ${unmatchedLines.map(escapeHtml).join(' • ')}</div>`;
+      }
+      document.getElementById('ocr-match-summary').innerHTML = summaryHtml;
+
+      document.getElementById('ocr-checklist').innerHTML = sorted.map(m => {
+        const isChecked = ocrSelectedMemberIds.has(m.id);
+        const shortName = extractFirstTwoArabicNames(m.name);
+        const reason = matchedReasons[m.id];
+        return `
+          <label class="ocr-check-item ${isChecked ? 'matched' : ''}">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleOcrMember('${m.id}', this.checked)" style="width:17px; height:17px;" />
+              <span>${escapeHtml(m.name)}</span>
+            </div>
+            <span style="font-size:11.5px; color:var(--muted);">${reason ? `طابق: ${escapeHtml(reason)}` : escapeHtml(shortName)}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function toggleOcrMember(mId, checked) {
+      if (checked) ocrSelectedMemberIds.add(mId);
+      else ocrSelectedMemberIds.delete(mId);
+      const summaryEl = document.getElementById('ocr-match-summary');
+      const total = (ocrTargetType === 'listening' ? getListeningMembers() : getGroupMembers()).length;
+      const firstLine = summaryEl.querySelector('strong');
+      if (firstLine) firstLine.textContent = ocrSelectedMemberIds.size;
+      else summaryEl.innerHTML = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${total}`;
+    }
+
+    function applyOcrSelection(markRestAbsent) {
+      const mode = getOcrMode();
+      const targetMembers = ocrTargetType === 'listening' ? getListeningMembers() : getGroupMembers();
+      if (ocrSelectedMemberIds.size === 0 && !markRestAbsent) {
+        return showToast('حددي اسماً واحداً على الأقل للاعتماد');
+      }
+
+      const day = ensureDayRecord();
+      const patch = {};
+      let markedCount = 0;
+      let restAbsentCount = 0;
+
+      ocrSelectedMemberIds.forEach(id => {
+        day[ocrTargetType][id] = mode;
+        patch[id] = mode;
+        markedCount++;
+      });
+
+      if (mode === 'present' && markRestAbsent) {
+        targetMembers.forEach(m => {
+          if (!ocrSelectedMemberIds.has(m.id) && !day[ocrTargetType][m.id]) {
+            day[ocrTargetType][m.id] = 'absent';
+            patch[m.id] = 'absent';
+            restAbsentCount++;
+          }
+        });
+      }
+
+      cloudPatchAttendance(currentDate, ocrTargetType, patch);
+      closeOcrModal();
+      renderAll();
+
+      if (mode === 'present' && markRestAbsent) {
+        showToast(`✅ تم تسجيل ${markedCount} حاضر و ${restAbsentCount} غياب`);
+      } else {
+        showToast(mode === 'present' ? `✅ تم تسجيل ${markedCount} حاضر من الصورة` : `❌ تم تسجيل ${markedCount} غياب من الصورة`);
+      }
+    }
+
     function togglePartnerBuilder(forceState) {
       const box = document.getElementById('partner-builder'), show = forceState !== undefined ? forceState : box.classList.contains('hidden');
       box.classList.toggle('hidden', !show);
@@ -996,7 +1680,7 @@
       showToast(`تم ربط رفقاء رقم ${maxNum + 1} بنجاح`);
     }
     function savePartnerNumber(pId) {
-      const val = parseInt(document.getElementById(`partner-num-input-${pId}`).value, 10);
+      const val = parseInt(toEnglishDigits(document.getElementById(`partner-num-input-${pId}`).value), 10);
       if (!val || val < 1) return showToast('أدخل رقماً صحيحاً');
       const p = db.partnerships.find(x => x.id === pId); if (p) { p.number = val; cloudSavePartnership(p); }
       editingPartnerNumId = null; renderRecitation(); showToast('تم تعديل رقم الرفقاء');
@@ -1109,7 +1793,6 @@
       cloudSetAttendance(currentDate, 'recitation', mId, next); renderStats(); renderRecitation(); renderManage();
     }
 
-    function toEnglishDigits(str) { return str.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)); }
     function parseMemberNameAndFlags(raw) {
       let s = raw.replace(/[🌹🍃👑🌻🥀•▪▫●○♦️🔹🔸]/g, ' ').replace(/^[\s\-–—.*ـ:]+|[\s\-–—.*ـ:]+$/g, '').replace(/\s+/g, ' ').trim();
       let recitationOnly = false;
@@ -1185,6 +1868,28 @@
       showToast(newP.length ? `✅ تمت إضافة ${newM.length} عضو وتكوين ${newP.length} مجموعة رفقاء بأرقامها!` : `✅ تمت إضافة ${newM.length} عضو بنجاح`);
     }
 
+    function startEditMember(mId) {
+      editingMemberId = mId;
+      renderManage();
+      const inp = document.getElementById(`edit-member-name-${mId}`);
+      if (inp) { inp.focus(); inp.select(); }
+    }
+
+    function saveMemberEdit(mId) {
+      const inp = document.getElementById(`edit-member-name-${mId}`);
+      if (!inp) return;
+      const parsed = parseMemberNameAndFlags(inp.value);
+      if (!parsed.name) return showToast('اكتب الاسم الجديد للعضو');
+      const m = db.members.find(x => x.id === mId);
+      if (!m) return;
+      m.name = parsed.name;
+      if (parsed.recitationOnly) m.recitationOnly = true;
+      cloudSaveMember(m);
+      editingMemberId = null;
+      renderAll();
+      showToast('✅ تم تعديل الاسم بنجاح');
+    }
+
     function toggleRecitationOnly(mId) {
       const m = db.members.find(x => x.id === mId); if (!m) return;
       m.recitationOnly = !m.recitationOnly; cloudSaveMember(m); renderAll();
@@ -1225,22 +1930,39 @@
     }
 
     function renderManage() {
-      const group = getCurrentGroup(), members = getGroupMembers(), partnerships = getGroupPartnerships();
-      document.getElementById('manage-count').textContent = members.length;
+      const group = getCurrentGroup(), allMembers = getGroupMembers(), partnerships = getGroupPartnerships();
+      document.getElementById('manage-count').textContent = allMembers.length;
       const pNumMap = {};
       partnerships.forEach((p, idx) => { const n = p.number || (idx + 1); p.memberIds.forEach(id => pNumMap[id] = n); });
       document.getElementById('reset-date-note').textContent = group && group.absenceStartDate ? `يتم حساب الغياب بدءاً من: ${group.absenceStartDate}` : 'يتم حساب الغياب من جميع الأيام المسجلة.';
       const list = document.getElementById('manage-members-list');
-      if (members.length === 0) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
+      const searchEl = document.getElementById('search-manage');
+      const q = searchEl ? searchEl.value.trim().toLowerCase() : '';
+      const members = q ? allMembers.filter(m => m.name.toLowerCase().includes(q)) : allMembers;
+
+      if (allMembers.length === 0) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
+      if (members.length === 0) { list.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة للبحث "${escapeHtml(q)}".</div>`; return; }
+
       list.innerHTML = members.map((m, i) => {
         const lAbs = getAbsenceCount(m.id, 'listening'), rAbs = getAbsenceCount(m.id, 'recitation'), pNum = pNumMap[m.id];
+        if (editingMemberId === m.id) {
+          return `
+            <div style="padding:10px; border-radius:12px; background:var(--primary-soft); border:1.5px solid #6ee7b7; margin-bottom:8px;">
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="edit-member-name-${m.id}" class="input" style="padding:8px 10px; font-size:14px; flex:1; min-width:170px;" value="${escapeHtml(m.name)}" onkeypress="if(event.key==='Enter') saveMemberEdit('${m.id}')" />
+                <button class="btn btn-primary btn-sm" onclick="saveMemberEdit('${m.id}')">💾 حفظ</button>
+                <button class="btn btn-outline btn-sm" onclick="editingMemberId=null; renderManage();">إلغاء</button>
+              </div>
+            </div>`;
+        }
         return `
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
             <div>
               <div style="font-weight:700;">${i + 1}. ${escapeHtml(m.name)} ${pNum ? `<span class="partner-type-pill" style="font-size:11px; padding:1px 7px;">رفقاء #${pNum}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div>
               <div style="font-size:12px; color:var(--muted);">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'} ${lAbs > 2 ? '⚠️ إنذار' : ''} •`} تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'} ${rAbs > 2 ? '⚠️ إنذار' : ''}</div>
             </div>
-            <div style="display:flex; gap:5px;">
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+              <button class="btn btn-soft btn-xs" onclick="startEditMember('${m.id}')">✏️ تعديل</button>
               <button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? '🎧 تفعيل الاستماع' : '📖 تسميع فقط'}</button>
               <button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">🗑️ حذف</button>
             </div>
@@ -1304,3 +2026,4 @@
   </script>
 </body>
 </html>
+```
