@@ -215,7 +215,6 @@
     .ocr-thumb-status { position: absolute; bottom: 4px; left: 4px; background: rgba(255,255,255,0.92); font-size: 11px; padding: 1px 5px; border-radius: 99px; font-weight: 800; }
     .ocr-thumb-del { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 99px; border: none; background: rgba(220,38,38,0.9); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    .ocr-ai-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 9px 11px; margin-bottom: 10px; font-size: 12.5px; }
     .ocr-progress-wrap { background: #e5e7eb; border-radius: 99px; height: 10px; overflow: hidden; margin: 8px 0; }
     .ocr-progress-bar { height: 100%; background: linear-gradient(90deg, #059669, #10b981); width: 0%; transition: width 0.2s; }
     .ocr-checklist { max-height: 220px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 13px; padding: 8px; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; -webkit-overflow-scrolling: touch; }
@@ -336,19 +335,6 @@
           <span style="font-size:12px; color:var(--muted);">إحصائيات اليوم: <strong id="head-today-date"></strong></span>
         </div>
         <div id="head-groups-list"></div>
-      </div>
-
-      <div class="card" style="background:#fffbeb; border-color:#fde68a;">
-        <h3 style="font-size:15.5px; color:#92400e; margin-bottom:6px;">⚡ تفعيل القارئ الذكي (Gemini AI) لجميع الجروبات</h3>
-        <p style="font-size:12.5px; color:#78350f; margin-bottom:10px;">
-          ضعي مفتاح Gemini المجاني (من <strong>aistudio.google.com</strong>) هنا مرة واحدة، وسيعمل تلقائياً عند جميع المشرفات لقراءة الصور بسرعة فائقة (ثانيتين) ودقة 99%.
-        </p>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <input type="password" id="head-ai-key-input" class="input" style="padding:8px 11px; font-size:13.5px; flex:1; min-width:190px;" placeholder="الصقي المفتاح هنا (AIza...)..." />
-          <button class="btn btn-gold btn-sm" onclick="saveHeadAiKey()">💾 حفظ وتفعيل للجميع</button>
-          <button class="btn btn-outline btn-sm" onclick="clearHeadAiKey()">إيقاف</button>
-        </div>
-        <div id="head-ai-status" style="font-size:12px; font-weight:700; margin-top:6px;"></div>
       </div>
 
       <div class="card">
@@ -561,22 +547,8 @@
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
       <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
-        اختاري صورة أو عدة صور، وسيقرأ البرنامج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
+        اختاري صورة أو عدة صور، وسيفهم القارئ العربي والإنجليزي والأرقام، ثم يستخرج <strong>أول اسمين</strong> فقط من كل اسم مع إكمال كلمة <strong>عبد</strong> بالاسم الذي بعدها.
       </p>
-
-      <details class="ocr-ai-box">
-        <summary style="cursor:pointer; font-weight:800; color:#92400e;">
-          ⚡ القارئ الذكي السريع (Gemini AI): <span id="gemini-status-badge">غير مفعّل</span>
-        </summary>
-        <p style="margin-top:6px; color:#78350f; line-height:1.6;">
-          يمكنكِ لصق مفتاح Gemini المجاني (من <strong>aistudio.google.com</strong>) هنا لهذا الجهاز، أو إضافته من <strong>لوحة المشرف الرئيسي</strong> ليشتغل تلقائياً عند الجميع:
-        </p>
-        <div style="display:flex; gap:6px; margin-top:6px;">
-          <input type="password" id="gemini-key-input" class="input" style="padding:7px 10px; font-size:13px;" placeholder="AIza..." />
-          <button class="btn btn-gold btn-sm" onclick="saveGeminiKey()">حفظ</button>
-          <button class="btn btn-outline btn-sm" onclick="clearGeminiKey()">إلغاء</button>
-        </div>
-      </details>
 
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
@@ -688,12 +660,10 @@
     const CLOUD_DB_URL = "https://quran-attendence-default-rtdb.firebaseio.com";
     const STORAGE_KEY = 'taahadu_qoran_app_v1';
     const SESSION_KEY = 'taahadu_session_v1';
-    const GEMINI_KEY_STORAGE = 'taahadu_gemini_api_key';
     const CLOUD_BASE = CLOUD_DB_URL.trim().replace(/\/+$/, '');
 
     const defaultData = {
       headSupervisor: { name: 'المشرف الرئيسي', password: '123' },
-      aiKey: '',
       groups: [
         { id: 'g1', name: 'جروب الفجر - تعاهدوا القرءان', supervisors: [{ id: 's1', name: 'أحمد', password: '123' }, { id: 's2', name: 'محمود', password: '123' }], absenceStartDate: '' },
         { id: 'g2', name: 'جروب الهمة - تعاهدوا القرءان', supervisors: [{ id: 's3', name: 'سارة', password: '123' }], absenceStartDate: '' }
@@ -743,7 +713,6 @@
     let ocrMatchedReasons = {};
     let ocrUnmatchedLines = [];
     let cachedTesseractWorker = null;
-    let cachedGeminiModel = null;
 
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('scroll-top-btn');
@@ -805,6 +774,7 @@
     function normalizeArabicText(s) {
       return String(s || '')
         .trim()
+        .toLowerCase()
         .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
         .replace(/[أإآٱ]/g, 'ا')
         .replace(/ى/g, 'ي')
@@ -848,7 +818,6 @@
     function normalizeDB(data) {
       const out = {
         headSupervisor: data.headSupervisor || { name: 'المشرف الرئيسي', password: '123' },
-        aiKey: data.aiKey ? String(data.aiKey).trim() : '',
         groups: objToArray(data.groups).map(g => ({
           id: g.id, name: g.name,
           supervisors: g.supervisors ? objToArray(g.supervisors) : [{ id: uid('s'), name: g.supervisorName || 'مشرف', password: (g.password !== undefined && g.password !== '') ? String(g.password) : '123' }],
@@ -871,7 +840,7 @@
       });
       localDb.members.forEach(m => { membersMap[m.id] = m; });
       localDb.partnerships.forEach(p => { partsMap[p.id] = p; });
-      return { headSupervisor: localDb.headSupervisor, aiKey: localDb.aiKey || '', groups: groupsMap, members: membersMap, partnerships: partsMap, attendance: localDb.attendance || {} };
+      return { headSupervisor: localDb.headSupervisor, groups: groupsMap, members: membersMap, partnerships: partsMap, attendance: localDb.attendance || {} };
     }
 
     function loadLocalDB() {
@@ -960,7 +929,6 @@
     }
     function cloudPatchAttendance(date, type, patch) { cloudExec(() => cloudRequest(`/attendance/${date}/${type}`, 'PATCH', patch)); }
     function cloudSaveHead() { cloudExec(() => cloudRequest('/headSupervisor', 'PUT', db.headSupervisor)); }
-    function cloudSaveAiKey() { cloudExec(() => cloudRequest('/aiKey', 'PUT', db.aiKey || '')); }
 
     function loadSession() { try { const r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
     function saveSession(s) { session = s; if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); }
@@ -1197,14 +1165,6 @@
       document.getElementById('head-edit-name').value = db.headSupervisor.name;
       document.getElementById('head-edit-pass').value = db.headSupervisor.password;
 
-      const aiInp = document.getElementById('head-ai-key-input');
-      const aiStatus = document.getElementById('head-ai-status');
-      if (aiInp) aiInp.value = db.aiKey || '';
-      if (aiStatus) {
-        aiStatus.textContent = db.aiKey ? 'الحالة: مفعّل للجميع ✅' : 'الحالة: غير مفعّل بعد (يعمل بالمحرك المدمج)';
-        aiStatus.style.color = db.aiKey ? '#059669' : '#92400e';
-      }
-
       const list = document.getElementById('head-groups-list');
       if (db.groups.length === 0) { list.innerHTML = `<div class="empty-state">لا توجد جروبات مسجلة بعد.</div>`; return; }
       const dayRecord = db.attendance[currentDate] || { listening: {}, recitation: {} };
@@ -1260,24 +1220,6 @@
             </div>
           </div>`;
       }).join('');
-    }
-
-    function saveHeadAiKey() {
-      const val = (document.getElementById('head-ai-key-input').value || '').trim();
-      if (!val) return showToast('الصقي مفتاح Gemini أولاً');
-      db.aiKey = val;
-      cachedGeminiModel = null;
-      cloudSaveAiKey();
-      renderHeadDashboard();
-      showToast('✅ تم تفعيل القارئ الذكي لجميع الجروبات والمشرفات!');
-    }
-
-    function clearHeadAiKey() {
-      db.aiKey = '';
-      cachedGeminiModel = null;
-      cloudSaveAiKey();
-      renderHeadDashboard();
-      showToast('تم إيقاف مفتاح Gemini العام');
     }
 
     function headCreateGroup() {
@@ -1795,47 +1737,8 @@
       }
     }
 
-    // ==================== قراءة الصور السريعة (Gemini Batch + Tesseract Fast Worker Cache) ====================
-    function getGeminiKey() {
-      const localK = (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
-      const cloudK = (db.aiKey || '').trim();
-      return localK || cloudK;
-    }
-
-    function updateGeminiStatusUI() {
-      const localK = (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
-      const cloudK = (db.aiKey || '').trim();
-      const activeK = localK || cloudK;
-      const badge = document.getElementById('gemini-status-badge');
-      const inp = document.getElementById('gemini-key-input');
-      if (badge) {
-        if (cloudK && !localK) badge.textContent = 'مفعّل لجميع الجروبات ✅';
-        else if (activeK) badge.textContent = 'مفعّل ✅ (سرعة فائقة)';
-        else badge.textContent = 'غير مفعّل (يعمل بالمحرك المدمج السريع)';
-        badge.style.color = activeK ? '#059669' : '#b45309';
-      }
-      if (inp) inp.value = localK;
-    }
-
-    function saveGeminiKey() {
-      const val = (document.getElementById('gemini-key-input').value || '').trim();
-      if (!val) return showToast('الصقي مفتاح Gemini أولاً');
-      localStorage.setItem(GEMINI_KEY_STORAGE, val);
-      cachedGeminiModel = null;
-      updateGeminiStatusUI();
-      showToast('✅ تم تفعيل القارئ الذكي (Gemini AI)');
-      if (ocrFiles.length > 0 && !ocrIsProcessing) reprocessAllOcrImages();
-    }
-
-    function clearGeminiKey() {
-      localStorage.removeItem(GEMINI_KEY_STORAGE);
-      cachedGeminiModel = null;
-      updateGeminiStatusUI();
-      showToast('تم مسح المفتاح المحلي');
-    }
-
+    // ==================== قارئ الصور السريع (عربي + إنجليزي وأرقام) ====================
     function openOcrModal() {
-      updateGeminiStatusUI();
       clearOcrFiles(false);
       updateOcrApplyButtons();
       document.getElementById('ocr-modal').classList.add('open');
@@ -1956,89 +1859,7 @@
       processPendingOcrFiles();
     }
 
-    // تجهيز مضغوط وسريع جداً لصور Gemini (الحد الأقصى للعرض 900px لسرعة الرفع والقراءة)
-    function sliceImageFastForAI(file) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const origW = img.naturalWidth || img.width;
-          const origH = img.naturalHeight || img.height;
-          const targetW = Math.min(origW, 950);
-          const scale = targetW / Math.max(1, origW);
-          const targetH = Math.round(origH * scale);
-
-          const sliceH = 2200;
-          const overlap = 160;
-          const parts = [];
-          let curY = 0;
-          while (curY < targetH) {
-            const h = Math.min(sliceH, targetH - curY);
-            const canvas = document.createElement('canvas');
-            canvas.width = targetW;
-            canvas.height = Math.max(1, Math.round(h));
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, curY / scale, origW, h / scale, 0, 0, canvas.width, canvas.height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            parts.push(dataUrl.split(',')[1]);
-            if (curY + h >= targetH) break;
-            curY += (sliceH - overlap);
-          }
-          resolve(parts);
-        };
-        img.onerror = () => resolve([]);
-        img.src = URL.createObjectURL(file);
-      });
-    }
-
-    async function callGeminiVisionBatch(model, apiKey, prompt, base64Arr) {
-      const parts = [{ text: prompt }];
-      base64Arr.forEach(b64 => parts.push({ inline_data: { mime_type: 'image/jpeg', data: b64 } }));
-      return fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts }],
-          generationConfig: { temperature: 0.1 }
-        })
-      });
-    }
-
-    async function recognizeWithGemini(file, apiKey) {
-      const base64Parts = await sliceImageFastForAI(file);
-      if (base64Parts.length === 0) throw new Error('Image read error');
-
-      const allModels = ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
-      const modelsToTry = cachedGeminiModel ? [cachedGeminiModel, ...allModels.filter(m => m !== cachedGeminiModel)] : allModels;
-      const prompt = 'اقرأ جميع أسماء الأشخاص العرب في هذه الصور بدقة تامة دون تخطي أي اسم. تجاهل تماماً الأوقات والتواريخ والأرقام الإنجليزية مثل Today و minutes ago و We و OTU وكلمة تعاهدوا. أعد الأسماء فقط (سطر لكل اسم، أول اسمين فقط من كل اسم، وإذا احتوى الاسم على كلمة عبد فاذكر الاسم الذي بعدها ليبقى الاسم كاملاً مثل نوران عبد الجواد) بدون تكرار أو ترقيم أو شرح.';
-
-      // إرسال أجزاء الصورة في دفعة واحدة (أو دفعتين بحد أقصى 5 أجزاء للدفعة) لسرعة فائقة
-      const batches = [];
-      for (let i = 0; i < base64Parts.length; i += 5) batches.push(base64Parts.slice(i, i + 5));
-
-      const allLines = [];
-      for (const batch of batches) {
-        let res = null;
-        for (const m of modelsToTry) {
-          const tryRes = await callGeminiVisionBatch(m, apiKey, prompt, batch);
-          if (tryRes.ok) {
-            cachedGeminiModel = m;
-            res = tryRes;
-            break;
-          }
-          if (tryRes.status !== 404) {
-            res = tryRes;
-            break;
-          }
-        }
-        if (!res || !res.ok) throw new Error('Gemini API error');
-        const json = await res.json();
-        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        text.split(/\r?\n/).forEach(l => { if (l.trim()) allLines.push(l.trim()); });
-      }
-      return allLines;
-    }
-
-    // تجهيز سريع وخفيف لقارئ Tesseract Fast (أصغر حجماً وأسرع 5x من قبل)
+    // تجهيز الصورة بدقة واضحة بدون مسح حواف الحروف مع الحفاظ على سرعة القراءة
     function sliceAndPreprocessImageForOcr(file, forceInvert) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -2047,15 +1868,15 @@
           const origH = img.naturalHeight || img.height;
 
           let targetW = origW;
-          if (origW < 750) targetW = Math.round(origW * Math.min(2.2, 860 / Math.max(1, origW)));
-          else if (origW > 1050) targetW = 1000;
+          if (origW < 850) targetW = Math.round(origW * Math.min(2.4, 980 / Math.max(1, origW)));
+          else if (origW > 1150) targetW = 1080;
 
           const scale = targetW / Math.max(1, origW);
           const targetH = Math.round(origH * scale);
 
           const probeCanvas = document.createElement('canvas');
-          const probeW = Math.min(150, origW);
-          const probeH = Math.min(300, origH);
+          const probeW = Math.min(160, origW);
+          const probeH = Math.min(320, origH);
           probeCanvas.width = probeW;
           probeCanvas.height = probeH;
           const probeCtx = probeCanvas.getContext('2d');
@@ -2069,9 +1890,9 @@
           const avgLum = samples ? sumLum / samples : 255;
           const shouldInvert = forceInvert || avgLum < 115;
 
-          const sliceTargetH = 1800;
-          const overlapTargetH = 140;
-          const pad = 16;
+          const sliceTargetH = 1600;
+          const overlapTargetH = 160;
+          const pad = 20;
           const blobs = [];
 
           let curY = 0;
@@ -2088,7 +1909,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'medium';
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, srcY, origW, srcH, pad, pad, targetW, Math.round(hSlice));
 
             const imgData = ctx.getImageData(pad, pad, targetW, Math.round(hSlice));
@@ -2096,7 +1917,7 @@
             for (let i = 0; i < d.length; i += 4) {
               let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
               if (shouldInvert) lum = 255 - lum;
-              lum = Math.max(0, Math.min(255, (lum - 128) * 1.35 + 128));
+              lum = Math.max(0, Math.min(255, (lum - 128) * 1.28 + 128));
               d[i] = d[i + 1] = d[i + 2] = lum;
             }
             ctx.putImageData(imgData, pad, pad);
@@ -2115,34 +1936,65 @@
       });
     }
 
-    function extractRawArabicLine(line) {
-      let s = String(line || '')
+    function isTimestampOrUiNoise(rawLine) {
+      const s = toEnglishDigits(String(rawLine || '')).trim();
+      if (!s) return true;
+      if (/^(today|yesterday|just\s+now|poll\s*details|new\s*group|view\s*votes)$/i.test(s)) return true;
+      if (/^(today|yesterday)[,\s]+\d{1,2}[:.]\d{2}/i.test(s)) return true;
+      if (/^\d+\s*(min|mins|minute|minutes|hr|hrs|hour|hours|sec|secs|second|seconds)\s*ago$/i.test(s)) return true;
+      if (/^\d+\s*votes?$/i.test(s)) return true;
+      if (/^[\d\s:.,+\-()]+(\s*(am|pm|ص|م))?$/i.test(s)) return true;
+      return false;
+    }
+
+    function extractCleanArabicAndEnglish(line) {
+      if (isTimestampOrUiNoise(line)) return { arabic: '', english: '' };
+
+      // إزالة التوقيتات والأرقام والرموز قبل الفصل بين العربي والإنجليزي
+      const cleanedBase = toEnglishDigits(String(line || ''))
+        .replace(/\b(today|yesterday|just\s+now|minutes?\s+ago|hours?\s+ago|seconds?\s+ago|poll\s+details|new\s+group|votes?)\b/gi, ' ')
         .replace(/\d{1,2}:\d{2}\s*(ص|م|AM|PM)?/gi, ' ')
-        .replace(/\+?\d[\d\s\-().]{6,}/g, ' ')
+        .replace(/\+?\d[\d\s\-().]{5,}/g, ' ');
+
+      let ar = cleanedBase
         .replace(/[^\u0600-\u06FF\s]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      if (!s) return '';
-      if (/^(نعم|لا|تصويت|أصوات|الآن|اليوم|أمس|منذ|تفاصيل|الاستطلاع)$/.test(s)) return '';
-      s = s.replace(/\s+تعاهدوا(\s+القر[ءاآ]ن)?$/g, '').trim();
-      return s;
+
+      if (/^(نعم|لا|تصويت|أصوات|الآن|اليوم|أمس|منذ|تفاصيل|الاستطلاع)$/.test(ar)) ar = '';
+      ar = ar.replace(/\s+تعاهدوا(\s+القر[ءاآ]ن)?$/g, '').trim();
+
+      const en = cleanedBase
+        .replace(/[^A-Za-z\s]/g, ' ')
+        .replace(/\b(am|pm|we|al|el|otu|group|new|poll|details|votes?|today|yesterday|ago|min|mins|minute|minutes|hour|hours)\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      return { arabic: ar, english: en };
     }
 
     function cleanOcrLineToShortName(line) {
-      const s = extractRawArabicLine(line);
-      if (!s) return '';
+      const { arabic, english } = extractCleanArabicAndEnglish(line);
 
-      const words = s.split(' ').filter(w => w.length >= 2);
-      if (words.length === 0) return '';
+      if (arabic) {
+        const words = arabic.split(' ').filter(w => w.length >= 2);
+        if (words.length === 0) return '';
+        const shortName = extractFirstTwoArabicNames(words.join(' '));
+        const finalWords = shortName.split(' ').filter(Boolean);
+        const totalChars = finalWords.join('').length;
+        if (finalWords.length === 1 && totalChars < 4) return '';
+        if (finalWords.length >= 2 && (totalChars < 5 || !finalWords.some(w => w.length >= 3))) return '';
+        return shortName;
+      }
 
-      const shortName = extractFirstTwoArabicNames(words.join(' '));
-      const finalWords = shortName.split(' ').filter(Boolean);
-      const totalChars = finalWords.join('').length;
+      // إذا كان السطر إنجليزياً خالصاً، لا يُقبل إلا إذا طابق اسماً إنجليزياً مسجلاً في الجروب
+      if (english && english.replace(/\s+/g, '').length >= 4) {
+        const members = getListeningMembers();
+        const hasEnglishMatch = members.some(m => /[A-Za-z]/.test(m.name) && nameSimilarity(english, m.name) >= 0.72);
+        if (hasEnglishMatch) return extractFirstTwoArabicNames(english);
+      }
 
-      if (finalWords.length === 1 && totalChars < 4) return '';
-      if (finalWords.length >= 2 && (totalChars < 5 || !finalWords.some(w => w.length >= 3))) return '';
-
-      return shortName;
+      return '';
     }
 
     function rebuildExtractedTextFromFiles() {
@@ -2161,16 +2013,16 @@
     }
 
     let currentOcrLogger = null;
-    async function getFastArabicWorker() {
+    async function getFastBilingualWorker() {
       if (cachedTesseractWorker) return cachedTesseractWorker;
       const opts = {
         langPath: 'https://tessdata.projectnaptha.com/4.0.0_fast',
         logger: m => { if (currentOcrLogger) currentOcrLogger(m); }
       };
       try {
-        cachedTesseractWorker = await Tesseract.createWorker('ara', 1, opts);
+        cachedTesseractWorker = await Tesseract.createWorker(['ara', 'eng'], 1, opts);
       } catch (e) {
-        cachedTesseractWorker = await Tesseract.createWorker('ara', 1, {
+        cachedTesseractWorker = await Tesseract.createWorker(['ara', 'eng'], 1, {
           logger: m => { if (currentOcrLogger) currentOcrLogger(m); }
         });
       }
@@ -2180,13 +2032,12 @@
 
     async function processPendingOcrFiles() {
       if (ocrIsProcessing) return;
-      const pendingItems = ocrFiles.filter(f => f.status === 'pending');
-      if (pendingItems.length === 0) return;
-
-      const geminiKey = getGeminiKey();
-      if (!geminiKey && typeof Tesseract === 'undefined') {
+      if (typeof Tesseract === 'undefined') {
         return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
       }
+
+      const pendingItems = ocrFiles.filter(f => f.status === 'pending');
+      if (pendingItems.length === 0) return;
 
       ocrIsProcessing = true;
       const progBox = document.getElementById('ocr-progress-box');
@@ -2195,66 +2046,32 @@
       const resBox = document.getElementById('ocr-result-box');
 
       progBox.classList.remove('hidden');
-      barEl.style.width = '12%';
+      barEl.style.width = '10%';
 
       try {
-        if (geminiKey) {
-          let aiFailed = false;
-          for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
-            const item = pendingItems[fIdx];
-            item.status = 'processing';
-            renderOcrThumbnails();
-            const pct = Math.max(15, Math.round(((fIdx + 0.4) / pendingItems.length) * 100));
-            barEl.style.width = pct + '%';
-            statusEl.textContent = `⚡ القارئ الذكي يقرأ صورة ${fIdx + 1} من ${pendingItems.length}...`;
-
-            try {
-              const aiLines = await recognizeWithGemini(item.file, geminiKey);
-              item.rawLines = aiLines.map(extractRawArabicLine).filter(Boolean);
-              item.lines = aiLines.map(cleanOcrLineToShortName).filter(Boolean);
-              item.status = 'done';
-            } catch (e) {
-              aiFailed = true;
-              item.status = 'pending';
-              showToast('⚠️ تعذر الاتصال بـ Gemini AI، تم التحويل للقارئ السريع المدمج');
-              break;
-            }
-            renderOcrThumbnails();
-          }
-          if (!aiFailed) {
-            barEl.style.width = '100%';
-            rebuildExtractedTextFromFiles();
-            progBox.classList.add('hidden');
-            resBox.classList.remove('hidden');
-            matchOcrLinesToMembers();
-            return;
-          }
-        }
-
-        const remainingPending = ocrFiles.filter(f => f.status === 'pending');
         const forceInvert = document.getElementById('ocr-invert-check').checked;
         let curFileIdx = 0, curSliceIdx = 0, curSliceCount = 1;
 
         statusEl.textContent = cachedTesseractWorker
-          ? 'جاري قراءة الصور بسرعة...'
-          : 'جاري تجهيز القارئ السريع (أول مرة فقط)...';
+          ? 'جاري قراءة الصور (عربي + إنجليزي)...'
+          : 'جاري تجهيز القارئ السريع (عربي + إنجليزي) لأول مرة...';
 
         currentOcrLogger = m => {
           if (m && m.status === 'recognizing text') {
             const fileFrac = (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount);
-            const overall = ((curFileIdx + fileFrac) / remainingPending.length) * 100;
+            const overall = ((curFileIdx + fileFrac) / pendingItems.length) * 100;
             const pct = Math.max(10, Math.min(99, Math.round(overall)));
             barEl.style.width = pct + '%';
-            statusEl.textContent = remainingPending.length > 1
-              ? `جاري قراءة صورة ${curFileIdx + 1} من ${remainingPending.length}... (${pct}%)`
+            statusEl.textContent = pendingItems.length > 1
+              ? `جاري قراءة صورة ${curFileIdx + 1} من ${pendingItems.length}... (${pct}%)`
               : `جاري استخراج الأسماء... (${pct}%)`;
           }
         };
 
-        const worker = await getFastArabicWorker();
+        const worker = await getFastBilingualWorker();
 
-        for (let fIdx = 0; fIdx < remainingPending.length; fIdx++) {
-          const item = remainingPending[fIdx];
+        for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
+          const item = pendingItems[fIdx];
           curFileIdx = fIdx;
           item.status = 'processing';
           renderOcrThumbnails();
@@ -2272,7 +2089,7 @@
                 String((data && data.text) || '').split(/\r?\n/).forEach(l => rawLines.push(l));
               }
             }
-            item.rawLines = rawLines.map(extractRawArabicLine).filter(Boolean);
+            item.rawLines = rawLines.map(l => extractCleanArabicAndEnglish(l).arabic).filter(Boolean);
             item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean);
             item.status = 'done';
           } catch (e) {
