@@ -386,7 +386,7 @@
         <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة أسماء الاستماع من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
-      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً ودعم الأسماء القصيرة والملتصقة.</p>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً وتقطيع آمن بين السطور.</p>
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -1111,7 +1111,7 @@
       showToast(autoRest && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
     }
 
-    // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن + قص الأيقونات بدقة) ====================
+    // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن + قص الأيقونات + تقطيع آمن بين السطور) ====================
     function openOcrModal() { clearOcrFiles(false); updateOcrApplyButtons(); document.getElementById('ocr-modal').classList.add('open'); }
     function closeOcrModal() { document.getElementById('ocr-modal').classList.remove('open'); }
     function getOcrMode() { const c = document.querySelector('input[name="ocr-mode"]:checked'); return c ? c.value : 'present'; }
@@ -1161,7 +1161,6 @@
       const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0, origW, origH, 0, 0, probeW, probeH);
       const data = ctx.getImageData(0, 0, probeW, probeH).data;
 
-      // 1. تقدير لون الخلفية الرئيسي
       const hist = {}; let bestKey = '0,0,0', bestCount = 0;
       const yMin = Math.floor(probeH * 0.12), yMax = Math.floor(probeH * 0.94);
       for (let y = yMin; y < yMax; y += 2) {
@@ -1175,7 +1174,6 @@
       const bgR = (bqr << 3) + 4, bgG = (bqg << 3) + 4, bgB = (bqb << 3) + 4;
       const bgLum = 0.299 * bgR + 0.587 * bgG + 0.114 * bgB;
 
-      // 2. تقسيم الارتفاع إلى شرائح أفقية لعزل أثر العنوان العلوي أو الأسماء الطويلة عن الممر الفاصل للأيقونات
       const NUM_BANDS = 24;
       const bandH = Math.max(1, Math.floor((yMax - yMin) / NUM_BANDS));
       const bandDensity = Array.from({ length: NUM_BANDS }, () => new Float32Array(probeW));
@@ -1201,7 +1199,6 @@
       }
       if (activeBands.length < 2) activeBands = Array.from({ length: NUM_BANDS }, (_, idx) => idx);
 
-      // 3. حساب الكثافة ونسبة الهدوء (خلو العمود من البكسلات) لكل عمود X عبر الشرائح النشطة
       const colDensity = new Float32Array(probeW);
       const colQuiet = new Float32Array(probeW);
       const actCount = activeBands.length;
@@ -1216,7 +1213,6 @@
         colQuiet[x] = quietC / actCount;
       }
 
-      // 4. تحليل كل جانب (اليسار للواجهة الإنجليزية LTR، واليمين للواجهة العربية RTL)
       const analyzeSide = (isRtl) => {
         if (!isRtl) {
           let peakX = Math.floor(probeW * 0.09), avPeak = 0;
@@ -1341,29 +1337,77 @@
             const { bgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
             const srcX = Math.round(origW * cropStartPct), srcCropW = Math.max(1, Math.round(origW * (cropEndPct - cropStartPct)));
             let targetW = srcCropW;
-            if (srcCropW < 780) targetW = Math.round(srcCropW * Math.min(2.2, 980 / srcCropW));
-            else if (srcCropW > 1650) targetW = 1450;
+            if (srcCropW < 1250) targetW = Math.round(srcCropW * Math.min(2.5, 1250 / srcCropW));
+            else if (srcCropW > 1800) targetW = 1550;
             const scale = targetW / srcCropW, targetH = Math.round(origH * scale), shouldInvert = forceInvert || bgLum < 120;
-            const sliceTargetH = 1400, overlapTargetH = 160, pad = 20, blobs = [];
-            let curY = 0;
-            while (curY < targetH) {
-              const hSlice = Math.min(sliceTargetH, targetH - curY), srcY = curY / scale, srcH = hSlice / scale;
-              const canvas = document.createElement('canvas'); canvas.width = targetW + pad * 2; canvas.height = Math.max(1, Math.round(hSlice)) + pad * 2;
-              const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-              ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-              ctx.drawImage(img, srcX, srcY, srcCropW, srcH, pad, pad, targetW, Math.round(hSlice));
-              const imgData = ctx.getImageData(pad, pad, targetW, Math.round(hSlice)), d = imgData.data;
-              for (let i = 0; i < d.length; i += 4) {
-                let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+
+            const fullCanvas = document.createElement('canvas');
+            fullCanvas.width = targetW;
+            fullCanvas.height = Math.max(1, targetH);
+            const fCtx = fullCanvas.getContext('2d');
+            fCtx.fillStyle = '#ffffff';
+            fCtx.fillRect(0, 0, fullCanvas.width, fullCanvas.height);
+            fCtx.imageSmoothingEnabled = true;
+            fCtx.imageSmoothingQuality = 'high';
+            fCtx.drawImage(img, srcX, 0, srcCropW, origH, 0, 0, targetW, fullCanvas.height);
+
+            const fullImgData = fCtx.getImageData(0, 0, targetW, fullCanvas.height), fd = fullImgData.data;
+            const rowIsBlank = new Uint8Array(fullCanvas.height);
+            for (let y = 0; y < fullCanvas.height; y++) {
+              let darkPixels = 0;
+              const rowOff = y * targetW * 4;
+              for (let x = 0; x < targetW; x++) {
+                const i = rowOff + x * 4;
+                let lum = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
                 if (shouldInvert) lum = 255 - lum;
-                lum = Math.max(0, Math.min(255, (lum - 128) * 1.35 + 128));
-                d[i] = d[i + 1] = d[i + 2] = lum;
+                lum = Math.max(0, Math.min(255, (lum - 128) * 1.55 + 128));
+                fd[i] = fd[i + 1] = fd[i + 2] = lum;
+                if (lum < 210) darkPixels++;
               }
-              ctx.putImageData(imgData, pad, pad);
+              if (darkPixels <= Math.max(2, Math.floor(targetW * 0.004))) rowIsBlank[y] = 1;
+            }
+            fCtx.putImageData(fullImgData, 0, 0);
+
+            const sliceTargetH = 1400, pad = 24, blobs = [];
+            let curY = 0;
+            while (curY < fullCanvas.height) {
+              let endY = Math.min(fullCanvas.height, curY + sliceTargetH);
+              let foundSafeCut = false;
+              if (endY < fullCanvas.height) {
+                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.60), endY - 360);
+                let bestCutY = -1, bestRunLen = 0, runStart = -1;
+                for (let y = endY; y >= searchMin; y--) {
+                  if (rowIsBlank[y]) {
+                    if (runStart === -1) runStart = y;
+                  } else if (runStart !== -1) {
+                    const len = runStart - y;
+                    if (len > bestRunLen) { bestRunLen = len; bestCutY = y + 1 + Math.floor(len / 2); }
+                    runStart = -1;
+                    if (bestRunLen >= 18) break;
+                  }
+                }
+                if (runStart !== -1) {
+                  const len = runStart - searchMin + 1;
+                  if (len > bestRunLen) { bestRunLen = len; bestCutY = searchMin + Math.floor(len / 2); }
+                }
+                if (bestCutY !== -1 && bestRunLen >= 4) {
+                  endY = bestCutY;
+                  foundSafeCut = true;
+                }
+              }
+
+              const hSlice = Math.max(1, endY - curY);
+              const canvas = document.createElement('canvas');
+              canvas.width = targetW + pad * 2;
+              canvas.height = hSlice + pad * 2;
+              const ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(fullCanvas, 0, curY, targetW, hSlice, pad, pad, targetW, hSlice);
               const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
               if (blob) blobs.push(blob);
-              if (curY + hSlice >= targetH) break;
-              curY += (sliceTargetH - overlapTargetH);
+              if (endY >= fullCanvas.height) break;
+              curY = foundSafeCut ? Math.max(curY + 1, endY - 10) : Math.max(curY + 1, endY - 220);
             }
             URL.revokeObjectURL(imgUrl); resolve(blobs.length ? blobs : [file]);
           } catch (e) { URL.revokeObjectURL(imgUrl); resolve([file]); }
@@ -1424,6 +1468,9 @@
             } else if (m && m.status) statusEl.textContent = 'جاري تجهيز القاموس العربي...';
           }
         });
+        try {
+          await worker.setParameters({ tessedit_pageseg_mode: (Tesseract.PSM && Tesseract.PSM.SINGLE_BLOCK) ? Tesseract.PSM.SINGLE_BLOCK : '6' });
+        } catch (e) {}
         for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
           const item = pendingItems[fIdx]; curFileIdx = fIdx; item.status = 'processing'; renderOcrThumbnails();
           try {
@@ -1493,12 +1540,12 @@
           if (score > bestScore) { bestScore = score; bestMember = m; }
         });
 
-        if (normLineWords.length === 1 && bestScore < 0.85) {
-          const fw = normLineWords[0];
+        if (bestScore < 0.85 && (normLineWords.length === 1 || normLineNoSpace.length >= 4)) {
+          const fw = normLineWords.length === 1 ? normLineWords[0] : normLineNoSpace;
           if (firstWordCounts[fw] === 1) {
             const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
-            if (uniqueM) { bestMember = uniqueM; bestScore = 0.92; }
-          } else {
+            if (uniqueM && 0.92 > bestScore) { bestMember = uniqueM; bestScore = 0.92; }
+          } else if (normLineWords.length === 1) {
             let candidates = [];
             targetMembers.forEach(m => {
               const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
