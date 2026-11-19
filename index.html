@@ -138,6 +138,9 @@
     .ocr-checklist { max-height: 220px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 13px; padding: 8px; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; -webkit-overflow-scrolling: touch; }
     .ocr-check-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13.5px; font-weight: 700; }
     .ocr-check-item.matched { background: var(--primary-soft); border-color: #6ee7b7; color: var(--primary); }
+    .ocr-unmatched-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 9px 10px; margin-top: 8px; font-size: 12.5px; }
+    .ocr-unmatched-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .ocr-unmatched-select { padding: 5px 8px; border-radius: 9px; border: 1px solid #d1d5db; font-size: 12px; background: #fff; flex: 1; min-width: 150px; }
     .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
     .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 170px; overflow-y: auto; }
     .name-match-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-soft); border: 1px solid #6ee7b7; color: var(--primary); padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 700; margin: 2px; }
@@ -409,6 +412,7 @@
         <textarea id="ocr-extracted-text" dir="rtl" class="input" rows="4" style="font-size:13.5px; padding:8px 10px; margin-top:4px;"></textarea>
         <button class="btn btn-soft btn-xs" style="margin-top:6px;" onclick="matchOcrLinesToMembers()">🔄 إعادة مطابقة الأسماء</button>
         <div id="ocr-match-summary" style="font-size:13px; font-weight:800; color:var(--primary); margin-top:10px;"></div>
+        <div id="ocr-unmatched-box" class="ocr-unmatched-box hidden"></div>
         <input type="text" id="ocr-filter-input" class="input" style="padding:7px 10px; font-size:13px; margin-top:8px;" placeholder="🔍 ابحث في القائمة للتأكد أو التحديد اليدوي..." oninput="renderOcrChecklist()" />
         <div id="ocr-checklist" class="ocr-checklist"></div>
         <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
@@ -461,6 +465,7 @@
     const CLOUD_DB_URL = "https://quran-attendence-default-rtdb.firebaseio.com";
     const STORAGE_KEY = 'taahadu_qoran_app_v1';
     const SESSION_KEY = 'taahadu_session_v1';
+    const OCR_ALIAS_KEY = 'taahadu_ocr_aliases_v1';
     const CLOUD_BASE = CLOUD_DB_URL.trim().replace(/\/+$/, '');
 
     const defaultData = {
@@ -1110,6 +1115,11 @@
     }
 
     // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن) ====================
+    function getOcrAliases(groupId) { try { return JSON.parse(localStorage.getItem(OCR_ALIAS_KEY) || '{}')[groupId] || {}; } catch (e) { return {}; } }
+    function saveOcrAlias(groupId, rawLine, memberId) {
+      const norm = normalizeArabicText(rawLine); if (!norm || !groupId || !memberId) return;
+      try { const all = JSON.parse(localStorage.getItem(OCR_ALIAS_KEY) || '{}'); if (!all[groupId]) all[groupId] = {}; all[groupId][norm] = memberId; localStorage.setItem(OCR_ALIAS_KEY, JSON.stringify(all)); } catch (e) {}
+    }
     function openOcrModal() { clearOcrFiles(false); updateOcrApplyButtons(); document.getElementById('ocr-modal').classList.add('open'); }
     function closeOcrModal() { document.getElementById('ocr-modal').classList.remove('open'); }
     function getOcrMode() { const c = document.querySelector('input[name="ocr-mode"]:checked'); return c ? c.value : 'present'; }
@@ -1123,6 +1133,7 @@
       ocrFiles = []; ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
       document.getElementById('ocr-file-input').value = ''; document.getElementById('ocr-filter-input').value = '';
       document.getElementById('ocr-extracted-text').value = ''; document.getElementById('ocr-checklist').innerHTML = '';
+      document.getElementById('ocr-unmatched-box').classList.add('hidden'); document.getElementById('ocr-unmatched-box').innerHTML = '';
       document.getElementById('ocr-progress-box').classList.add('hidden'); document.getElementById('ocr-result-box').classList.add('hidden');
       renderOcrThumbnails(); if (showMsg) showToast('تم مسح جميع الصور المختارة');
     }
@@ -1177,20 +1188,18 @@
         colDensity[x] = nonBg / rowsChecked;
       }
       const avgRange = (aP, bP) => { const a = Math.max(0, Math.floor(probeW * aP)), b = Math.min(probeW, Math.ceil(probeW * bP)); let s = 0; for (let x = a; x < b; x++) s += colDensity[x]; return s / Math.max(1, b - a); };
+      const pickGapMidpoint = (startF, endF) => {
+        const x1 = Math.floor(probeW * startF), x2 = Math.floor(probeW * endF);
+        let minV = 999; for (let x = x1; x <= x2; x++) if (colDensity[x] < minV) minV = colDensity[x];
+        const gap = []; for (let x = x1; x <= x2; x++) if (colDensity[x] <= minV + 0.015) gap.push(x);
+        return gap.length ? gap[Math.floor(gap.length / 2)] : Math.floor((x1 + x2) / 2);
+      };
       const leftAv = avgRange(0.03, 0.16), rightEmpty = avgRange(0.90, 0.99), rightAv = avgRange(0.84, 0.97), leftEmpty = avgRange(0.01, 0.10);
       let cropStartPct = 0.0, cropEndPct = 1.0;
       if (leftAv > 0.10 && rightEmpty < 0.05 && leftAv > rightEmpty * 2.5) {
-        let cutX = Math.floor(probeW * 0.165);
-        for (let x = Math.floor(probeW * 0.12); x <= Math.floor(probeW * 0.20); x++) {
-          if (colDensity[x] < 0.03) { cutX = Math.min(probeW, x + 2); break; }
-        }
-        cropStartPct = cutX / probeW; cropEndPct = 0.99;
+        cropStartPct = pickGapMidpoint(0.14, 0.22) / probeW; cropEndPct = 0.99;
       } else if (rightAv > 0.10 && leftEmpty < 0.05 && rightAv > leftEmpty * 2.5) {
-        let cutX = Math.floor(probeW * 0.835);
-        for (let x = Math.floor(probeW * 0.88); x >= Math.floor(probeW * 0.80); x--) {
-          if (colDensity[x] < 0.03) { cutX = Math.max(0, x - 2); break; }
-        }
-        cropStartPct = 0.01; cropEndPct = cutX / probeW;
+        cropStartPct = 0.01; cropEndPct = pickGapMidpoint(0.78, 0.86) / probeW;
       }
       return { bgLum, cropStartPct, cropEndPct };
     }
@@ -1204,7 +1213,7 @@
             const { bgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
             const srcX = Math.round(origW * cropStartPct), srcCropW = Math.max(1, Math.round(origW * (cropEndPct - cropStartPct)));
             let targetW = srcCropW;
-            if (srcCropW < 1050) targetW = Math.round(srcCropW * Math.min(2.2, 1050 / srcCropW));
+            if (srcCropW < 780) targetW = Math.round(srcCropW * Math.min(2.2, 980 / srcCropW));
             else if (srcCropW > 1650) targetW = 1450;
             const scale = targetW / srcCropW, targetH = Math.round(origH * scale), shouldInvert = forceInvert || bgLum < 120;
             const sliceTargetH = 1400, overlapTargetH = 160, pad = 20, blobs = [];
@@ -1236,13 +1245,14 @@
       });
     }
 
-    const OCR_STOP_WORDS_RE = /(^|\s)(تفاصيل|استطلاع|الراي|الرأي|التصويت|المصوتون|المصوتين|اصوات|أصوات|اجابات|الإجابات|امس.?|أمس.?|اليوم|منذ|دقيقه|دقيقة|دقائق|ساعه|ساعة|ساعات|يناير|فبراير|مارس|ابريل|أبريل|مايو|يونيو|يوليو|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر|الاثنين|الإثنين|الثلاثاء|الاربعاء|الأربعاء|الخميس|الجمعة|السبت|الاحد|الأحد)(?=\s|$)/;
+    const OCR_STOP_WORDS_RE = /(^|\s)(تفاصيل|استطلاع|الراي|الرأي|التصويت|المصوتون|المصوتين|اصوات|أصوات|اجابات|الإجابات|امس|أمس|اليوم|منذ|دقيقه|دقيقة|دقائق|ساعه|ساعة|ساعات|يناير|فبراير|مارس|ابريل|أبريل|مايو|يونيو|يوليو|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر|الاثنين|الإثنين|الثلاثاء|الاربعاء|الأربعاء|الخميس|الجمعة|السبت|الاحد|الأحد)(?=\s|$)/;
     function cleanOcrLineToShortName(line) {
       let s = String(line || '').replace(/\d{1,2}:\d{2}\s*(ص|م|AM|PM)?/gi, ' ').replace(/\+?\d[\d\s\-().]{5,}/g, ' ').replace(/[^\u0600-\u06FF\s]/g, ' ').replace(/\s+/g, ' ').trim();
       if (!s) return '';
       const normCheck = normalizeArabicText(s);
       if (/^(نعم|لا|ص|م|ا|و)$/.test(normCheck) || OCR_STOP_WORDS_RE.test(normCheck)) return '';
-      s = s.replace(/تعا\s*هدوا(\s*القر[ءاآ]ن)?/g, ' ').replace(/\s+/g, ' ').trim();
+      // Remove "تعاهدوا" even if glued to the end of a word (e.g. فاروقتعاهدوا)
+      s = s.replace(/تعاهدوا(\s*القر[ءاآ]ن)?/g, ' ').replace(/\s+/g, ' ').trim();
       const words = s.split(' ').filter(w => w.length >= 2); if (!words.length) return '';
       const shortName = extractFirstTwoArabicNames(words.join(' '), true), finalWords = shortName.split(' ').filter(Boolean), totalChars = finalWords.join('').length;
       if (finalWords.length === 1 && totalChars < 3) return '';
@@ -1281,7 +1291,8 @@
             for (let sIdx = 0; sIdx < slices.length; sIdx++) {
               curSliceIdx = sIdx; const { data } = await worker.recognize(slices[sIdx]);
               if (data && Array.isArray(data.lines) && data.lines.length) {
-                data.lines.forEach(l => rawLines.push(l.text));
+                const hc = data.lines.filter(l => l.confidence === undefined || l.confidence >= 25);
+                (hc.length ? hc : data.lines).forEach(l => rawLines.push(l.text));
               } else String((data && data.text) || '').split(/\r?\n/).forEach(l => rawLines.push(l));
             }
             item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean); item.status = 'done';
@@ -1312,7 +1323,7 @@
         .split(/\r?\n/)
         .map(l => cleanOcrLineToShortName(l.trim()) || extractFirstTwoArabicNames(l.trim(), true))
         .filter(Boolean);
-      const targetMembers = getListeningMembers();
+      const targetMembers = getListeningMembers(), memberMap = Object.fromEntries(targetMembers.map(m => [m.id, m])), aliases = getOcrAliases(currentGroupId);
       ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
       const matchedLineNorms = [], firstWordCounts = {};
       targetMembers.forEach(m => { const fw = normalizeArabicText(m.name).split(' ')[0]; if (fw) firstWordCounts[fw] = (firstWordCounts[fw] || 0) + 1; });
@@ -1320,10 +1331,14 @@
 
       rawLines.forEach(line => {
         const normLine = normalizeArabicText(line), normLineWords = normLine.split(' ').filter(Boolean), normLineNoSpace = normLine.replace(/\s+/g, '');
+        const aliasedId = aliases[normLine];
+        if (aliasedId && memberMap[aliasedId]) {
+          ocrSelectedMemberIds.add(aliasedId); ocrMatchedReasons[aliasedId] = line; ocrMatchedScores[aliasedId] = 1.0; matchedLineNorms.push(normLine); return;
+        }
         let bestMember = null, bestScore = 0;
         const dotlessLine = stripArabicDots(normLine);
 
-        // 1. Compare against full / 2-word names (spaced and glued)
+        // 1. Always compare against full/2-word names (handles both spaced AND glued names like مريمكرم / سلسبيلحمد)
         targetMembers.forEach(m => {
           const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
           const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
@@ -1344,28 +1359,22 @@
           if (score > bestScore) { bestScore = score; bestMember = m; }
         });
 
-        // 2. Fallback against unique first name (covers single-word names, different WhatsApp surname, or split first name)
-        if (bestScore < 0.75 && normLineWords.length > 0) {
-          const firstWord = normLineWords[0];
-          const firstProbe = normLineWords.length === 1 ? normLineNoSpace : firstWord;
-          if (firstProbe.length >= 3 && !COMPOUND_PREFIXES.has(firstProbe) && firstWordCounts[firstProbe] === 1) {
-            const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === firstProbe);
-            if (uniqueM) { bestMember = uniqueM; bestScore = 0.90; }
+        // 2. If single-word line didn't strongly match a 2-word name, check unique first name (exact & fuzzy like تقي / نقى / سلسبيل)
+        if (normLineWords.length === 1 && bestScore < 0.85) {
+          const fw = normLineWords[0];
+          if (firstWordCounts[fw] === 1) {
+            const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
+            if (uniqueM) { bestMember = uniqueM; bestScore = 0.92; }
           } else {
             let candidates = [];
-            const probes = normLineWords.length === 1 ? [normLineNoSpace] : [firstWord, normLineNoSpace];
             targetMembers.forEach(m => {
-              const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw || mFw.length < 3 || COMPOUND_PREFIXES.has(mFw)) return;
-              let bestFwSc = 0;
-              probes.forEach(pr => {
-                const sim = nameSimilarity(pr, mFw), dotSim = nameSimilarity(stripArabicDots(pr), stripArabicDots(mFw));
-                const sc = dotSim >= 0.83 ? (0.55 * sim + 0.45 * dotSim) : (sim >= 0.55 ? 0.72 * sim + 0.28 * dotSim : sim);
-                if (sc > bestFwSc) bestFwSc = sc;
-              });
-              if (bestFwSc >= 0.72) candidates.push({ m, sc: bestFwSc });
+              const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
+              const sim = nameSimilarity(fw, mFw), dotSim = nameSimilarity(stripArabicDots(fw), stripArabicDots(mFw));
+              const sc = dotSim >= 0.85 ? (0.55 * sim + 0.45 * dotSim) : (sim >= 0.55 ? 0.72 * sim + 0.28 * dotSim : sim);
+              if (sc >= 0.72) candidates.push({ m, sc });
             });
             candidates.sort((a, b) => b.sc - a.sc);
-            if (candidates.length === 1 || (candidates.length > 1 && candidates[0].sc - candidates[1].sc >= 0.10)) {
+            if (candidates.length === 1 || (candidates.length > 1 && candidates[0].sc - candidates[1].sc >= 0.12)) {
               if (candidates[0].sc > bestScore) { bestMember = candidates[0].m; bestScore = candidates[0].sc; }
             }
           }
@@ -1382,15 +1391,25 @@
       renderOcrChecklist();
     }
 
+    function linkOcrUnmatchedToMember(rawLine, memberId) {
+      if (!memberId) return;
+      saveOcrAlias(currentGroupId, rawLine, memberId);
+      ocrSelectedMemberIds.add(memberId); ocrMatchedReasons[memberId] = rawLine; ocrMatchedScores[memberId] = 1.0;
+      ocrUnmatchedLines = ocrUnmatchedLines.filter(l => l !== rawLine);
+      renderOcrChecklist(); showToast('✅ تم ربط الاسم وحفظه للمرات القادمة');
+    }
+
     function renderOcrChecklist() {
       const targetMembers = getListeningMembers(), filterQ = (document.getElementById('ocr-filter-input').value || '').trim().toLowerCase();
       const sorted = [...targetMembers].filter(m => !filterQ || m.name.toLowerCase().includes(filterQ)).sort((a, b) => (ocrSelectedMemberIds.has(a.id) ? 0 : 1) - (ocrSelectedMemberIds.has(b.id) ? 0 : 1) || compareArabic(a.name, b.name));
-      let summaryHtml = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${targetMembers.length}`;
+      document.getElementById('ocr-match-summary').innerHTML = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${targetMembers.length}`;
+      const unmatchedBox = document.getElementById('ocr-unmatched-box');
       if (ocrUnmatchedLines.length > 0) {
-        summaryHtml += `<div style="font-size:12px; color:#b45309; font-weight:600; margin-top:4px;">أسطر لم تُطابق تلقائياً: ${ocrUnmatchedLines.map(escapeHtml).join(' • ')}</div>`;
-      }
-      document.getElementById('ocr-match-summary').innerHTML = summaryHtml;
-
+        const sortedSelect = [...targetMembers].sort((a, b) => compareArabic(a.name, b.name));
+        const optionsHtml = `<option value="">-- اختاري العضو لربطه وحفظه --</option>` + sortedSelect.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
+        unmatchedBox.innerHTML = `<strong style="color:#92400e;">⚠️ أسطر من الصورة لم تطابق تلقائياً (${ocrUnmatchedLines.length}):</strong>` + ocrUnmatchedLines.map(line => `<div class="ocr-unmatched-row"><span style="font-weight:800; color:#78350f;">«${escapeHtml(line)}»</span><select class="ocr-unmatched-select" onchange="linkOcrUnmatchedToMember(${JSON.stringify(line).replace(/"/g, '&quot;')}, this.value)">${optionsHtml}</select></div>`).join('');
+        unmatchedBox.classList.remove('hidden');
+      } else { unmatchedBox.classList.add('hidden'); unmatchedBox.innerHTML = ''; }
       document.getElementById('ocr-checklist').innerHTML = sorted.map(m => {
         const isChecked = ocrSelectedMemberIds.has(m.id), shortName = extractFirstTwoArabicNames(m.name), reason = ocrMatchedReasons[m.id], sc = ocrMatchedScores[m.id] || 1;
         const badgeText = reason ? (sc < 0.85 ? `⚠️ تأكدي: ${escapeHtml(reason)}` : `طابق: ${escapeHtml(reason)}`) : escapeHtml(shortName);
