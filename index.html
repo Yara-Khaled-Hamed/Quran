@@ -386,7 +386,7 @@
         <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة أسماء الاستماع من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
-      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً والحفاظ على دقة الحروف.</p>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً وتقطيع آمن بين السطور.</p>
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -584,12 +584,12 @@
     }
 
     const COMPOUND_PREFIXES = new Set(['عبد', 'ابو', 'ام', 'ال', 'بن', 'بنت', 'ذي']);
-    function extractFirstTwoArabicNames(rawName, allowSplitExtra = false, maxLogical = 2) {
+    function extractFirstTwoArabicNames(rawName, allowSplitExtra = false) {
       const words = String(rawName || '').trim().split(/\s+/).filter(Boolean);
       if (!words.length) return '';
       const picked = [];
       let logicalCount = 0, i = 0;
-      while (i < words.length && logicalCount < maxLogical) {
+      while (i < words.length && logicalCount < 2) {
         const w = words[i];
         picked.push(w); i++;
         if (COMPOUND_PREFIXES.has(normalizeArabicText(w)) && i < words.length) {
@@ -1252,7 +1252,7 @@
 
           let cutX = -1;
           if (bestGapStart !== -1) {
-            cutX = Math.round(bestGapStart + (bestGapEnd - bestGapStart) * 0.75);
+            cutX = Math.round(bestGapStart + (bestGapEnd - bestGapStart) * 0.60);
             for (let x = bestGapStart; x <= bestGapEnd; x++) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
           } else {
             let minX = gSearchStart, minD = 999;
@@ -1260,7 +1260,7 @@
               if (colDensity[x] < minD) { minD = colDensity[x]; minX = x; }
             }
             if (minD >= avPeak * 0.45) return { score: 0 };
-            cutX = Math.min(gSearchEnd, minX + 2);
+            cutX = Math.min(gSearchEnd, minX + 1);
             bestGapQuality = Math.max(0.35, colQuiet[minX]);
           }
 
@@ -1300,7 +1300,7 @@
 
           let cutX = -1;
           if (bestGapStart !== -1) {
-            cutX = Math.round(bestGapStart - (bestGapStart - bestGapEnd) * 0.75);
+            cutX = Math.round(bestGapStart - (bestGapStart - bestGapEnd) * 0.60);
             for (let x = bestGapStart; x >= bestGapEnd; x--) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
           } else {
             let minX = gSearchStart, minD = 999;
@@ -1308,7 +1308,7 @@
               if (colDensity[x] < minD) { minD = colDensity[x]; minX = x; }
             }
             if (minD >= avPeak * 0.45) return { score: 0 };
-            cutX = Math.max(gSearchEnd, minX - 2);
+            cutX = Math.max(gSearchEnd, minX - 1);
             bestGapQuality = Math.max(0.35, colQuiet[minX]);
           }
 
@@ -1342,12 +1342,12 @@
         img.onload = async () => {
           try {
             const origW = img.naturalWidth || img.width, origH = img.naturalHeight || img.height;
-            const { bgLum: probedBgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
+            const { bgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
             const srcX = Math.round(origW * cropStartPct), srcCropW = Math.max(1, Math.round(origW * (cropEndPct - cropStartPct)));
             let targetW = srcCropW;
-            if (srcCropW < 1400) targetW = Math.round(srcCropW * Math.min(3.0, 1400 / srcCropW));
-            else if (srcCropW > 1850) targetW = 1600;
-            const scale = targetW / srcCropW, targetH = Math.max(1, Math.round(origH * scale)), shouldInvert = forceInvert || probedBgLum < 120;
+            if (srcCropW < 1150) targetW = Math.round(srcCropW * Math.min(2.3, 1150 / srcCropW));
+            else if (srcCropW > 1700) targetW = 1500;
+            const scale = targetW / srcCropW, targetH = Math.max(1, Math.round(origH * scale)), shouldInvert = forceInvert || bgLum < 120;
 
             const fullCanvas = document.createElement('canvas');
             fullCanvas.width = targetW;
@@ -1360,70 +1360,30 @@
             fCtx.drawImage(img, srcX, 0, srcCropW, origH, 0, 0, targetW, targetH);
 
             const fullImgData = fCtx.getImageData(0, 0, targetW, targetH), fd = fullImgData.data;
-
-            const lumHist = new Uint32Array(256);
-            let totalSamples = 0;
-            for (let y = 0; y < targetH; y += 2) {
-              const rowOff = y * targetW * 4;
-              for (let x = 0; x < targetW; x += 2) {
-                const i = rowOff + x * 4;
-                const l = Math.round(0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2]);
-                lumHist[l]++;
-                totalSamples++;
-              }
-            }
-            let bgLum = probedBgLum, maxBin = 0;
-            for (let b = 0; b < 256; b++) { if (lumHist[b] > maxBin) { maxBin = lumHist[b]; bgLum = b; } }
-            let fgLum = shouldInvert ? 235 : 20, acc = 0;
-            const targetPct = Math.max(1, Math.floor(totalSamples * 0.005));
-            if (shouldInvert) {
-              for (let b = 255; b >= 0; b--) { acc += lumHist[b]; if (acc >= targetPct) { fgLum = b; break; } }
-              if (fgLum < bgLum + 60) fgLum = Math.min(255, bgLum + 160);
-            } else {
-              for (let b = 0; b < 256; b++) { acc += lumHist[b]; if (acc >= targetPct) { fgLum = b; break; } }
-              if (fgLum > bgLum - 60) fgLum = Math.max(0, bgLum - 160);
-            }
-            const lumSpan = Math.max(60, Math.abs(fgLum - bgLum));
-
             const rowIsBlank = new Uint8Array(targetH);
             for (let y = 0; y < targetH; y++) {
               let darkPixels = 0;
               const rowOff = y * targetW * 4;
               for (let x = 0; x < targetW; x++) {
                 const i = rowOff + x * 4;
-                const lum = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
-                const rawT = shouldInvert ? (lum - bgLum) / lumSpan : (bgLum - lum) / lumSpan;
-                const t = Math.max(0, Math.min(1, (rawT - 0.16) / 0.72));
-                const outLum = Math.round(255 * (1 - t));
-                fd[i] = fd[i + 1] = fd[i + 2] = outLum;
-                if (outLum < 185) darkPixels++;
+                let lum = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
+                if (shouldInvert) lum = 255 - lum;
+                lum = Math.max(0, Math.min(255, (lum - 128) * 1.40 + 128));
+                fd[i] = fd[i + 1] = fd[i + 2] = lum;
+                if (lum < 190) darkPixels++;
               }
               if (darkPixels <= Math.max(2, Math.floor(targetW * 0.003))) rowIsBlank[y] = 1;
             }
             fCtx.putImageData(fullImgData, 0, 0);
 
-            const pad = 36;
-            if (targetH <= 4200) {
-              const canvas = document.createElement('canvas');
-              canvas.width = targetW + pad * 2;
-              canvas.height = targetH + pad * 2;
-              const ctx = canvas.getContext('2d');
-              ctx.fillStyle = '#ffffff';
-              ctx.fillRect(0, 0, canvas.width, canvas.height);
-              ctx.drawImage(fullCanvas, 0, 0, targetW, targetH, pad, pad, targetW, targetH);
-              const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
-              URL.revokeObjectURL(imgUrl);
-              resolve(blob ? [blob] : [file]);
-              return;
-            }
-
-            const sliceTargetH = 2200, blobs = [];
+            // التقطيع في الفراغات الفاصلة بين السطور فقط لحماية أي اسم من الانقسام عند الحافة
+            const sliceTargetH = 1350, pad = 24, blobs = [];
             let curY = 0;
             while (curY < targetH) {
               let endY = Math.min(targetH, curY + sliceTargetH);
               let foundSafeCut = false;
               if (endY < targetH) {
-                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.55), endY - 450);
+                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.65), endY - 360);
                 let bestCutY = -1, bestRunLen = 0, runStart = -1;
                 for (let y = endY; y >= searchMin; y--) {
                   if (rowIsBlank[y]) {
@@ -1432,7 +1392,7 @@
                     const len = runStart - y;
                     if (len > bestRunLen) { bestRunLen = len; bestCutY = y + 1 + Math.floor(len / 2); }
                     runStart = -1;
-                    if (bestRunLen >= 22) break;
+                    if (bestRunLen >= 18) break;
                   }
                 }
                 if (runStart !== -1) {
@@ -1456,7 +1416,7 @@
               const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
               if (blob) blobs.push(blob);
               if (endY >= targetH) break;
-              curY = foundSafeCut ? Math.max(curY + 1, endY - 14) : Math.max(curY + 1, endY - 260);
+              curY = foundSafeCut ? Math.max(curY + 1, endY - 12) : Math.max(curY + 1, endY - 180);
             }
             URL.revokeObjectURL(imgUrl); resolve(blobs.length ? blobs : [file]);
           } catch (e) { URL.revokeObjectURL(imgUrl); resolve([file]); }
@@ -1491,7 +1451,7 @@
         return w.length >= 2 && !OCR_INLINE_TIME_WORDS.has(nw) && !OCR_INLINE_TIME_WORDS.has(normalizeArabicText(w));
       });
       if (!words.length) return '';
-      const shortName = extractFirstTwoArabicNames(words.join(' '), true, 3);
+      const shortName = extractFirstTwoArabicNames(words.join(' '), true);
       const finalWords = shortName.split(' ').filter(Boolean), totalChars = finalWords.join('').length;
       if (finalWords.length === 1 && totalChars < 3) return '';
       if (finalWords.length >= 2 && (totalChars < 4 || !finalWords.some(w => w.length >= 3))) return '';
@@ -1522,12 +1482,6 @@
             } else if (m && m.status) statusEl.textContent = 'جاري تجهيز القاموس العربي...';
           }
         });
-        try {
-          await worker.setParameters({
-            tessedit_pageseg_mode: (Tesseract.PSM && Tesseract.PSM.SINGLE_BLOCK) ? Tesseract.PSM.SINGLE_BLOCK : '6',
-            preserve_interword_spaces: '1'
-          });
-        } catch (e) {}
         for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
           const item = pendingItems[fIdx]; curFileIdx = fIdx; item.status = 'processing'; renderOcrThumbnails();
           try {
@@ -1564,7 +1518,7 @@
     function matchOcrLinesToMembers() {
       const rawLines = document.getElementById('ocr-extracted-text').value
         .split(/\r?\n/)
-        .map(l => cleanOcrLineToShortName(l.trim()) || extractFirstTwoArabicNames(l.trim(), true, 3))
+        .map(l => cleanOcrLineToShortName(l.trim()) || extractFirstTwoArabicNames(l.trim(), true))
         .filter(Boolean);
       const targetMembers = getListeningMembers();
       ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
@@ -1574,8 +1528,6 @@
 
       rawLines.forEach(line => {
         const normLine = normalizeArabicText(line), normLineWords = normLine.split(' ').filter(Boolean), normLineNoSpace = normLine.replace(/\s+/g, '');
-        const normLineTwo = normalizeArabicText(extractFirstTwoArabicNames(line, true, 2));
-        const normLineTwoNoSpace = normLineTwo.replace(/\s+/g, '');
         let bestMember = null, bestScore = 0;
         const dotlessLine = stripArabicDots(normLine);
 
@@ -1583,19 +1535,18 @@
           const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
           const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
           let score = 0;
-          if (normLine === normMShort || normLineTwo === normMShort || normLineNoSpace === normMShortNoSpace || normLineNoSpace === normMFullNoSpace || normLineTwoNoSpace === normMShortNoSpace) {
+          if (normLine === normMShort || normLineNoSpace === normMShortNoSpace || normLineNoSpace === normMFullNoSpace) {
             score = 1.0;
           } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort) || normMFullNoSpace.startsWith(normLineNoSpace) || normLineNoSpace.startsWith(normMShortNoSpace)) {
             score = 0.95;
           } else {
-            const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull), nameSimilarity(normLineTwo, normMShort));
-            const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)), nameSimilarity(stripArabicDots(normLineTwo), stripArabicDots(normMShort)));
+            const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+            const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)));
             score = dotSim >= 0.85 ? (0.60 * sim + 0.40 * dotSim) : (sim >= 0.50 ? (0.68 * sim + 0.32 * dotSim) : sim);
-
             if (normLineWords.length >= 2 && mFullWords.length >= 2) {
               const sFirst = nameSimilarity(normLineWords[0], mFullWords[0]);
               const sLast = Math.max(...mFullWords.slice(1).map(w => nameSimilarity(normLineWords[1], w)));
-              if (sFirst < 0.50 && nameSimilarity(stripArabicDots(normLineWords[0]), stripArabicDots(mFullWords[0])) < 0.65) {
+              if (sFirst < 0.45 && nameSimilarity(stripArabicDots(normLineWords[0]), stripArabicDots(mFullWords[0])) < 0.60) {
                 score = Math.min(score, 0.55);
               } else if (sFirst >= 0.72 && sLast >= 0.72) {
                 score = Math.max(score, 0.92 * (0.65 * sFirst + 0.35 * sLast));
@@ -1610,7 +1561,7 @@
           if (firstWordCounts[fw] === 1) {
             const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
             if (uniqueM && 0.92 > bestScore) { bestMember = uniqueM; bestScore = 0.92; }
-          } else if (normLineWords.length === 1 || bestScore < 0.70) {
+          } else if (normLineWords.length === 1) {
             let candidates = [];
             targetMembers.forEach(m => {
               const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
