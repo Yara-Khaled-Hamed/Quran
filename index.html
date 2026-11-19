@@ -1180,14 +1180,12 @@
       const leftAv = avgRange(0.03, 0.16), rightEmpty = avgRange(0.90, 0.99), rightAv = avgRange(0.84, 0.97), leftEmpty = avgRange(0.01, 0.10);
       let cropStartPct = 0.0, cropEndPct = 1.0;
       if (leftAv > 0.10 && rightEmpty < 0.05 && leftAv > rightEmpty * 2.5) {
-        // LTR: scan rightward from avatar body (12%) until right outside avatar edge (< 0.03)
         let cutX = Math.floor(probeW * 0.165);
         for (let x = Math.floor(probeW * 0.12); x <= Math.floor(probeW * 0.20); x++) {
           if (colDensity[x] < 0.03) { cutX = Math.min(probeW, x + 2); break; }
         }
         cropStartPct = cutX / probeW; cropEndPct = 0.99;
       } else if (rightAv > 0.10 && leftEmpty < 0.05 && rightAv > leftEmpty * 2.5) {
-        // RTL: scan leftward from avatar body (88%) until right outside avatar edge (< 0.03)
         let cutX = Math.floor(probeW * 0.835);
         for (let x = Math.floor(probeW * 0.88); x >= Math.floor(probeW * 0.80); x--) {
           if (colDensity[x] < 0.03) { cutX = Math.max(0, x - 2); break; }
@@ -1206,7 +1204,7 @@
             const { bgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
             const srcX = Math.round(origW * cropStartPct), srcCropW = Math.max(1, Math.round(origW * (cropEndPct - cropStartPct)));
             let targetW = srcCropW;
-            if (srcCropW < 780) targetW = Math.round(srcCropW * Math.min(2.2, 980 / srcCropW));
+            if (srcCropW < 1050) targetW = Math.round(srcCropW * Math.min(2.2, 1050 / srcCropW));
             else if (srcCropW > 1650) targetW = 1450;
             const scale = targetW / srcCropW, targetH = Math.round(origH * scale), shouldInvert = forceInvert || bgLum < 120;
             const sliceTargetH = 1400, overlapTargetH = 160, pad = 20, blobs = [];
@@ -1283,8 +1281,7 @@
             for (let sIdx = 0; sIdx < slices.length; sIdx++) {
               curSliceIdx = sIdx; const { data } = await worker.recognize(slices[sIdx]);
               if (data && Array.isArray(data.lines) && data.lines.length) {
-                const hc = data.lines.filter(l => l.confidence === undefined || l.confidence >= 15);
-                (hc.length ? hc : data.lines).forEach(l => rawLines.push(l.text));
+                data.lines.forEach(l => rawLines.push(l.text));
               } else String((data && data.text) || '').split(/\r?\n/).forEach(l => rawLines.push(l));
             }
             item.lines = rawLines.map(cleanOcrLineToShortName).filter(Boolean); item.status = 'done';
@@ -1326,7 +1323,7 @@
         let bestMember = null, bestScore = 0;
         const dotlessLine = stripArabicDots(normLine);
 
-        // 1. Compare against full / 2-word names (handles both spaced and glued words)
+        // 1. Compare against full / 2-word names (spaced and glued)
         targetMembers.forEach(m => {
           const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
           const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
@@ -1347,18 +1344,25 @@
           if (score > bestScore) { bestScore = score; bestMember = m; }
         });
 
-        // 2. Fallback against unique first name (covers both single-word names AND split first names like "سل سبيل" -> "سلسبيل")
-        if (bestScore < 0.80) {
-          if (firstWordCounts[normLineNoSpace] === 1) {
-            const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === normLineNoSpace);
-            if (uniqueM) { bestMember = uniqueM; bestScore = 0.92; }
-          } else if (normLineWords.length === 1 || normLineNoSpace.length <= 9) {
+        // 2. Fallback against unique first name (covers single-word names, different WhatsApp surname, or split first name)
+        if (bestScore < 0.75 && normLineWords.length > 0) {
+          const firstWord = normLineWords[0];
+          const firstProbe = normLineWords.length === 1 ? normLineNoSpace : firstWord;
+          if (firstProbe.length >= 3 && !COMPOUND_PREFIXES.has(firstProbe) && firstWordCounts[firstProbe] === 1) {
+            const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === firstProbe);
+            if (uniqueM) { bestMember = uniqueM; bestScore = 0.90; }
+          } else {
             let candidates = [];
+            const probes = normLineWords.length === 1 ? [normLineNoSpace] : [firstWord, normLineNoSpace];
             targetMembers.forEach(m => {
-              const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
-              const sim = nameSimilarity(normLineNoSpace, mFw), dotSim = nameSimilarity(stripArabicDots(normLineNoSpace), stripArabicDots(mFw));
-              const sc = dotSim >= 0.83 ? (0.55 * sim + 0.45 * dotSim) : (sim >= 0.55 ? 0.72 * sim + 0.28 * dotSim : sim);
-              if (sc >= 0.72) candidates.push({ m, sc });
+              const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw || mFw.length < 3 || COMPOUND_PREFIXES.has(mFw)) return;
+              let bestFwSc = 0;
+              probes.forEach(pr => {
+                const sim = nameSimilarity(pr, mFw), dotSim = nameSimilarity(stripArabicDots(pr), stripArabicDots(mFw));
+                const sc = dotSim >= 0.83 ? (0.55 * sim + 0.45 * dotSim) : (sim >= 0.55 ? 0.72 * sim + 0.28 * dotSim : sim);
+                if (sc > bestFwSc) bestFwSc = sc;
+              });
+              if (bestFwSc >= 0.72) candidates.push({ m, sc: bestFwSc });
             });
             candidates.sort((a, b) => b.sc - a.sc);
             if (candidates.length === 1 || (candidates.length > 1 && candidates[0].sc - candidates[1].sc >= 0.10)) {
