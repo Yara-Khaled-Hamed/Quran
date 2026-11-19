@@ -922,10 +922,18 @@
       if (!db.attendance[currentDate].recitation) db.attendance[currentDate].recitation = {};
       return db.attendance[currentDate];
     }
+    // حساب أيام الغياب المتتابعة فقط؛ حضور العضوة في أي يوم يصفّر العدّ ويبدأ من جديد
     function getAbsenceCount(memberId, type, upToDate = currentDate) {
       const group = getCurrentGroup(), startDate = group && group.absenceStartDate ? group.absenceStartDate : '';
+      const dates = Object.keys(db.attendance)
+        .filter(date => date <= upToDate && (!startDate || date >= startDate))
+        .sort((a, b) => b.localeCompare(a));
       let count = 0;
-      Object.keys(db.attendance).forEach(date => { if (date <= upToDate && (!startDate || date >= startDate) && db.attendance[date]?.[type]?.[memberId] === 'absent') count++; });
+      for (const date of dates) {
+        const st = db.attendance[date]?.[type]?.[memberId];
+        if (st === 'present') break;
+        if (st === 'absent') count++;
+      }
       return count;
     }
     function markRemainingAbsent(type) {
@@ -1008,7 +1016,7 @@
       if (!members.length) { list.innerHTML = `<div class="card empty-state">${listeningFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في الاستماع اليوم!' : 'لا يوجد أعضاء مطابقون للتصفية الحالية.'}</div>`; return; }
       list.innerHTML = members.map(m => {
         const st = day.listening[m.id] || '', absCount = getAbsenceCount(m.id, 'listening');
-        const absTag = absCount > 0 ? `<span class="absence-tag">غياب الاستماع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</span>` : '';
+        const absTag = absCount > 0 ? `<span class="absence-tag">غياب الاستماع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</span>` : '';
         return `<div class="member-row ${st ? 'status-' + st : ''}"><div class="member-info"><div class="member-name">🎧 ${escapeHtml(m.name)}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✅ حاضر</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">❌ غائب</button></div></div>`;
       }).join('');
     }
@@ -1353,7 +1361,6 @@
 
             const fullImgData = fCtx.getImageData(0, 0, targetW, targetH), fd = fullImgData.data;
 
-            // حساب درجة الخلفية والخط الفعليين لمنع تضخم أسنان الحروف المتقاربة مثل (سلسبيل)
             const lumHist = new Uint32Array(256);
             let totalSamples = 0;
             for (let y = 0; y < targetH; y += 2) {
@@ -1385,9 +1392,9 @@
               for (let x = 0; x < targetW; x++) {
                 const i = rowOff + x * 4;
                 const lum = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
-                let t = shouldInvert ? (lum - bgLum) / lumSpan : (bgLum - lum) / lumSpan;
-                t = Math.max(0, Math.min(1, t));
-                const outLum = Math.round(255 * (1 - Math.pow(t, 1.35)));
+                const rawT = shouldInvert ? (lum - bgLum) / lumSpan : (bgLum - lum) / lumSpan;
+                const t = Math.max(0, Math.min(1, (rawT - 0.16) / 0.72));
+                const outLum = Math.round(255 * (1 - t));
                 fd[i] = fd[i + 1] = fd[i + 2] = outLum;
                 if (outLum < 185) darkPixels++;
               }
@@ -1395,13 +1402,28 @@
             }
             fCtx.putImageData(fullImgData, 0, 0);
 
-            const sliceTargetH = 950, pad = 32, blobs = [];
+            const pad = 36;
+            if (targetH <= 4200) {
+              const canvas = document.createElement('canvas');
+              canvas.width = targetW + pad * 2;
+              canvas.height = targetH + pad * 2;
+              const ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(fullCanvas, 0, 0, targetW, targetH, pad, pad, targetW, targetH);
+              const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
+              URL.revokeObjectURL(imgUrl);
+              resolve(blob ? [blob] : [file]);
+              return;
+            }
+
+            const sliceTargetH = 2200, blobs = [];
             let curY = 0;
             while (curY < targetH) {
               let endY = Math.min(targetH, curY + sliceTargetH);
               let foundSafeCut = false;
               if (endY < targetH) {
-                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.50), endY - 360);
+                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.55), endY - 450);
                 let bestCutY = -1, bestRunLen = 0, runStart = -1;
                 for (let y = endY; y >= searchMin; y--) {
                   if (rowIsBlank[y]) {
@@ -1410,14 +1432,14 @@
                     const len = runStart - y;
                     if (len > bestRunLen) { bestRunLen = len; bestCutY = y + 1 + Math.floor(len / 2); }
                     runStart = -1;
-                    if (bestRunLen >= 18) break;
+                    if (bestRunLen >= 22) break;
                   }
                 }
                 if (runStart !== -1) {
                   const len = runStart - searchMin + 1;
                   if (len > bestRunLen) { bestRunLen = len; bestCutY = searchMin + Math.floor(len / 2); }
                 }
-                if (bestCutY !== -1 && bestRunLen >= 4) {
+                if (bestCutY !== -1 && bestRunLen >= 5) {
                   endY = bestCutY;
                   foundSafeCut = true;
                 }
@@ -1434,7 +1456,7 @@
               const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
               if (blob) blobs.push(blob);
               if (endY >= targetH) break;
-              curY = foundSafeCut ? Math.max(curY + 1, endY - 12) : Math.max(curY + 1, endY - 220);
+              curY = foundSafeCut ? Math.max(curY + 1, endY - 14) : Math.max(curY + 1, endY - 260);
             }
             URL.revokeObjectURL(imgUrl); resolve(blobs.length ? blobs : [file]);
           } catch (e) { URL.revokeObjectURL(imgUrl); resolve([file]); }
@@ -1444,9 +1466,9 @@
       });
     }
 
-    const OCR_HEADER_STOP_WORDS_RE = /(^|\s)(تفاصيل|استطلاع|الاستطلاع|الراي|التصويت|المصوتون|المصوتين|اصوات|صوت|صوتا|اجابات|خيارات|الخيارات)(?=\s|$)/;
+    const OCR_HEADER_STOP_WORDS_RE = /(^|\s)(تفاصيل|استطلاع|الاستطلاع|الراي|التصويت|المصوتون|المصوتين|اصوات|صوت|صوتا|اجابات|خيارات|الخيارات)|استطلاع\s*الراي|تفاصيل\s*استطلاع/;
     const OCR_INLINE_TIME_WORDS = new Set([
-      'امس', 'اليوم', 'الان', 'منذ', 'دقيقه', 'دقائق', 'ساعه', 'ساعات', 'ثانيه', 'ثواني',
+      'امس', 'امسء', 'اليوم', 'الان', 'منذ', 'دقيقه', 'دقائق', 'ساعه', 'ساعات', 'ثانيه', 'ثواني',
       'صباحا', 'مساء', 'يناير', 'فبراير', 'مارس', 'ابريل', 'مايو', 'يونيو', 'يوليو',
       'اغسطس', 'سبتمبر', 'اكتوبر', 'نوفمبر', 'ديسمبر',
       'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعه', 'السبت', 'الاحد'
@@ -1462,10 +1484,13 @@
       if (!s) return '';
       const normCheck = normalizeArabicText(s);
       if (/^(نعم|لا|ص|م|ا|و|تم|الكل)$/.test(normCheck) || OCR_HEADER_STOP_WORDS_RE.test(normCheck)) return '';
+      if (/^(امس|امسء|اليوم|منذ)(\s+\S+){0,2}$/.test(normCheck)) return '';
       s = s.replace(/تعاهدوا(\s*القر[ءاآ]ن)?/g, ' ').replace(/\s+/g, ' ').trim();
-      const words = s.split(' ').filter(w => w.length >= 2 && !OCR_INLINE_TIME_WORDS.has(normalizeArabicText(w)));
+      const words = s.split(' ').filter(w => {
+        const nw = normalizeArabicText(w).replace(/ء$/, '');
+        return w.length >= 2 && !OCR_INLINE_TIME_WORDS.has(nw) && !OCR_INLINE_TIME_WORDS.has(normalizeArabicText(w));
+      });
       if (!words.length) return '';
-      // الاحتفاظ بـ 3 كلمات كحد أقصى من سطر الصورة حتى لا يضيع الاسم الثاني لو انقسمت الكلمة الأولى في القراءة
       const shortName = extractFirstTwoArabicNames(words.join(' '), true, 3);
       const finalWords = shortName.split(' ').filter(Boolean), totalChars = finalWords.join('').length;
       if (finalWords.length === 1 && totalChars < 3) return '';
@@ -1566,9 +1591,15 @@
             const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull), nameSimilarity(normLineTwo, normMShort));
             const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)), nameSimilarity(stripArabicDots(normLineTwo), stripArabicDots(normMShort)));
             score = dotSim >= 0.85 ? (0.60 * sim + 0.40 * dotSim) : (sim >= 0.50 ? (0.68 * sim + 0.32 * dotSim) : sim);
+
             if (normLineWords.length >= 2 && mFullWords.length >= 2) {
-              const sFirst = nameSimilarity(normLineWords[0], mFullWords[0]), sLast = Math.max(...mFullWords.slice(1).map(w => nameSimilarity(normLineWords[1], w)));
-              if (sFirst >= 0.75 && sLast >= 0.75) score = Math.max(score, 0.90 * ((sFirst + sLast) / 2));
+              const sFirst = nameSimilarity(normLineWords[0], mFullWords[0]);
+              const sLast = Math.max(...mFullWords.slice(1).map(w => nameSimilarity(normLineWords[1], w)));
+              if (sFirst < 0.50 && nameSimilarity(stripArabicDots(normLineWords[0]), stripArabicDots(mFullWords[0])) < 0.65) {
+                score = Math.min(score, 0.55);
+              } else if (sFirst >= 0.72 && sLast >= 0.72) {
+                score = Math.max(score, 0.92 * (0.65 * sFirst + 0.35 * sLast));
+              }
             }
           }
           if (score > bestScore) { bestScore = score; bestMember = m; }
@@ -1695,7 +1726,7 @@
 
     function renderRecitationMemberRow(m, day) {
       const st = day.recitation[m.id] || '', absCount = getAbsenceCount(m.id, 'recitation');
-      const absTag = absCount > 0 ? `<div class="absence-tag">غياب التسميع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</div>` : '';
+      const absTag = absCount > 0 ? `<div class="absence-tag">غياب التسميع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</div>` : '';
       const badge = m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : '';
       return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div><span style="font-weight:700;">${escapeHtml(m.name)}</span> ${badge}${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button></div></div>`;
     }
@@ -1835,7 +1866,7 @@
       const group = getCurrentGroup(), allMembers = getGroupMembers(), partnerships = getGroupPartnerships();
       document.getElementById('manage-count').textContent = allMembers.length;
       const pNumMap = {}; partnerships.forEach((p, idx) => { const n = p.number || (idx + 1); p.memberIds.forEach(id => pNumMap[id] = n); });
-      document.getElementById('reset-date-note').textContent = group && group.absenceStartDate ? `يتم حساب الغياب بدءاً من: ${group.absenceStartDate}` : 'يتم حساب الغياب من جميع الأيام المسجلة.';
+      document.getElementById('reset-date-note').textContent = group && group.absenceStartDate ? `يتم حساب الغياب المتتابع بدءاً من: ${group.absenceStartDate}` : 'يتم حساب الغياب المتتابع (يتصفر تلقائياً عند الحضور).';
       const list = document.getElementById('manage-members-list'), searchEl = document.getElementById('search-manage'), q = searchEl ? searchEl.value.trim().toLowerCase() : '';
       const members = q ? allMembers.filter(m => m.name.toLowerCase().includes(q)) : allMembers;
       if (!allMembers.length) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
