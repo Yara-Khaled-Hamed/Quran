@@ -386,7 +386,7 @@
         <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة أسماء الاستماع من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
-      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً وتقطيع آمن بين السطور.</p>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً والحفاظ على دقة الحروف.</p>
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -584,12 +584,12 @@
     }
 
     const COMPOUND_PREFIXES = new Set(['عبد', 'ابو', 'ام', 'ال', 'بن', 'بنت', 'ذي']);
-    function extractFirstTwoArabicNames(rawName, allowSplitExtra = false) {
+    function extractFirstTwoArabicNames(rawName, allowSplitExtra = false, maxLogical = 2) {
       const words = String(rawName || '').trim().split(/\s+/).filter(Boolean);
       if (!words.length) return '';
       const picked = [];
       let logicalCount = 0, i = 0;
-      while (i < words.length && logicalCount < 2) {
+      while (i < words.length && logicalCount < maxLogical) {
         const w = words[i];
         picked.push(w); i++;
         if (COMPOUND_PREFIXES.has(normalizeArabicText(w)) && i < words.length) {
@@ -1111,7 +1111,7 @@
       showToast(autoRest && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
     }
 
-    // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن + قص الأيقونات + تقطيع آمن بين السطور) ====================
+    // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن) ====================
     function openOcrModal() { clearOcrFiles(false); updateOcrApplyButtons(); document.getElementById('ocr-modal').classList.add('open'); }
     function closeOcrModal() { document.getElementById('ocr-modal').classList.remove('open'); }
     function getOcrMode() { const c = document.querySelector('input[name="ocr-mode"]:checked'); return c ? c.value : 'present'; }
@@ -1334,47 +1334,74 @@
         img.onload = async () => {
           try {
             const origW = img.naturalWidth || img.width, origH = img.naturalHeight || img.height;
-            const { bgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
+            const { bgLum: probedBgLum, cropStartPct, cropEndPct } = detectImageBackgroundAndCrop(img, origW, origH);
             const srcX = Math.round(origW * cropStartPct), srcCropW = Math.max(1, Math.round(origW * (cropEndPct - cropStartPct)));
             let targetW = srcCropW;
-            if (srcCropW < 1250) targetW = Math.round(srcCropW * Math.min(2.5, 1250 / srcCropW));
-            else if (srcCropW > 1800) targetW = 1550;
-            const scale = targetW / srcCropW, targetH = Math.round(origH * scale), shouldInvert = forceInvert || bgLum < 120;
+            if (srcCropW < 1400) targetW = Math.round(srcCropW * Math.min(3.0, 1400 / srcCropW));
+            else if (srcCropW > 1850) targetW = 1600;
+            const scale = targetW / srcCropW, targetH = Math.max(1, Math.round(origH * scale)), shouldInvert = forceInvert || probedBgLum < 120;
 
             const fullCanvas = document.createElement('canvas');
             fullCanvas.width = targetW;
-            fullCanvas.height = Math.max(1, targetH);
+            fullCanvas.height = targetH;
             const fCtx = fullCanvas.getContext('2d');
             fCtx.fillStyle = '#ffffff';
             fCtx.fillRect(0, 0, fullCanvas.width, fullCanvas.height);
             fCtx.imageSmoothingEnabled = true;
             fCtx.imageSmoothingQuality = 'high';
-            fCtx.drawImage(img, srcX, 0, srcCropW, origH, 0, 0, targetW, fullCanvas.height);
+            fCtx.drawImage(img, srcX, 0, srcCropW, origH, 0, 0, targetW, targetH);
 
-            const fullImgData = fCtx.getImageData(0, 0, targetW, fullCanvas.height), fd = fullImgData.data;
-            const rowIsBlank = new Uint8Array(fullCanvas.height);
-            for (let y = 0; y < fullCanvas.height; y++) {
+            const fullImgData = fCtx.getImageData(0, 0, targetW, targetH), fd = fullImgData.data;
+
+            // حساب درجة الخلفية والخط الفعليين لمنع تضخم أسنان الحروف المتقاربة مثل (سلسبيل)
+            const lumHist = new Uint32Array(256);
+            let totalSamples = 0;
+            for (let y = 0; y < targetH; y += 2) {
+              const rowOff = y * targetW * 4;
+              for (let x = 0; x < targetW; x += 2) {
+                const i = rowOff + x * 4;
+                const l = Math.round(0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2]);
+                lumHist[l]++;
+                totalSamples++;
+              }
+            }
+            let bgLum = probedBgLum, maxBin = 0;
+            for (let b = 0; b < 256; b++) { if (lumHist[b] > maxBin) { maxBin = lumHist[b]; bgLum = b; } }
+            let fgLum = shouldInvert ? 235 : 20, acc = 0;
+            const targetPct = Math.max(1, Math.floor(totalSamples * 0.005));
+            if (shouldInvert) {
+              for (let b = 255; b >= 0; b--) { acc += lumHist[b]; if (acc >= targetPct) { fgLum = b; break; } }
+              if (fgLum < bgLum + 60) fgLum = Math.min(255, bgLum + 160);
+            } else {
+              for (let b = 0; b < 256; b++) { acc += lumHist[b]; if (acc >= targetPct) { fgLum = b; break; } }
+              if (fgLum > bgLum - 60) fgLum = Math.max(0, bgLum - 160);
+            }
+            const lumSpan = Math.max(60, Math.abs(fgLum - bgLum));
+
+            const rowIsBlank = new Uint8Array(targetH);
+            for (let y = 0; y < targetH; y++) {
               let darkPixels = 0;
               const rowOff = y * targetW * 4;
               for (let x = 0; x < targetW; x++) {
                 const i = rowOff + x * 4;
-                let lum = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
-                if (shouldInvert) lum = 255 - lum;
-                lum = Math.max(0, Math.min(255, (lum - 128) * 1.55 + 128));
-                fd[i] = fd[i + 1] = fd[i + 2] = lum;
-                if (lum < 210) darkPixels++;
+                const lum = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
+                let t = shouldInvert ? (lum - bgLum) / lumSpan : (bgLum - lum) / lumSpan;
+                t = Math.max(0, Math.min(1, t));
+                const outLum = Math.round(255 * (1 - Math.pow(t, 1.35)));
+                fd[i] = fd[i + 1] = fd[i + 2] = outLum;
+                if (outLum < 185) darkPixels++;
               }
-              if (darkPixels <= Math.max(2, Math.floor(targetW * 0.004))) rowIsBlank[y] = 1;
+              if (darkPixels <= Math.max(2, Math.floor(targetW * 0.003))) rowIsBlank[y] = 1;
             }
             fCtx.putImageData(fullImgData, 0, 0);
 
-            const sliceTargetH = 1400, pad = 24, blobs = [];
+            const sliceTargetH = 950, pad = 32, blobs = [];
             let curY = 0;
-            while (curY < fullCanvas.height) {
-              let endY = Math.min(fullCanvas.height, curY + sliceTargetH);
+            while (curY < targetH) {
+              let endY = Math.min(targetH, curY + sliceTargetH);
               let foundSafeCut = false;
-              if (endY < fullCanvas.height) {
-                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.60), endY - 360);
+              if (endY < targetH) {
+                const searchMin = Math.max(curY + Math.floor(sliceTargetH * 0.50), endY - 360);
                 let bestCutY = -1, bestRunLen = 0, runStart = -1;
                 for (let y = endY; y >= searchMin; y--) {
                   if (rowIsBlank[y]) {
@@ -1406,8 +1433,8 @@
               ctx.drawImage(fullCanvas, 0, curY, targetW, hSlice, pad, pad, targetW, hSlice);
               const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
               if (blob) blobs.push(blob);
-              if (endY >= fullCanvas.height) break;
-              curY = foundSafeCut ? Math.max(curY + 1, endY - 10) : Math.max(curY + 1, endY - 220);
+              if (endY >= targetH) break;
+              curY = foundSafeCut ? Math.max(curY + 1, endY - 12) : Math.max(curY + 1, endY - 220);
             }
             URL.revokeObjectURL(imgUrl); resolve(blobs.length ? blobs : [file]);
           } catch (e) { URL.revokeObjectURL(imgUrl); resolve([file]); }
@@ -1438,7 +1465,9 @@
       s = s.replace(/تعاهدوا(\s*القر[ءاآ]ن)?/g, ' ').replace(/\s+/g, ' ').trim();
       const words = s.split(' ').filter(w => w.length >= 2 && !OCR_INLINE_TIME_WORDS.has(normalizeArabicText(w)));
       if (!words.length) return '';
-      const shortName = extractFirstTwoArabicNames(words.join(' '), true), finalWords = shortName.split(' ').filter(Boolean), totalChars = finalWords.join('').length;
+      // الاحتفاظ بـ 3 كلمات كحد أقصى من سطر الصورة حتى لا يضيع الاسم الثاني لو انقسمت الكلمة الأولى في القراءة
+      const shortName = extractFirstTwoArabicNames(words.join(' '), true, 3);
+      const finalWords = shortName.split(' ').filter(Boolean), totalChars = finalWords.join('').length;
       if (finalWords.length === 1 && totalChars < 3) return '';
       if (finalWords.length >= 2 && (totalChars < 4 || !finalWords.some(w => w.length >= 3))) return '';
       return shortName;
@@ -1469,7 +1498,10 @@
           }
         });
         try {
-          await worker.setParameters({ tessedit_pageseg_mode: (Tesseract.PSM && Tesseract.PSM.SINGLE_BLOCK) ? Tesseract.PSM.SINGLE_BLOCK : '6' });
+          await worker.setParameters({
+            tessedit_pageseg_mode: (Tesseract.PSM && Tesseract.PSM.SINGLE_BLOCK) ? Tesseract.PSM.SINGLE_BLOCK : '6',
+            preserve_interword_spaces: '1'
+          });
         } catch (e) {}
         for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
           const item = pendingItems[fIdx]; curFileIdx = fIdx; item.status = 'processing'; renderOcrThumbnails();
@@ -1507,7 +1539,7 @@
     function matchOcrLinesToMembers() {
       const rawLines = document.getElementById('ocr-extracted-text').value
         .split(/\r?\n/)
-        .map(l => cleanOcrLineToShortName(l.trim()) || extractFirstTwoArabicNames(l.trim(), true))
+        .map(l => cleanOcrLineToShortName(l.trim()) || extractFirstTwoArabicNames(l.trim(), true, 3))
         .filter(Boolean);
       const targetMembers = getListeningMembers();
       ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
@@ -1517,6 +1549,8 @@
 
       rawLines.forEach(line => {
         const normLine = normalizeArabicText(line), normLineWords = normLine.split(' ').filter(Boolean), normLineNoSpace = normLine.replace(/\s+/g, '');
+        const normLineTwo = normalizeArabicText(extractFirstTwoArabicNames(line, true, 2));
+        const normLineTwoNoSpace = normLineTwo.replace(/\s+/g, '');
         let bestMember = null, bestScore = 0;
         const dotlessLine = stripArabicDots(normLine);
 
@@ -1524,13 +1558,13 @@
           const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
           const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
           let score = 0;
-          if (normLine === normMShort || normLineNoSpace === normMShortNoSpace || normLineNoSpace === normMFullNoSpace) {
+          if (normLine === normMShort || normLineTwo === normMShort || normLineNoSpace === normMShortNoSpace || normLineNoSpace === normMFullNoSpace || normLineTwoNoSpace === normMShortNoSpace) {
             score = 1.0;
           } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort) || normMFullNoSpace.startsWith(normLineNoSpace) || normLineNoSpace.startsWith(normMShortNoSpace)) {
             score = 0.95;
           } else {
-            const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
-            const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)));
+            const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull), nameSimilarity(normLineTwo, normMShort));
+            const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)), nameSimilarity(stripArabicDots(normLineTwo), stripArabicDots(normMShort)));
             score = dotSim >= 0.85 ? (0.60 * sim + 0.40 * dotSim) : (sim >= 0.50 ? (0.68 * sim + 0.32 * dotSim) : sim);
             if (normLineWords.length >= 2 && mFullWords.length >= 2) {
               const sFirst = nameSimilarity(normLineWords[0], mFullWords[0]), sLast = Math.max(...mFullWords.slice(1).map(w => nameSimilarity(normLineWords[1], w)));
@@ -1545,7 +1579,7 @@
           if (firstWordCounts[fw] === 1) {
             const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
             if (uniqueM && 0.92 > bestScore) { bestMember = uniqueM; bestScore = 0.92; }
-          } else if (normLineWords.length === 1) {
+          } else if (normLineWords.length === 1 || bestScore < 0.70) {
             let candidates = [];
             targetMembers.forEach(m => {
               const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
