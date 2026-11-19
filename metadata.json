@@ -1,1 +1,7 @@
+{
+  "name": "تعاهدوا القرءان - متابعة الحضور",
+  "description": "متابعة حضور الاستماع والتسميع لحفظة كتاب الله مع قراءة الأسماء من صور استطلاعات الواتساب",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
 
