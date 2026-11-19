@@ -386,7 +386,7 @@
         <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة أسماء الاستماع من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
-      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية ودعم الأسماء القصيرة (مثل تقي وسلسبيل) والأسماء الملتصقة.</p>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً ودعم الأسماء القصيرة والملتصقة.</p>
       <div style="background:var(--primary-soft); padding:10px 12px; border-radius:12px; margin-bottom:10px; font-size:13px; border:1px solid #d1fae5;">
         <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">نوع الأسماء الموجودة في الصور:</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -1111,7 +1111,7 @@
       showToast(autoRest && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
     }
 
-    // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن) ====================
+    // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن + قص الأيقونات بدقة) ====================
     function openOcrModal() { clearOcrFiles(false); updateOcrApplyButtons(); document.getElementById('ocr-modal').classList.add('open'); }
     function closeOcrModal() { document.getElementById('ocr-modal').classList.remove('open'); }
     function getOcrMode() { const c = document.querySelector('input[name="ocr-mode"]:checked'); return c ? c.value : 'present'; }
@@ -1156,81 +1156,179 @@
     }
 
     function detectImageBackgroundAndCrop(img, origW, origH) {
-      const probeW = Math.min(240, origW), probeH = Math.min(480, origH);
+      const probeW = Math.max(20, Math.min(300, origW)), probeH = Math.max(40, Math.min(600, origH));
       const c = document.createElement('canvas'); c.width = probeW; c.height = probeH;
       const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0, origW, origH, 0, 0, probeW, probeH);
       const data = ctx.getImageData(0, 0, probeW, probeH).data;
+
+      // 1. تقدير لون الخلفية الرئيسي
       const hist = {}; let bestKey = '0,0,0', bestCount = 0;
-      const yMin = Math.floor(probeH * 0.14), yMax = Math.floor(probeH * 0.92);
+      const yMin = Math.floor(probeH * 0.12), yMax = Math.floor(probeH * 0.94);
       for (let y = yMin; y < yMax; y += 2) {
         for (let x = 0; x < probeW; x += 2) {
           const i = (y * probeW + x) * 4, k = `${data[i] >> 3},${data[i+1] >> 3},${data[i+2] >> 3}`;
-          hist[k] = (hist[k] || 0) + 1; if (hist[k] > bestCount) { bestCount = hist[k]; bestKey = k; }
+          hist[k] = (hist[k] || 0) + 1;
+          if (hist[k] > bestCount) { bestCount = hist[k]; bestKey = k; }
         }
       }
       const [bqr, bqg, bqb] = bestKey.split(',').map(Number);
-      const bgR = (bqr << 3) + 4, bgG = (bqg << 3) + 4, bgB = (bqb << 3) + 4, bgLum = 0.299 * bgR + 0.587 * bgG + 0.114 * bgB;
-      const colDensity = new Float32Array(probeW), rowsChecked = Math.max(1, yMax - yMin);
-      for (let x = 0; x < probeW; x++) {
-        let nonBg = 0;
-        for (let y = yMin; y < yMax; y++) {
-          const i = (y * probeW + x) * 4;
-          if (Math.abs(data[i] - bgR) + Math.abs(data[i + 1] - bgG) + Math.abs(data[i + 2] - bgB) > 40) nonBg++;
+      const bgR = (bqr << 3) + 4, bgG = (bqg << 3) + 4, bgB = (bqb << 3) + 4;
+      const bgLum = 0.299 * bgR + 0.587 * bgG + 0.114 * bgB;
+
+      // 2. تقسيم الارتفاع إلى شرائح أفقية لعزل أثر العنوان العلوي أو الأسماء الطويلة عن الممر الفاصل للأيقونات
+      const NUM_BANDS = 24;
+      const bandH = Math.max(1, Math.floor((yMax - yMin) / NUM_BANDS));
+      const bandDensity = Array.from({ length: NUM_BANDS }, () => new Float32Array(probeW));
+      let activeBands = [];
+
+      for (let b = 0; b < NUM_BANDS; b++) {
+        const by0 = yMin + b * bandH;
+        const by1 = (b === NUM_BANDS - 1) ? yMax : Math.min(yMax, by0 + bandH);
+        const rowsInBand = Math.max(1, by1 - by0);
+        let activeColsInBand = 0;
+        for (let x = 0; x < probeW; x++) {
+          let nonBg = 0;
+          for (let y = by0; y < by1; y++) {
+            const i = (y * probeW + x) * 4;
+            const dR = Math.abs(data[i] - bgR), dG = Math.abs(data[i + 1] - bgG), dB = Math.abs(data[i + 2] - bgB);
+            if (dR + dG + dB > 28 || Math.max(dR, dG, dB) > 14) nonBg++;
+          }
+          const dens = nonBg / rowsInBand;
+          bandDensity[b][x] = dens;
+          if (dens > 0.15) activeColsInBand++;
         }
-        colDensity[x] = nonBg / rowsChecked;
+        if (activeColsInBand >= Math.max(4, Math.floor(probeW * 0.06))) activeBands.push(b);
       }
-      const avgRange = (aP, bP) => {
-        const a = Math.max(0, Math.floor(probeW * aP)), b = Math.min(probeW, Math.ceil(probeW * bP));
-        let s = 0; for (let x = a; x < b; x++) s += colDensity[x]; return s / Math.max(1, b - a);
-      };
-      const peakRange = (aP, bP) => {
-        const a = Math.max(0, Math.floor(probeW * aP)), b = Math.min(probeW, Math.ceil(probeW * bP));
-        let mx = 0; for (let x = a; x < b; x++) if (colDensity[x] > mx) mx = colDensity[x]; return mx;
-      };
-      const findAvatarExitGap = (isRtl) => {
+      if (activeBands.length < 2) activeBands = Array.from({ length: NUM_BANDS }, (_, idx) => idx);
+
+      // 3. حساب الكثافة ونسبة الهدوء (خلو العمود من البكسلات) لكل عمود X عبر الشرائح النشطة
+      const colDensity = new Float32Array(probeW);
+      const colQuiet = new Float32Array(probeW);
+      const actCount = activeBands.length;
+      for (let x = 0; x < probeW; x++) {
+        let sumD = 0, quietC = 0;
+        for (let k = 0; k < actCount; k++) {
+          const d = bandDensity[activeBands[k]][x];
+          sumD += d;
+          if (d <= 0.05) quietC++;
+        }
+        colDensity[x] = sumD / actCount;
+        colQuiet[x] = quietC / actCount;
+      }
+
+      // 4. تحليل كل جانب (اليسار للواجهة الإنجليزية LTR، واليمين للواجهة العربية RTL)
+      const analyzeSide = (isRtl) => {
         if (!isRtl) {
-          const xStart = Math.floor(probeW * 0.02), xEnd = Math.floor(probeW * 0.24), minExitX = Math.floor(probeW * 0.11);
-          let peak = 0; for (let x = xStart; x <= Math.floor(probeW * 0.17); x++) if (colDensity[x] > peak) peak = colDensity[x];
-          const enterThr = Math.max(0.08, peak * 0.35), exitThr = Math.min(0.045, Math.max(0.015, peak * 0.18));
-          let entered = false, gapStart = -1, gapEnd = -1;
-          for (let x = xStart; x <= xEnd; x++) {
-            if (!entered) { if (colDensity[x] >= enterThr) entered = true; }
-            else if (x >= minExitX) {
-              if (colDensity[x] <= exitThr) { if (gapStart === -1) gapStart = x; gapEnd = x; }
-              else if (gapStart !== -1) break;
+          let peakX = Math.floor(probeW * 0.09), avPeak = 0;
+          for (let x = Math.floor(probeW * 0.02); x <= Math.floor(probeW * 0.18); x++) {
+            if (colDensity[x] > avPeak) { avPeak = colDensity[x]; peakX = x; }
+          }
+          if (avPeak < 0.12) return { score: 0 };
+
+          const gSearchStart = Math.max(peakX + 2, Math.floor(probeW * 0.10));
+          const gSearchEnd = Math.floor(probeW * 0.27);
+          if (gSearchStart >= gSearchEnd) return { score: 0 };
+
+          let bestGapStart = -1, bestGapEnd = -1, curStart = -1, bestGapQuality = 0;
+          for (let x = gSearchStart; x <= gSearchEnd; x++) {
+            const isGutter = colQuiet[x] >= 0.60 && colDensity[x] <= Math.max(0.08, avPeak * 0.28);
+            if (isGutter) {
+              if (curStart === -1) curStart = x;
+            } else if (curStart !== -1) {
+              const len = x - curStart;
+              if (len >= 2 && (bestGapStart === -1 || len > (bestGapEnd - bestGapStart + 1))) {
+                bestGapStart = curStart; bestGapEnd = x - 1;
+              }
+              curStart = -1;
             }
           }
-          if (gapStart !== -1) return Math.round(gapStart + (gapEnd - gapStart) * 0.45) / probeW;
-          let minX = Math.floor(probeW * 0.17), minV = 999;
-          for (let x = Math.floor(probeW * 0.13); x <= Math.floor(probeW * 0.22); x++) if (colDensity[x] < minV) { minV = colDensity[x]; minX = x; }
-          return minX / probeW;
+          if (curStart !== -1 && (bestGapStart === -1 || (gSearchEnd - curStart + 1) > (bestGapEnd - bestGapStart + 1))) {
+            bestGapStart = curStart; bestGapEnd = gSearchEnd;
+          }
+
+          let cutX = -1;
+          if (bestGapStart !== -1) {
+            cutX = Math.round(bestGapStart + (bestGapEnd - bestGapStart) * 0.75);
+            for (let x = bestGapStart; x <= bestGapEnd; x++) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
+          } else {
+            let minX = gSearchStart, minD = 999;
+            for (let x = gSearchStart; x <= gSearchEnd; x++) {
+              if (colDensity[x] < minD) { minD = colDensity[x]; minX = x; }
+            }
+            if (minD >= avPeak * 0.45) return { score: 0 };
+            cutX = Math.min(gSearchEnd, minX + 2);
+            bestGapQuality = Math.max(0.35, colQuiet[minX]);
+          }
+
+          let textMax = 0;
+          const tEnd = Math.min(probeW - 1, cutX + Math.floor(probeW * 0.25));
+          for (let x = cutX + 2; x <= tEnd; x++) if (colDensity[x] > textMax) textMax = colDensity[x];
+          if (textMax < 0.08) return { score: 0 };
+
+          return { score: avPeak * Math.max(0.35, bestGapQuality), cropPct: cutX / probeW };
         } else {
-          const xStart = Math.floor(probeW * 0.98), xEnd = Math.floor(probeW * 0.76), maxExitX = Math.floor(probeW * 0.89);
-          let peak = 0; for (let x = xStart; x >= Math.floor(probeW * 0.83); x--) if (colDensity[x] > peak) peak = colDensity[x];
-          const enterThr = Math.max(0.08, peak * 0.35), exitThr = Math.min(0.045, Math.max(0.015, peak * 0.18));
-          let entered = false, gapStart = -1, gapEnd = -1;
-          for (let x = xStart; x >= xEnd; x--) {
-            if (!entered) { if (colDensity[x] >= enterThr) entered = true; }
-            else if (x <= maxExitX) {
-              if (colDensity[x] <= exitThr) { if (gapStart === -1) gapStart = x; gapEnd = x; }
-              else if (gapStart !== -1) break;
+          let peakX = Math.floor(probeW * 0.91), avPeak = 0;
+          for (let x = Math.floor(probeW * 0.98); x >= Math.floor(probeW * 0.82); x--) {
+            if (colDensity[x] > avPeak) { avPeak = colDensity[x]; peakX = x; }
+          }
+          if (avPeak < 0.12) return { score: 0 };
+
+          const gSearchStart = Math.min(peakX - 2, Math.floor(probeW * 0.90));
+          const gSearchEnd = Math.floor(probeW * 0.73);
+          if (gSearchStart <= gSearchEnd) return { score: 0 };
+
+          let bestGapStart = -1, bestGapEnd = -1, curStart = -1, bestGapQuality = 0;
+          for (let x = gSearchStart; x >= gSearchEnd; x--) {
+            const isGutter = colQuiet[x] >= 0.60 && colDensity[x] <= Math.max(0.08, avPeak * 0.28);
+            if (isGutter) {
+              if (curStart === -1) curStart = x;
+            } else if (curStart !== -1) {
+              const len = curStart - x;
+              if (len >= 2 && (bestGapStart === -1 || len > (bestGapStart - bestGapEnd + 1))) {
+                bestGapStart = curStart; bestGapEnd = x + 1;
+              }
+              curStart = -1;
             }
           }
-          if (gapStart !== -1) return Math.round(gapStart - (gapStart - gapEnd) * 0.45) / probeW;
-          let minX = Math.floor(probeW * 0.83), minV = 999;
-          for (let x = Math.floor(probeW * 0.87); x >= Math.floor(probeW * 0.78); x--) if (colDensity[x] < minV) { minV = colDensity[x]; minX = x; }
-          return minX / probeW;
+          if (curStart !== -1 && (bestGapStart === -1 || (curStart - gSearchEnd + 1) > (bestGapStart - bestGapEnd + 1))) {
+            bestGapStart = curStart; bestGapEnd = gSearchEnd;
+          }
+
+          let cutX = -1;
+          if (bestGapStart !== -1) {
+            cutX = Math.round(bestGapStart - (bestGapStart - bestGapEnd) * 0.75);
+            for (let x = bestGapStart; x >= bestGapEnd; x--) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
+          } else {
+            let minX = gSearchStart, minD = 999;
+            for (let x = gSearchStart; x >= gSearchEnd; x--) {
+              if (colDensity[x] < minD) { minD = colDensity[x]; minX = x; }
+            }
+            if (minD >= avPeak * 0.45) return { score: 0 };
+            cutX = Math.max(gSearchEnd, minX - 2);
+            bestGapQuality = Math.max(0.35, colQuiet[minX]);
+          }
+
+          let textMax = 0;
+          const tStart = Math.max(0, cutX - Math.floor(probeW * 0.25));
+          for (let x = cutX - 2; x >= tStart; x--) if (colDensity[x] > textMax) textMax = colDensity[x];
+          if (textMax < 0.08) return { score: 0 };
+
+          return { score: avPeak * Math.max(0.35, bestGapQuality), cropPct: cutX / probeW };
         }
       };
 
-      const leftAv = avgRange(0.03, 0.16), rightAv = avgRange(0.84, 0.97);
-      const leftPeak = peakRange(0.03, 0.16), rightPeak = peakRange(0.84, 0.97);
+      const leftRes = analyzeSide(false);
+      const rightRes = analyzeSide(true);
       let cropStartPct = 0.0, cropEndPct = 1.0;
-      if (leftAv > 0.06 && leftPeak > 0.14 && leftAv > rightAv * 1.45) {
-        cropStartPct = findAvatarExitGap(false); cropEndPct = 0.99;
-      } else if (rightAv > 0.06 && rightPeak > 0.14 && rightAv > leftAv * 1.45) {
-        cropStartPct = 0.01; cropEndPct = findAvatarExitGap(true);
+
+      if (leftRes.score > 0.08 && leftRes.score >= rightRes.score) {
+        cropStartPct = Math.min(0.30, Math.max(0.0, leftRes.cropPct));
+        cropEndPct = 0.99;
+      } else if (rightRes.score > 0.08) {
+        cropStartPct = 0.01;
+        cropEndPct = Math.max(0.70, Math.min(1.0, rightRes.cropPct));
       }
+
       return { bgLum, cropStartPct, cropEndPct };
     }
 
@@ -1287,12 +1385,12 @@
         .replace(/\d{1,2}\s*:\s*\d{2}\s*(ص|م|AM|PM)?/gi, ' ')
         .replace(/\+?\d[\d\s\-().\/]{3,}/g, ' ')
         .replace(/[^\u0600-\u06FF\s]/g, ' ')
+        .replace(/[\u060C\u061B\u061F\u0640\u0660-\u0669\u06F0-\u06F9]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
       if (!s) return '';
       const normCheck = normalizeArabicText(s);
       if (/^(نعم|لا|ص|م|ا|و|تم|الكل)$/.test(normCheck) || OCR_HEADER_STOP_WORDS_RE.test(normCheck)) return '';
-      // Remove "تعاهدوا" even if glued to the end of a word (e.g. فاروقتعاهدوا)
       s = s.replace(/تعاهدوا(\s*القر[ءاآ]ن)?/g, ' ').replace(/\s+/g, ' ').trim();
       const words = s.split(' ').filter(w => w.length >= 2 && !OCR_INLINE_TIME_WORDS.has(normalizeArabicText(w)));
       if (!words.length) return '';
@@ -1375,7 +1473,6 @@
         let bestMember = null, bestScore = 0;
         const dotlessLine = stripArabicDots(normLine);
 
-        // 1. Always compare against full/2-word names (handles both spaced AND glued names like مريمكرم / سلسبيلحمد)
         targetMembers.forEach(m => {
           const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
           const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
@@ -1396,7 +1493,6 @@
           if (score > bestScore) { bestScore = score; bestMember = m; }
         });
 
-        // 2. If single-word line didn't strongly match a 2-word name, check unique first name (exact & fuzzy like تقي / نقى / سلسبيل)
         if (normLineWords.length === 1 && bestScore < 0.85) {
           const fw = normLineWords[0];
           if (firstWordCounts[fw] === 1) {
@@ -1417,7 +1513,6 @@
           }
         }
 
-        // 3. Fallback for 2+ word lines where a unique first name appears alongside an extra noisy word
         if (bestScore < 0.70 && normLineWords.length >= 2) {
           for (let wi = 0; wi < normLineWords.length; wi++) {
             const w = normLineWords[wi];
