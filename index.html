@@ -94,7 +94,12 @@
     .guide-num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 99px; background: #d97706; color: #fff; font-weight: 800; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
     .step-label { font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .action-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
-    .batch-absent-box { background: #fff8f8; border: 1.5px solid #fecaca; border-radius: 14px; padding: 13px; margin-bottom: 12px; animation: fadeSlideUp 0.18s var(--ease); }
+    .batch-absent-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 13px; margin-bottom: 12px; animation: fadeSlideUp 0.18s var(--ease); }
+    .search-wrap { position: relative; display: flex; align-items: center; margin-bottom: 8px; }
+    .search-wrap .input { padding-left: 38px; margin-bottom: 0 !important; }
+    .search-clear-btn { position: absolute; left: 8px; width: 28px; height: 28px; border-radius: 99px; border: none; background: #e5e7eb; color: #374151; font-size: 13px; font-weight: 800; cursor: pointer; display: none; align-items: center; justify-content: center; line-height: 1; transition: background-color 0.15s; }
+    .search-clear-btn:hover, .search-clear-btn:active { background: #d1d5db; }
+    .search-clear-btn.show { display: inline-flex; }
     .ambig-row { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 7px 9px; margin-top: 6px; }
     .ambig-pick-btn { background: #fff; border: 1px solid #f59e0b; color: #92400e; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; cursor: pointer; margin: 3px 2px 0; }
     .ambig-pick-btn:hover, .ambig-pick-btn:active { background: #fef3c7; }
@@ -329,37 +334,41 @@
 
       <div id="tab-listening" class="tab-panel">
         <div class="card" style="padding:14px;">
-          <div class="step-label"><span>١. سجّلي حضور أو غياب الاستماع</span></div>
+          <button class="btn btn-danger-solid btn-block" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)</button>
+          <div id="listening-status-line" class="status-summary-line" style="margin-bottom:10px;"></div>
+
+          <div class="step-label"><span>تسجيل حضور أو غياب الاستماع</span></div>
           <div class="action-grid-2">
             <button class="btn btn-gold" onclick="openOcrModal()">📸 تسجيل من صور الواتساب</button>
-            <button id="listening-batch-toggle-btn" class="btn btn-danger" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء غياب</button>
+            <button id="listening-batch-toggle-btn" class="btn btn-soft" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء</button>
           </div>
 
           <div id="listening-batch-box" class="batch-absent-box hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-              <strong style="font-size:14px; color:var(--danger);">📝 تسجيل مجموعة أسماء في الاستماع دفعة واحدة</strong>
+              <strong style="font-size:14px; color:var(--primary);">📝 تسجيل مجموعة أسماء في الاستماع دفعة واحدة</strong>
               <button class="btn btn-outline btn-xs" onclick="toggleListeningBatch(false)">إغلاق</button>
             </div>
-            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي أسماء الغائبين (كل اسم في سطر، أو بينهم فاصلة <code>،</code> — حتى لو منسوخة من الواتساب بالإيموجي مثل <code>🥀</code>).</p>
+            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي الأسماء (كل اسم في سطر، أو بينهم فاصلة <code>،</code> — حتى لو منسوخة من الواتساب بالإيموجي مثل <code>🥀</code>).</p>
             <textarea id="listening-batch-input" dir="rtl" class="input" rows="4" style="padding:10px 12px; font-size:14px;" placeholder="مثال:&#10;سلسبيل محمد&#10;مريم كرم، أسماء أبو حسين&#10;🥀 سحر الأفندي" oninput="previewListeningBatch()"></textarea>
             <div id="listening-batch-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:9px; cursor:pointer;">
               <input type="checkbox" id="listening-batch-auto-present" style="width:17px; height:17px;" />
-              <span>تسجيل باقي غير المسجلين اليوم كـ «حاضر» تلقائياً</span>
+              <span>تسجيل باقي غير المسجلين بالعكس تلقائياً (مثلاً: الباقي غياب عند تسجيل الحضور)</span>
             </label>
-            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
-              <button class="btn btn-danger-solid btn-sm" style="flex:2; min-width:170px;" onclick="applyListeningBatch('absent')">❌ تسجيل المحددين غياب مرة واحدة</button>
-              <button class="btn btn-soft btn-sm" style="flex:1; min-width:120px;" onclick="applyListeningBatch('present')">✅ تسجيلهم حاضر</button>
-              <button class="btn btn-outline btn-sm" onclick="clearListeningBatch()">مسح</button>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <button class="btn btn-primary btn-block" onclick="applyListeningBatch('present')">✅ تسجيل المحددين حاضر مرة واحدة</button>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:170px;" onclick="applyListeningBatch('absent')">❌ تسجيل المحددين غياب</button>
+                <button class="btn btn-outline btn-sm" onclick="clearListeningBatch()">مسح</button>
+              </div>
             </div>
           </div>
 
-          <div class="step-label" style="margin-top:4px;"><span>٢. أرسلي غياب اليوم للواتساب</span></div>
-          <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)</button>
-          <div id="listening-status-line" class="status-summary-line"></div>
-
           <hr class="section-divider" />
-          <input type="text" id="search-listening" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
+          <div class="search-wrap">
+            <input type="text" id="search-listening" class="input" style="padding:9px 12px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
+            <button type="button" class="search-clear-btn" data-target="search-listening" title="مسح البحث" onclick="clearSearchInput('search-listening', renderListening)">✕</button>
+          </div>
           <div id="listening-filters" class="filter-chips"></div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
@@ -372,12 +381,11 @@
 
       <div id="tab-recitation" class="tab-panel hidden">
         <div class="card" style="padding:14px;">
-          <div class="step-label"><span>١. سجّلي التسميع أو انسخي رسالة الغياب</span></div>
-          <div class="action-grid-2">
-            <button id="recit-quick-toggle-btn" class="btn btn-soft" onclick="toggleRecitationQuickBox()">⚡ تسجيل سريع (أرقام أو أسماء)</button>
-            <button class="btn btn-danger-solid" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع</button>
-          </div>
-          <div id="recitation-status-line" class="status-summary-line" style="margin-top:0; margin-bottom:8px;"></div>
+          <button class="btn btn-danger-solid btn-block" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)</button>
+          <div id="recitation-status-line" class="status-summary-line" style="margin-bottom:10px;"></div>
+
+          <div class="step-label"><span>تسجيل التسميع</span></div>
+          <button id="recit-quick-toggle-btn" class="btn btn-soft btn-block" style="margin-bottom:10px;" onclick="toggleRecitationQuickBox()">⚡ تسجيل سريع (أرقام أو أسماء)</button>
 
           <div id="recitation-unified-box" class="quick-num-box hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
@@ -388,7 +396,7 @@
             <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer;">
-              <input type="checkbox" id="recit-unified-auto-rest" style="width:16px; height:16px;" />
+              <input type="checkbox" id="recit-unified-auto-rest" checked style="width:16px; height:16px;" />
               <span>تسجيل باقي غير المسجلين بالعكس تلقائياً (مثلاً: الباقي حضور عند تسجيل الغياب)</span>
             </label>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
@@ -398,7 +406,10 @@
           </div>
 
           <hr class="section-divider" />
-          <input type="text" id="search-recitation" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
+          <div class="search-wrap">
+            <input type="text" id="search-recitation" class="input" style="padding:9px 12px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
+            <button type="button" class="search-clear-btn" data-target="search-recitation" title="مسح البحث" onclick="clearSearchInput('search-recitation', renderRecitation)">✕</button>
+          </div>
           <div id="recitation-filters" class="filter-chips"></div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
@@ -451,7 +462,10 @@
               <button class="btn btn-danger btn-sm" onclick="deleteAllGroupMembers()">🗑️ مسح جميع الأسماء</button>
             </div>
           </div>
-          <input type="text" id="search-manage" class="input" style="padding:8px 12px; margin-bottom:8px; font-size:14px;" placeholder="🔍 ابحث عن اسم لتعديله أو إدارته..." oninput="renderManage()" />
+          <div class="search-wrap">
+            <input type="text" id="search-manage" class="input" style="padding:8px 12px; font-size:14px;" placeholder="🔍 ابحث عن اسم لتعديله أو إدارته..." oninput="renderManage()" />
+            <button type="button" class="search-clear-btn" data-target="search-manage" title="مسح البحث" onclick="clearSearchInput('search-manage', renderManage)">✕</button>
+          </div>
           <p id="reset-date-note" style="font-size:12px; color:var(--muted); margin-bottom:8px;"></p>
           <div id="manage-members-list"></div>
         </div>
@@ -490,7 +504,10 @@
         <button class="btn btn-soft btn-xs" style="margin-top:6px;" onclick="matchOcrLinesToMembers()">🔄 إعادة مطابقة الأسماء</button>
         <div id="ocr-match-summary" style="font-size:13px; font-weight:800; color:var(--primary); margin-top:10px;"></div>
         <div id="ocr-unmatched-box" class="ocr-unmatched-box hidden"></div>
-        <input type="text" id="ocr-filter-input" class="input" style="padding:7px 10px; font-size:13px; margin-top:8px;" placeholder="🔍 ابحث في القائمة للتأكد أو التحديد اليدوي..." oninput="renderOcrChecklist()" />
+        <div class="search-wrap" style="margin-top:8px;">
+          <input type="text" id="ocr-filter-input" class="input" style="padding:7px 10px; font-size:13px;" placeholder="🔍 ابحث في القائمة للتأكد أو التحديد اليدوي..." oninput="renderOcrChecklist()" />
+          <button type="button" class="search-clear-btn" data-target="ocr-filter-input" title="مسح البحث" onclick="clearSearchInput('ocr-filter-input', renderOcrChecklist)">✕</button>
+        </div>
         <div id="ocr-checklist" class="ocr-checklist"></div>
         <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
           <button id="ocr-apply-only-btn" class="btn btn-primary btn-block" onclick="applyOcrSelection(false)">✅ اعتماد المحددين فقط</button>
@@ -1116,7 +1133,20 @@
     function setListeningFilter(f) { listeningFilter = f; renderListening(); }
     function setRecitationFilter(f) { recitationFilter = f; renderRecitation(); }
 
+    function updateSearchClearBtn(inputId) {
+      const input = document.getElementById(inputId);
+      const btn = document.querySelector(`.search-clear-btn[data-target="${inputId}"]`);
+      if (input && btn) btn.classList.toggle('show', input.value.length > 0);
+    }
+    function clearSearchInput(inputId, callback) {
+      const input = document.getElementById(inputId); if (!input) return;
+      input.value = ''; updateSearchClearBtn(inputId);
+      if (typeof callback === 'function') callback();
+      input.focus();
+    }
+
     function renderListening() {
+      updateSearchClearBtn('search-listening');
       const list = document.getElementById('listening-list'), q = document.getElementById('search-listening').value.trim().toLowerCase();
       const allListen = getListeningMembers(), day = ensureDayRecord();
       const lRecorded = allListen.filter(m => Boolean(day.listening[m.id])).length, lRemaining = Math.max(0, allListen.length - lRecorded);
@@ -1226,7 +1256,7 @@
       let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">الأسماء المطابقة في الاستماع (${matched.length}):</div>`;
       if (matched.length) {
         html += `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:4px;">` +
-          matched.map(m => `<span class="name-match-chip absent-chip">👤 ${escapeHtml(m.name)} <button type="button" class="name-chip-remove" title="إزالة" onclick="removeListeningBatchMatch('${m.id}')">×</button></span>`).join('') +
+          matched.map(m => `<span class="name-match-chip">👤 ${escapeHtml(m.name)} <button type="button" class="name-chip-remove" title="إزالة" onclick="removeListeningBatchMatch('${m.id}')">×</button></span>`).join('') +
           `</div>`;
       } else {
         html += `<div style="color:var(--muted);">لم تتم مطابقة أي اسم من قائمة الاستماع بعد.</div>`;
@@ -1354,7 +1384,7 @@
     function clearOcrFiles(showMsg = false) {
       ocrFiles.forEach(item => { try { URL.revokeObjectURL(item.url); } catch (e) {} });
       ocrFiles = []; ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
-      document.getElementById('ocr-file-input').value = ''; document.getElementById('ocr-filter-input').value = '';
+      document.getElementById('ocr-file-input').value = ''; document.getElementById('ocr-filter-input').value = ''; updateSearchClearBtn('ocr-filter-input');
       document.getElementById('ocr-extracted-text').value = ''; document.getElementById('ocr-checklist').innerHTML = '';
       document.getElementById('ocr-unmatched-box').classList.add('hidden'); document.getElementById('ocr-unmatched-box').innerHTML = '';
       document.getElementById('ocr-progress-box').classList.add('hidden'); document.getElementById('ocr-result-box').classList.add('hidden');
@@ -1961,6 +1991,7 @@
     }
 
     function renderOcrChecklist() {
+      updateSearchClearBtn('ocr-filter-input');
       const targetMembers = getListeningMembers(), filterQ = (document.getElementById('ocr-filter-input').value || '').trim().toLowerCase();
       const sorted = [...targetMembers].filter(m => !filterQ || m.name.toLowerCase().includes(filterQ)).sort((a, b) => (ocrSelectedMemberIds.has(a.id) ? 0 : 1) - (ocrSelectedMemberIds.has(b.id) ? 0 : 1) || compareArabic(a.name, b.name));
       document.getElementById('ocr-match-summary').innerHTML = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${targetMembers.length}`;
@@ -2034,6 +2065,7 @@
     }
 
     function renderRecitation() {
+      updateSearchClearBtn('search-recitation');
       const container = document.getElementById('recitation-list'), members = getGroupMembers();
       const memberMap = Object.fromEntries(members.map(m => [m.id, m])), partnerships = getGroupPartnerships(), day = ensureDayRecord();
       const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
@@ -2168,6 +2200,7 @@
     }
 
     function renderManage() {
+      updateSearchClearBtn('search-manage');
       const group = getCurrentGroup(), allMembers = getGroupMembers(), partnerships = getGroupPartnerships();
       document.getElementById('manage-count').textContent = allMembers.length;
       const pNumMap = {}; partnerships.forEach((p, idx) => { const n = p.number || (idx + 1); p.memberIds.forEach(id => pNumMap[id] = n); });
