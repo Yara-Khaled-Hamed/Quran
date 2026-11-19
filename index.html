@@ -31,7 +31,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; padding-bottom: 90px; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; overflow-x: hidden; padding-bottom: max(90px, calc(72px + env(safe-area-inset-bottom))); }
     button, input, select, textarea { font-family: inherit; outline: none; }
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -143,7 +143,7 @@
     .modal-backdrop.open { display: flex; }
     .modal { background: #fff; width: 100%; max-width: 540px; border-radius: 22px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); animation: modalPop 0.22s var(--ease); -webkit-overflow-scrolling: touch; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 11px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; z-index: 2000; display: none; box-shadow: 0 12px 30px rgba(0,0,0,0.25); white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; }
+    .toast { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 11px 18px; border-radius: 14px; font-size: 14px; font-weight: 700; z-index: 2000; display: none; box-shadow: 0 12px 30px rgba(0,0,0,0.25); white-space: normal; text-align: center; line-height: 1.45; width: max-content; max-width: 92vw; }
     .empty-state { text-align: center; padding: 30px 14px; color: var(--muted); font-weight: 600; }
     .hidden { display: none !important; }
     .ocr-thumbs-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 8px 4px; margin: 6px 0; -webkit-overflow-scrolling: touch; }
@@ -166,16 +166,28 @@
     .name-match-chip.absent-chip { background: var(--danger-soft); border-color: #fca5a5; color: var(--danger); }
     .name-chip-remove { background: transparent; border: none; color: inherit; font-weight: 800; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 2px; opacity: 0.75; }
     .name-chip-remove:hover { opacity: 1; }
+    .bulk-actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .group-pick-btn { width: 100%; text-align: right; justify-content: space-between; padding: 13px 15px; margin-bottom: 8px; background: var(--primary-soft); border: 1.5px solid #a7f3d0; color: var(--primary); border-radius: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; }
-    .scroll-top-btn { position: fixed; bottom: 20px; left: 18px; width: 44px; height: 44px; border-radius: 99px; background: var(--primary); color: #fff; border: none; box-shadow: 0 6px 18px rgba(6,95,70,0.3); font-size: 18px; cursor: pointer; z-index: 900; display: none; align-items: center; justify-content: center; }
+    .scroll-top-btn { position: fixed; bottom: max(18px, env(safe-area-inset-bottom)); left: 14px; width: 44px; height: 44px; border-radius: 99px; background: var(--primary); color: #fff; border: none; box-shadow: 0 6px 18px rgba(6,95,70,0.3); font-size: 18px; cursor: pointer; z-index: 900; display: none; align-items: center; justify-content: center; }
     .scroll-top-btn.show { display: flex; }
     @media (max-width: 560px) {
+      .container { padding: 10px; }
+      .card { padding: 13px; border-radius: 16px; margin-bottom: 12px; }
+      .app-header { padding: 12px 12px 18px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; }
+      .header-title h1 { font-size: 17px; }
+      .header-btn { min-height: 36px; padding: 6px 10px; font-size: 12px; }
+      .date-controls { width: 100%; }
+      .date-controls #date-picker { flex: 1; min-width: 0; text-align: center; }
+      .input, textarea.input { font-size: 16px !important; }
       .action-grid-2 { grid-template-columns: 1fr; }
+      .bulk-actions-row { display: grid; grid-template-columns: repeat(2, 1fr); }
+      .bulk-actions-row .btn-span-full { grid-column: 1 / -1; }
       .member-row, .partner-member-item { flex-direction: column; align-items: stretch; }
       .status-pills { justify-content: space-between; }
       .pill { flex: 1; text-align: center; padding: 9px 6px; }
       .tabs { top: 4px; }
       .tab-btn { font-size: 12.5px; padding: 9px 4px; }
+      .modal { padding: 16px; border-radius: 18px; }
     }
   </style>
 </head>
@@ -370,10 +382,10 @@
             <button type="button" class="search-clear-btn" data-target="search-listening" title="مسح البحث" onclick="clearSearchInput('search-listening', renderListening)">✕</button>
           </div>
           <div id="listening-filters" class="filter-chips"></div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <div class="bulk-actions-row">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
-            <button class="btn btn-outline btn-sm" onclick="clearDayType('listening')">🗑️ مسح اليوم</button>
+            <button class="btn btn-outline btn-sm btn-span-full" onclick="clearDayType('listening')">🗑️ مسح اليوم</button>
           </div>
         </div>
         <div id="listening-list"></div>
@@ -384,24 +396,18 @@
           <button class="btn btn-danger-solid btn-block" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)</button>
           <div id="recitation-status-line" class="status-summary-line" style="margin-bottom:10px;"></div>
 
-          <div class="step-label"><span>تسجيل التسميع</span></div>
-          <button id="recit-quick-toggle-btn" class="btn btn-soft btn-block" style="margin-bottom:10px;" onclick="toggleRecitationQuickBox()">⚡ تسجيل سريع (أرقام أو أسماء)</button>
-
-          <div id="recitation-unified-box" class="quick-num-box hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
-              <strong style="font-size:14px; color:var(--primary);">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</strong>
-              <button class="btn btn-outline btn-xs" onclick="toggleRecitationQuickBox(false)">إغلاق</button>
-            </div>
+          <div id="recitation-unified-box" class="quick-num-box">
+            <div style="font-weight:800; font-size:14px; color:var(--primary); margin-bottom:4px;">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</div>
             <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>) لتسجيلهم دفعة واحدة.</p>
             <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer;">
-              <input type="checkbox" id="recit-unified-auto-rest" checked style="width:16px; height:16px;" />
+              <input type="checkbox" id="recit-unified-auto-rest" checked style="width:17px; height:17px;" />
               <span>تسجيل باقي غير المسجلين بالعكس تلقائياً (مثلاً: الباقي حضور عند تسجيل الغياب)</span>
             </label>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="applyRecitationUnified('present')">✅ تسجيل المحددين حضور (سمّع)</button>
-              <button class="btn btn-danger-solid btn-sm" style="flex:1;" onclick="applyRecitationUnified('absent')">❌ تسجيل المحددين غياب</button>
+              <button class="btn btn-primary btn-sm" style="flex:1; min-width:140px;" onclick="applyRecitationUnified('present')">✅ تسجيل المحددين حضور (سمّع)</button>
+              <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:140px;" onclick="applyRecitationUnified('absent')">❌ تسجيل المحددين غياب</button>
             </div>
           </div>
 
@@ -411,7 +417,7 @@
             <button type="button" class="search-clear-btn" data-target="search-recitation" title="مسح البحث" onclick="clearSearchInput('search-recitation', renderRecitation)">✕</button>
           </div>
           <div id="recitation-filters" class="filter-chips"></div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <div class="bulk-actions-row">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
             <button class="btn btn-primary btn-sm" onclick="togglePartnerBuilder()">➕ رفقاء جدد</button>
@@ -1182,12 +1188,6 @@
       const show = forceState !== undefined ? forceState : box.classList.contains('hidden');
       box.classList.toggle('hidden', !show);
       if (show) { const ta = document.getElementById('listening-batch-input'); if (ta) ta.focus(); }
-    }
-    function toggleRecitationQuickBox(forceState) {
-      const box = document.getElementById('recitation-unified-box'); if (!box) return;
-      const show = forceState !== undefined ? forceState : box.classList.contains('hidden');
-      box.classList.toggle('hidden', !show);
-      if (show) { const ta = document.getElementById('recitation-unified-input'); if (ta) ta.focus(); }
     }
     function clearListeningBatch() {
       const ta = document.getElementById('listening-batch-input');
