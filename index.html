@@ -35,9 +35,10 @@
     button, input, select, textarea { font-family: inherit; outline: none; }
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .container { max-width: 780px; margin: 0 auto; padding: 14px; }
+    .container { max-width: 880px; margin: 0 auto; padding: 14px; }
     .card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid rgba(6, 95, 70, 0.08); margin-bottom: 14px; transition: box-shadow 0.2s var(--ease); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 13px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; transition: transform 0.14s var(--ease), background-color 0.2s, box-shadow 0.2s, opacity 0.2s; }
+    h1, h2, h3 { text-wrap: balance; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 10px 16px; border-radius: 13px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; transition: transform 0.14s var(--ease), background-color 0.2s, box-shadow 0.2s, opacity 0.2s; }
     .btn:active { transform: scale(0.96); }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .btn-primary { background: linear-gradient(135deg, #065f46, #047857); color: #fff; box-shadow: 0 4px 12px rgba(6,95,70,0.2); }
@@ -46,8 +47,8 @@
     .btn-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
     .btn-danger-solid { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; box-shadow: 0 4px 12px rgba(220,38,38,0.2); }
     .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
-    .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 11px; }
-    .btn-xs { padding: 5px 9px; font-size: 12px; border-radius: 9px; }
+    .btn-sm { min-height: 40px; padding: 8px 12px; font-size: 13px; border-radius: 11px; }
+    .btn-xs { min-height: 34px; padding: 5px 10px; font-size: 12px; border-radius: 9px; }
     .btn-block { width: 100%; }
     .input { width: 100%; padding: 11px 14px; border-radius: 13px; border: 1.5px solid var(--border); font-size: 15px; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
     .input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12); }
@@ -59,11 +60,11 @@
     .quick-chips { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; max-height: 230px; overflow-y: auto; padding: 2px; -webkit-overflow-scrolling: touch; }
     .quick-group-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 11px; border-radius: 13px; background: #f8faf9; border: 1px solid var(--border); }
     .quick-group-title { font-size: 13px; font-weight: 800; color: var(--primary); margin-left: 4px; }
-    .chip { padding: 5px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.15s; }
+    .chip { padding: 6px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.15s; }
     .chip:hover, .chip:active { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); transform: translateY(-1px); }
     .chip-head { background: var(--accent-soft); border-color: #fcd34d; color: #92400e; align-self: flex-start; padding: 7px 14px; font-size: 13px; }
     .app-header { background: linear-gradient(135deg, #064e3b, #047857); color: #fff; padding: 16px 16px 22px; border-bottom-left-radius: 26px; border-bottom-right-radius: 26px; box-shadow: 0 8px 24px rgba(6,95,70,0.2); }
-    .header-top { max-width: 780px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .header-top { max-width: 880px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .header-brand { display: flex; align-items: center; gap: 10px; }
     .header-title h1 { font-size: 19px; font-weight: 800; line-height: 1.3; }
     .header-title p { font-size: 13px; opacity: 0.92; }
@@ -76,19 +77,31 @@
     .stat-box { background: var(--primary-soft); border-radius: 14px; padding: 10px 8px; text-align: center; border: 1px solid #d1fae5; }
     .stat-box.amber { background: var(--accent-soft); border-color: #fde68a; }
     .stat-box.gray { background: #f3f4f6; border-color: #e5e7eb; }
-    .stat-num { font-size: 19px; font-weight: 800; color: var(--primary); }
+    .stat-num { font-size: 19px; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
     .stat-box.amber .stat-num { color: #b45309; }
     .stat-box.gray .stat-num { color: #374151; }
     .stat-label { font-size: 12px; color: var(--muted); font-weight: 700; }
     .stat-mini-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin-top: 6px; }
     .stat-mini-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.4s var(--ease); border-radius: 99px; }
     .stat-box.amber .stat-mini-fill { background: var(--accent); }
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #e5e7eb; padding: 5px; border-radius: 16px; margin-bottom: 14px; position: sticky; top: 8px; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .tab-btn { padding: 10px 6px; border: none; border-radius: 12px; background: transparent; font-weight: 800; font-size: 13.5px; color: #4b5563; cursor: pointer; transition: all 0.2s var(--ease); }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #e5e7eb; padding: 5px; border-radius: 16px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .tab-btn { min-height: 42px; padding: 9px 6px; border: none; border-radius: 12px; background: transparent; font-weight: 800; font-size: 13.5px; color: #4b5563; cursor: pointer; transition: all 0.2s var(--ease); }
     .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
     .tab-panel { animation: fadeSlideUp 0.22s var(--ease); }
+    .guide-card { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+    .guide-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
+    .guide-step { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: #374151; line-height: 1.55; }
+    .guide-num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 99px; background: #d97706; color: #fff; font-weight: 800; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+    .step-label { font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .action-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+    .batch-absent-box { background: #fff8f8; border: 1.5px solid #fecaca; border-radius: 14px; padding: 13px; margin-bottom: 12px; animation: fadeSlideUp 0.18s var(--ease); }
+    .ambig-row { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 7px 9px; margin-top: 6px; }
+    .ambig-pick-btn { background: #fff; border: 1px solid #f59e0b; color: #92400e; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; cursor: pointer; margin: 3px 2px 0; }
+    .ambig-pick-btn:hover, .ambig-pick-btn:active { background: #fef3c7; }
+    .status-summary-line { font-size: 12.5px; font-weight: 700; color: var(--muted); text-align: center; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-    .filter-chip { padding: 5px 11px; border-radius: 99px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; }
+    .filter-chip { min-height: 36px; padding: 6px 12px; border-radius: 99px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; font-variant-numeric: tabular-nums; }
     .filter-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
     .filter-chip.active-absent { background: var(--danger); border-color: var(--danger); color: #fff; }
     .filter-chip.active-present { background: #059669; border-color: #059669; color: #fff; }
@@ -102,7 +115,7 @@
     .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; }
     .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 99px; margin-right: 4px; }
     .status-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-    .pill { padding: 8px 11px; border-radius: 11px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--muted); }
+    .pill { min-height: 44px; padding: 8px 12px; border-radius: 11px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--muted); }
     .pill:active { transform: scale(0.95); }
     .pill.active-present { background: #059669; border-color: #059669; color: #fff; }
     .pill.active-absent { background: #dc2626; border-color: #dc2626; color: #fff; }
@@ -110,7 +123,7 @@
     .partner-card { border: 1.5px solid var(--border); border-radius: 16px; padding: 14px; background: #fff; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
     .partner-card.all-done { border-color: #6ee7b7; background: #f0fdf4; }
     .partner-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
-    .partner-num-pill { background: var(--primary); color: #fff; padding: 4px 11px; border-radius: 99px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
+    .partner-num-pill { background: var(--primary); color: #fff; padding: 4px 11px; border-radius: 99px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
     .partner-type-pill { background: var(--primary-soft); color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
     .partner-members-list { display: flex; flex-direction: column; gap: 8px; }
     .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(255,255,255,0.92); padding: 9px 12px; border-radius: 12px; border: 1.5px solid var(--border); }
@@ -142,13 +155,17 @@
     .ocr-check-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13.5px; font-weight: 700; }
     .ocr-check-item.matched { background: var(--primary-soft); border-color: #6ee7b7; color: var(--primary); }
     .ocr-unmatched-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 9px 10px; margin-top: 8px; font-size: 12.5px; }
-    .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
-    .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 170px; overflow-y: auto; }
-    .name-match-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-soft); border: 1px solid #6ee7b7; color: var(--primary); padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 700; margin: 2px; }
+    .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-bottom: 10px; animation: fadeSlideUp 0.18s var(--ease); }
+    .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 190px; overflow-y: auto; }
+    .name-match-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-soft); border: 1px solid #6ee7b7; color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; margin: 2px; }
+    .name-match-chip.absent-chip { background: var(--danger-soft); border-color: #fca5a5; color: var(--danger); }
+    .name-chip-remove { background: transparent; border: none; color: inherit; font-weight: 800; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 2px; opacity: 0.75; }
+    .name-chip-remove:hover { opacity: 1; }
     .group-pick-btn { width: 100%; text-align: right; justify-content: space-between; padding: 13px 15px; margin-bottom: 8px; background: var(--primary-soft); border: 1.5px solid #a7f3d0; color: var(--primary); border-radius: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; }
     .scroll-top-btn { position: fixed; bottom: 20px; left: 18px; width: 44px; height: 44px; border-radius: 99px; background: var(--primary); color: #fff; border: none; box-shadow: 0 6px 18px rgba(6,95,70,0.3); font-size: 18px; cursor: pointer; z-index: 900; display: none; align-items: center; justify-content: center; }
     .scroll-top-btn.show { display: flex; }
-    @media (max-width: 520px) {
+    @media (max-width: 560px) {
+      .action-grid-2 { grid-template-columns: 1fr; }
       .member-row, .partner-member-item { flex-direction: column; align-items: stretch; }
       .status-pills { justify-content: space-between; }
       .pill { flex: 1; text-align: center; padding: 9px 6px; }
@@ -259,6 +276,7 @@
         <div class="header-actions">
           <button id="switch-group-btn" class="header-btn hidden" onclick="openSwitchGroupModal()">🔄 تبديل الجروب</button>
           <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
+          <button class="header-btn" onclick="toggleQuickGuide()">❓ شرح</button>
           <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
           <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
           <button class="header-btn" onclick="logout()">خروج</button>
@@ -266,6 +284,27 @@
       </div>
     </header>
     <div class="container">
+      <div id="quick-guide-card" class="guide-card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+          <strong style="font-size:15px; color:#92400e;">💡 طريقة الاستخدام في ٣ خطوات بسيطة</strong>
+          <button class="btn btn-outline btn-xs" onclick="dismissQuickGuide()">فهمت، إخفاء 👍️</button>
+        </div>
+        <div class="guide-steps">
+          <div class="guide-step">
+            <span class="guide-num">1</span>
+            <div><strong>الاستماع:</strong> صوّري استطلاع الواتساب، أو اضغطي <strong>«كتابة/لصق أسماء غياب»</strong> لتسجيل مجموعة أسماء مرة واحدة، أو اضغطي أمام كل اسم.</div>
+          </div>
+          <div class="guide-step">
+            <span class="guide-num">2</span>
+            <div><strong>التسميع:</strong> اضغطي أمام كل رفيقة، أو استخدمي <strong>«تسجيل سريع»</strong> لكتابة أرقام الرفقاء (مثل <code>1 3 5</code>) أو الأسماء دفعة واحدة.</div>
+          </div>
+          <div class="guide-step">
+            <span class="guide-num">3</span>
+            <div><strong>رسالة الواتساب:</strong> بعد الانتهاء اضغطي <strong>«نسخ رسالة الغياب»</strong> وأرسليها للجروب — والإنذارات 🔴 تُحسب تلقائياً.</div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="date-bar">
           <div><span style="font-size:13px; color:var(--muted); font-weight:600;">تاريخ المتابعة:</span><div style="font-weight:800; font-size:15.5px;" id="date-readable"></div></div>
@@ -283,34 +322,69 @@
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" id="tab-btn-listening" onclick="switchTab('listening')">🎧 الاستماع (فردي)</button>
-        <button class="tab-btn" id="tab-btn-recitation" onclick="switchTab('recitation')">📖 التسميع (رفقاء)</button>
+        <button class="tab-btn active" id="tab-btn-listening" onclick="switchTab('listening')">🎧 الاستماع</button>
+        <button class="tab-btn" id="tab-btn-recitation" onclick="switchTab('recitation')">📖 التسميع</button>
         <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء والتقرير</button>
       </div>
 
       <div id="tab-listening" class="tab-panel">
-        <div class="card" style="padding:13px;">
-          <div style="display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px;">
-            <button class="btn btn-gold btn-block" onclick="openOcrModal()">📸 أخذ حضور/غياب الاستماع من صورة أو عدة صور</button>
-            <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)</button>
+        <div class="card" style="padding:14px;">
+          <div class="step-label"><span>١. سجّلي حضور أو غياب الاستماع</span></div>
+          <div class="action-grid-2">
+            <button class="btn btn-gold" onclick="openOcrModal()">📸 تسجيل من صور الواتساب</button>
+            <button id="listening-batch-toggle-btn" class="btn btn-danger" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء غياب</button>
           </div>
+
+          <div id="listening-batch-box" class="batch-absent-box hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+              <strong style="font-size:14px; color:var(--danger);">📝 تسجيل مجموعة أسماء في الاستماع دفعة واحدة</strong>
+              <button class="btn btn-outline btn-xs" onclick="toggleListeningBatch(false)">إغلاق</button>
+            </div>
+            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي أسماء الغائبين (كل اسم في سطر، أو بينهم فاصلة <code>،</code> — حتى لو منسوخة من الواتساب بالإيموجي مثل <code>🥀</code>).</p>
+            <textarea id="listening-batch-input" dir="rtl" class="input" rows="4" style="padding:10px 12px; font-size:14px;" placeholder="مثال:&#10;سلسبيل محمد&#10;مريم كرم، أسماء أبو حسين&#10;🥀 سحر الأفندي" oninput="previewListeningBatch()"></textarea>
+            <div id="listening-batch-preview" class="quick-num-preview hidden"></div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:9px; cursor:pointer;">
+              <input type="checkbox" id="listening-batch-auto-present" style="width:17px; height:17px;" />
+              <span>تسجيل باقي غير المسجلين اليوم كـ «حاضر» تلقائياً</span>
+            </label>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+              <button class="btn btn-danger-solid btn-sm" style="flex:2; min-width:170px;" onclick="applyListeningBatch('absent')">❌ تسجيل المحددين غياب مرة واحدة</button>
+              <button class="btn btn-soft btn-sm" style="flex:1; min-width:120px;" onclick="applyListeningBatch('present')">✅ تسجيلهم حاضر</button>
+              <button class="btn btn-outline btn-sm" onclick="clearListeningBatch()">مسح</button>
+            </div>
+          </div>
+
+          <div class="step-label" style="margin-top:4px;"><span>٢. أرسلي غياب اليوم للواتساب</span></div>
+          <button class="btn btn-danger-solid btn-block btn-sm" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)</button>
+          <div id="listening-status-line" class="status-summary-line"></div>
+
+          <hr class="section-divider" />
           <input type="text" id="search-listening" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
           <div id="listening-filters" class="filter-chips"></div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
-            <button class="btn btn-outline btn-sm" onclick="clearDayType('listening')">مسح اليوم</button>
+            <button class="btn btn-outline btn-sm" onclick="clearDayType('listening')">🗑️ مسح اليوم</button>
           </div>
         </div>
         <div id="listening-list"></div>
       </div>
 
       <div id="tab-recitation" class="tab-panel hidden">
-        <div class="card" style="padding:13px;">
-          <button class="btn btn-danger-solid btn-block btn-sm" style="margin-bottom:10px;" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)</button>
-          <div class="quick-num-box">
-            <div style="font-weight:800; font-size:14px; color:var(--primary); margin-bottom:4px;">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>) أو <strong>اجمعي الأرقام والأسماء معاً</strong> في نفس المربع لتسجيلهم دفعة واحدة.</p>
+        <div class="card" style="padding:14px;">
+          <div class="step-label"><span>١. سجّلي التسميع أو انسخي رسالة الغياب</span></div>
+          <div class="action-grid-2">
+            <button id="recit-quick-toggle-btn" class="btn btn-soft" onclick="toggleRecitationQuickBox()">⚡ تسجيل سريع (أرقام أو أسماء)</button>
+            <button class="btn btn-danger-solid" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع</button>
+          </div>
+          <div id="recitation-status-line" class="status-summary-line" style="margin-top:0; margin-bottom:8px;"></div>
+
+          <div id="recitation-unified-box" class="quick-num-box hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
+              <strong style="font-size:14px; color:var(--primary);">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</strong>
+              <button class="btn btn-outline btn-xs" onclick="toggleRecitationQuickBox(false)">إغلاق</button>
+            </div>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>) لتسجيلهم دفعة واحدة.</p>
             <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer;">
@@ -322,13 +396,15 @@
               <button class="btn btn-danger-solid btn-sm" style="flex:1;" onclick="applyRecitationUnified('absent')">❌ تسجيل المحددين غياب</button>
             </div>
           </div>
+
+          <hr class="section-divider" />
           <input type="text" id="search-recitation" class="input" style="padding:9px 12px; margin-bottom:8px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
           <div id="recitation-filters" class="filter-chips"></div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
             <button class="btn btn-primary btn-sm" onclick="togglePartnerBuilder()">➕ رفقاء جدد</button>
-            <button class="btn btn-outline btn-sm" onclick="clearDayType('recitation')">مسح اليوم</button>
+            <button class="btn btn-outline btn-sm" onclick="clearDayType('recitation')">🗑️ مسح اليوم</button>
           </div>
           <div id="partner-builder" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
             <p style="font-size:13px; font-weight:700; color:var(--primary);">حدد 2 أو 3 أفراد للربط معاً (المحدد حالياً: <span id="selected-count">0</span> / 3):</p>
@@ -497,9 +573,12 @@
     let currentGroupId = session ? session.groupId : null;
     let currentDate = getTodayStr();
     let currentTab = 'listening';
+    const GUIDE_STORAGE_KEY = 'taahadu_hide_guide_v1';
     let listeningFilter = 'all';
     let recitationFilter = 'all';
     let recitationMatchedMemberIds = [];
+    let listeningBatchMatchedIds = [];
+    let listeningBatchExcludedIds = new Set();
     let selectedForPartner = [];
     let pendingSupervisorName = '';
     let pendingSupervisorPassword = '';
@@ -790,13 +869,29 @@
     }
     function cancelNewSupervisor() { document.getElementById('login-step-2').classList.add('hidden'); document.getElementById('login-step-1').classList.remove('hidden'); }
 
+    function initQuickGuideState() {
+      const card = document.getElementById('quick-guide-card'); if (!card) return;
+      let hidden = false;
+      try { hidden = localStorage.getItem(GUIDE_STORAGE_KEY) === '1'; } catch (e) {}
+      card.classList.toggle('hidden', hidden);
+    }
+    function toggleQuickGuide() {
+      const card = document.getElementById('quick-guide-card'); if (!card) return;
+      const willShow = card.classList.contains('hidden');
+      card.classList.toggle('hidden', !willShow);
+      try { if (willShow) localStorage.removeItem(GUIDE_STORAGE_KEY); else localStorage.setItem(GUIDE_STORAGE_KEY, '1'); } catch (e) {}
+    }
+    function dismissQuickGuide() {
+      const card = document.getElementById('quick-guide-card'); if (card) card.classList.add('hidden');
+      try { localStorage.setItem(GUIDE_STORAGE_KEY, '1'); } catch (e) {}
+    }
     function openGroupScreen(groupId) {
       currentGroupId = groupId; editingMemberId = null; listeningFilter = 'all'; recitationFilter = 'all';
       if (session) saveSession({ ...session, groupId });
       document.getElementById('login-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
       document.getElementById('date-picker').value = currentDate;
       document.getElementById('back-to-head-btn').classList.toggle('hidden', !(session && session.role === 'head'));
-      updateSwitchGroupBtn(); renderAll();
+      initQuickGuideState(); updateSwitchGroupBtn(); renderAll();
     }
     function updateSwitchGroupBtn() {
       const btn = document.getElementById('switch-group-btn');
@@ -947,9 +1042,13 @@
       else showToast('جميع الأعضاء مسجلون بالفعل لهذا اليوم');
     }
     function clearDayType(type) {
-      const day = ensureDayRecord(), patch = {};
+      const label = type === 'listening' ? 'الاستماع' : 'التسميع';
+      const day = ensureDayRecord();
+      if (!Object.keys(day[type] || {}).length) return showToast(`لا يوجد تسجيل في ${label} لهذا اليوم`);
+      if (!confirm(`هل تريد مسح جميع تسجيلات ${label} ليوم (${currentDate})؟`)) return;
+      const patch = {};
       getGroupMembers().forEach(m => { delete day[type][m.id]; patch[m.id] = null; });
-      cloudPatchAttendance(currentDate, type, patch); renderAll(); showToast('تم مسح تسجيل اليوم');
+      cloudPatchAttendance(currentDate, type, patch); renderAll(); showToast(`تم مسح تسجيل ${label} لليوم`);
     }
     function onDateChange() { const v = document.getElementById('date-picker').value; if (v) { currentDate = v; renderAll(); } }
     function changeDate(delta) { const d = new Date(currentDate + 'T00:00:00'); d.setDate(d.getDate() + delta); currentDate = dateToStr(d); document.getElementById('date-picker').value = currentDate; renderAll(); }
@@ -965,9 +1064,16 @@
         const others = supNames.filter(n => n !== session.supervisorName);
         supLabel = others.length > 0 ? `${session.supervisorName} (مشترك مع: ${others.join('، ')})` : session.supervisorName;
       }
+      const members = getGroupMembers(), listenM = getListeningMembers(), day = ensureDayRecord();
+      const lRecorded = listenM.filter(m => Boolean(day.listening[m.id])).length, lRemaining = Math.max(0, listenM.length - lRecorded);
+      const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
+      const lStatusEl = document.getElementById('listening-status-line');
+      if (lStatusEl) lStatusEl.textContent = listenM.length ? `المُسجَّل اليوم: ${lRecorded} من ${listenM.length} • المتبقي: ${lRemaining}` : '';
+      const rStatusEl = document.getElementById('recitation-status-line');
+      if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل اليوم: ${rRecorded} من ${members.length} • المتبقي: ${rRemaining}` : '';
       document.getElementById('header-supervisor-name').textContent = supLabel;
       document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
-      updateSwitchGroupBtn(); renderStats(); renderListening(); renderRecitation(); renderManage(); previewRecitationUnified();
+      updateSwitchGroupBtn(); renderStats(); renderListening(); renderRecitation(); renderManage(); previewListeningBatch(); previewRecitationUnified();
     }
 
     function renderStats() {
@@ -1013,6 +1119,9 @@
     function renderListening() {
       const list = document.getElementById('listening-list'), q = document.getElementById('search-listening').value.trim().toLowerCase();
       const allListen = getListeningMembers(), day = ensureDayRecord();
+      const lRecorded = allListen.filter(m => Boolean(day.listening[m.id])).length, lRemaining = Math.max(0, allListen.length - lRecorded);
+      const lStatusEl = document.getElementById('listening-status-line');
+      if (lStatusEl) lStatusEl.textContent = allListen.length ? `المُسجَّل اليوم: ${lRecorded} من ${allListen.length} • المتبقي: ${lRemaining}` : '';
       renderFilterChips('listening-filters', allListen, day.listening, listeningFilter, 'setListeningFilter');
       const members = allListen.filter(m => m.name.toLowerCase().includes(q) && matchesStatusFilter(day.listening[m.id], listeningFilter)).sort((a, b) => compareArabic(a.name, b.name));
       if (!allListen.length) { list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`; return; }
@@ -1035,6 +1144,117 @@
     function markAllRecitation(status) {
       const day = ensureDayRecord(), patch = {}; getGroupMembers().forEach(m => { day.recitation[m.id] = status; patch[m.id] = status; });
       cloudPatchAttendance(currentDate, 'recitation', patch); renderStats(); renderRecitation(); renderManage(); showToast('تم تحضير الجميع في التسميع');
+    }
+
+    // ==================== تسجيل مجموعة أسماء الاستماع دفعة واحدة ====================
+    function toggleListeningBatch(forceState) {
+      const box = document.getElementById('listening-batch-box'); if (!box) return;
+      const show = forceState !== undefined ? forceState : box.classList.contains('hidden');
+      box.classList.toggle('hidden', !show);
+      if (show) { const ta = document.getElementById('listening-batch-input'); if (ta) ta.focus(); }
+    }
+    function toggleRecitationQuickBox(forceState) {
+      const box = document.getElementById('recitation-unified-box'); if (!box) return;
+      const show = forceState !== undefined ? forceState : box.classList.contains('hidden');
+      box.classList.toggle('hidden', !show);
+      if (show) { const ta = document.getElementById('recitation-unified-input'); if (ta) ta.focus(); }
+    }
+    function clearListeningBatch() {
+      const ta = document.getElementById('listening-batch-input');
+      if (ta) ta.value = '';
+      listeningBatchExcludedIds.clear();
+      previewListeningBatch();
+    }
+    function parseListeningBatchNames(rawText) {
+      const raw = toEnglishDigits(String(rawText || '')).replace(/(?:^|\n)\s*[^\n]*(?:غياب\s+(?:ال[اإ]ستماع|التسميع)|مثابرات\s+ا?ل[اإ]سبوع|لا يوجد غياب)[^\n]*/g, '');
+      const segments = raw.split(/[\r\n،,;؛\/]+/);
+      const nameTokens = [];
+      segments.forEach(seg => {
+        let s = seg
+          .replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳🎧📖#]/g, ' ')
+          .replace(/إنذار\s+بالحذف/g, ' ')
+          .replace(/الجميل[هة]\s*\/?/g, ' ')
+          .replace(/\d+/g, ' ')
+          .replace(/^[\s\-–—.*ـ:()]+|[\s\-–—.*ـ:()]+$/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (s) nameTokens.push(s);
+      });
+      return nameTokens;
+    }
+    function removeListeningBatchMatch(memberId) {
+      listeningBatchExcludedIds.add(memberId);
+      previewListeningBatch();
+    }
+    function resolveAmbiguousListeningName(rawEntry, chosenName) {
+      const ta = document.getElementById('listening-batch-input'); if (!ta) return;
+      const tokens = parseListeningBatchNames(ta.value);
+      const normRaw = normalizeArabicText(rawEntry);
+      let replaced = false;
+      const updated = tokens.map(tok => {
+        if (!replaced && normalizeArabicText(tok) === normRaw) { replaced = true; return chosenName; }
+        return tok;
+      });
+      if (!replaced) updated.push(chosenName);
+      ta.value = updated.join('\n');
+      previewListeningBatch();
+    }
+    function previewListeningBatch() {
+      const inputEl = document.getElementById('listening-batch-input'), box = document.getElementById('listening-batch-preview');
+      if (!inputEl || !box) return;
+      const raw = inputEl.value;
+      if (!raw.trim()) {
+        listeningBatchMatchedIds = [];
+        listeningBatchExcludedIds.clear();
+        box.classList.add('hidden'); box.innerHTML = ''; return;
+      }
+      const tokens = parseListeningBatchNames(raw), members = getListeningMembers();
+      const matched = [], matchedSet = new Set(), ambiguousList = [], unmatchedList = [];
+      tokens.forEach(token => {
+        const res = matchTypedNameToMember(token, members);
+        if (res.status === 'matched') {
+          if (!listeningBatchExcludedIds.has(res.member.id) && !matchedSet.has(res.member.id)) {
+            matchedSet.add(res.member.id); matched.push(res.member);
+          }
+        } else if (res.status === 'ambiguous') {
+          ambiguousList.push(res);
+        } else if (res.status === 'unmatched') {
+          unmatchedList.push(res.entry);
+        }
+      });
+      listeningBatchMatchedIds = matched.map(m => m.id);
+      let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">الأسماء المطابقة في الاستماع (${matched.length}):</div>`;
+      if (matched.length) {
+        html += `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:4px;">` +
+          matched.map(m => `<span class="name-match-chip absent-chip">👤 ${escapeHtml(m.name)} <button type="button" class="name-chip-remove" title="إزالة" onclick="removeListeningBatchMatch('${m.id}')">×</button></span>`).join('') +
+          `</div>`;
+      } else {
+        html += `<div style="color:var(--muted);">لم تتم مطابقة أي اسم من قائمة الاستماع بعد.</div>`;
+      }
+      if (ambiguousList.length) {
+        html += ambiguousList.map(a => `<div class="ambig-row"><div style="color:#92400e; font-weight:700;">⚠️ «${escapeHtml(a.entry)}» يطابق أكثر من عضوة — اضغطي للاختيار:</div><div>${a.names.map(n => `<button type="button" class="ambig-pick-btn" data-entry="${escapeHtml(a.entry)}" data-choice="${escapeHtml(n)}" onclick="resolveAmbiguousListeningName(this.dataset.entry, this.dataset.choice)">${escapeHtml(n)}</button>`).join('')}</div></div>`).join('');
+      }
+      if (unmatchedList.length) {
+        html += `<div style="color:var(--danger); font-weight:700; margin-top:6px;">❌ أسماء لم نجدها في قائمة الاستماع: ${unmatchedList.map(escapeHtml).join(' ، ')}</div>`;
+      }
+      box.innerHTML = html; box.classList.remove('hidden');
+    }
+    function applyListeningBatch(status) {
+      if (!listeningBatchMatchedIds.length) return showToast('اكتبي أو الصقي أسماء صحيحة من قائمة الاستماع أولاً');
+      const autoPresent = Boolean(document.getElementById('listening-batch-auto-present')?.checked);
+      const members = getListeningMembers(), matchedSet = new Set(listeningBatchMatchedIds);
+      const day = ensureDayRecord(), patch = {};
+      matchedSet.forEach(id => { day.listening[id] = status; patch[id] = status; });
+      let restCount = 0; const oppositeStatus = status === 'absent' ? 'present' : 'absent';
+      if (autoPresent) {
+        members.forEach(m => {
+          if (!matchedSet.has(m.id) && !day.listening[m.id]) { day.listening[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++; }
+        });
+      }
+      cloudPatchAttendance(currentDate, 'listening', patch);
+      clearListeningBatch(); renderAll();
+      const statusLabel = status === 'absent' ? 'غائب' : 'حاضر', restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
+      showToast(autoPresent && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
     }
 
     // ==================== تسجيل التسميع الموحد (أرقام + أسماء معاً) ====================
@@ -1816,6 +2036,9 @@
     function renderRecitation() {
       const container = document.getElementById('recitation-list'), members = getGroupMembers();
       const memberMap = Object.fromEntries(members.map(m => [m.id, m])), partnerships = getGroupPartnerships(), day = ensureDayRecord();
+      const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
+      const rStatusEl = document.getElementById('recitation-status-line');
+      if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل اليوم: ${rRecorded} من ${members.length} • المتبقي: ${rRemaining}` : '';
       renderFilterChips('recitation-filters', members, day.recitation, recitationFilter, 'setRecitationFilter');
       const rawQ = document.getElementById('search-recitation').value.trim(), normQ = toEnglishDigits(rawQ).replace(/^#/, '').replace(/^رقم\s*/, '').trim().toLowerCase(), isNumSearch = /^\d+$/.test(normQ);
       let visiblePartnerships = partnerships.map((p, idx) => ({ p, pNum: p.number || (idx + 1) }));
