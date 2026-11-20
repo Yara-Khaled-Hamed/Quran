@@ -189,6 +189,44 @@
       .tab-btn { font-size: 12.5px; padding: 9px 4px; }
       .modal { padding: 16px; border-radius: 18px; }
     }
+    /* ==================== صانع الجداول الشهرية (مستقل تماماً عن الغياب) ==================== */
+    .sched-badge-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 99px; font-size: 12px; font-weight: 800; }
+    .sched-badge-saved { background: var(--primary-soft); color: var(--primary); border: 1px solid #a7f3d0; }
+    .sched-badge-auto { background: var(--accent-soft); color: #92400e; border: 1px solid #fcd34d; }
+    .sched-month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .sched-month-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .sched-mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 7px; margin: 8px 0 12px; }
+    .sched-mode-btn { min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.16s var(--ease); text-align: center; }
+    .sched-mode-btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); box-shadow: 0 2px 8px rgba(6,95,70,0.12); }
+    .sched-preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .sched-days-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .sched-day-chip { min-height: 36px; padding: 5px 11px; border-radius: 99px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+    .sched-day-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .sched-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 10px; }
+    .sched-field label { display: block; font-size: 12px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .sched-subbox { background: #f8faf9; padding: 12px; border-radius: 13px; border: 1px solid var(--border); margin-bottom: 10px; }
+    /* جدول مطابق لشكل الإكسل بالضبط */
+    .sched-excel-wrap { overflow-x: auto; border: 2px solid #1f2937; background: #fff; border-radius: 6px; -webkit-overflow-scrolling: touch; }
+    .sched-excel-table { width: 100%; border-collapse: collapse; min-width: 680px; font-size: 13px; color: #111827; }
+    .sched-excel-table th, .sched-excel-table td { border: 1px solid #374151; padding: 6px 8px; text-align: center; vertical-align: middle; line-height: 1.4; font-weight: 700; }
+    .sched-excel-title-cell { background: #ffffff !important; font-size: 16px !important; font-weight: 800 !important; padding: 9px 10px !important; color: #000 !important; }
+    .sched-excel-footer-cell { background: #ffffff !important; font-size: 15px !important; font-weight: 800 !important; padding: 9px 10px !important; color: #000 !important; }
+    .sched-excel-head-cell { background: #ffff00 !important; color: #000 !important; font-weight: 800 !important; font-size: 13.5px !important; padding: 8px 6px !important; }
+    .sched-excel-row { cursor: pointer; transition: filter 0.12s; }
+    .sched-excel-row:hover { filter: brightness(0.96); }
+    .sched-excel-exam-cell { background: #ff0000 !important; color: #ffffff !important; font-weight: 800 !important; font-size: 14px !important; }
+    .sched-end-banner { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--primary-soft); border: 1px solid #a7f3d0; font-size: 13px; color: var(--primary); font-weight: 700; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .sched-actions-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    @media print {
+      body { background: #fff !important; padding: 0 !important; }
+      #login-screen, #head-screen, #app-screen, #scroll-top-btn, #toast, .modal-backdrop,
+      #schedules-screen .app-header, #sched-selector-card, #sched-plan-card, #sched-actions-bar, #sched-end-banner, #sched-edit-hint, .sched-col-edit { display: none !important; }
+      #schedules-screen { display: block !important; }
+      #schedules-screen .container { max-width: 100% !important; padding: 0 !important; }
+      #sched-preview-card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+      .sched-excel-wrap { overflow: visible !important; }
+      .sched-excel-table { min-width: 0 !important; font-size: 11px; }
+    }
   </style>
 </head>
 <body>
@@ -235,7 +273,10 @@
         <button class="btn btn-outline btn-block btn-sm" style="margin-top:8px;" onclick="cancelPickGroup()">رجوع</button>
       </div>
       <hr style="border:none; border-top:1px solid var(--border); margin:18px 0 12px;" />
-      <button class="btn btn-soft btn-block btn-sm" onclick="openDownloadModal()">📲 تثبيت التطبيق على الموبايل</button>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn btn-gold btn-block btn-sm" onclick="openSchedulesScreen(null, 'login')">📅 صانع الجداول الشهرية (مستقل عن الغياب)</button>
+        <button class="btn btn-soft btn-block btn-sm" onclick="openDownloadModal()">📲 تثبيت التطبيق على الموبايل</button>
+      </div>
     </div>
   </div>
 
@@ -247,6 +288,7 @@
           <div class="header-title"><h1>👑 لوحة المشرف الرئيسي</h1><p>متابعة وإدارة جميع الجروبات (<span id="head-name-display"></span>)</p></div>
         </div>
         <div class="header-actions">
+          <button class="header-btn" onclick="openSchedulesScreen(null, 'head')">📅 الجداول الشهرية</button>
           <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
           <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
           <button class="header-btn" onclick="logout()">خروج</button>
@@ -272,12 +314,13 @@
       </div>
       <div class="card">
         <details>
-          <summary style="cursor:pointer; font-weight:700; font-size:14.5px; color:var(--primary);">🔐 تغيير اسم أو كلمة مرور المشرف الرئيسي</summary>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
+          <summary style="cursor:pointer; font-weight:700; font-size:14.5px; color:var(--primary);">🔐 تغيير اسم أو كلمات المرور (المشرف الرئيسي والجداول)</summary>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-top:12px;">
             <div><label style="font-size:12px; font-weight:700;">اسم الدخول للمشرف الرئيسي:</label><input type="text" id="head-edit-name" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
-            <div><label style="font-size:12px; font-weight:700;">كلمة المرور الجديدة:</label><input type="text" id="head-edit-pass" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
+            <div><label style="font-size:12px; font-weight:700;">كلمة مرور المشرف الرئيسي:</label><input type="text" id="head-edit-pass" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
+            <div><label style="font-size:12px; font-weight:700;">كلمة مرور جزئية الجداول:</label><input type="text" id="head-sched-pass" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
           </div>
-          <button class="btn btn-soft btn-sm" style="margin-top:10px;" onclick="saveHeadCredentials()">💾 حفظ بيانات المشرف الرئيسي</button>
+          <button class="btn btn-soft btn-sm" style="margin-top:10px;" onclick="saveHeadCredentials()">💾 حفظ كلمات المرور والبيانات</button>
         </details>
       </div>
     </div>
@@ -291,6 +334,7 @@
           <div class="header-title"><h1 id="header-group-name">جروب تعاهدوا القرءان</h1><p>المشرف: <span id="header-supervisor-name"></span></p></div>
         </div>
         <div class="header-actions">
+          <button class="header-btn" onclick="openSchedulesScreen(currentGroupId, 'app')">📅 الجداول</button>
           <button id="switch-group-btn" class="header-btn hidden" onclick="openSwitchGroupModal()">🔄 تبديل الجروب</button>
           <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
           <button class="header-btn" onclick="toggleQuickGuide()">❓ شرح</button>
@@ -487,6 +531,542 @@
     </div>
   </div>
 
+  <div id="schedules-screen" class="hidden">
+    <header class="app-header">
+      <div class="header-top">
+        <div class="header-brand">
+          <svg viewBox="0 0 128 128" width="42" height="42" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
+          <div class="header-title">
+            <h1>📅 الجداول الشهرية الهجرية</h1>
+            <p>صانع الجداول التلقائي لكل مجموعة بالشهور الهجرية (منفصل عن الغياب)</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn" onclick="openSchedPasswordModal()">🔐 باسورد الجداول</button>
+          <button class="header-btn" onclick="lockSchedulesScreen()">🔒 قفل</button>
+          <button class="header-btn" onclick="backFromSchedules()">🔙 رجوع</button>
+          <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
+        </div>
+      </div>
+    </header>
+    <div class="container">
+      <div id="sched-selector-card" class="card">
+        <div class="sched-form-grid" style="margin-bottom:12px;">
+          <div class="sched-field">
+            <label for="sched-group-select">🕌 المجموعة:</label>
+            <select id="sched-group-select" class="input" style="padding:9px 12px;" onchange="onSchedGroupChange()"></select>
+          </div>
+          <div class="sched-field">
+            <label>🌙 الشهر الهجري المطلوب:</label>
+            <div class="sched-month-controls">
+              <button type="button" class="btn btn-outline btn-sm" onclick="shiftScheduleMonth(-1)">◀️ السابق</button>
+              <select id="sched-hijri-month" class="input" style="padding:8px 10px; flex:1; min-width:130px;" onchange="onSchedHijriChange()"></select>
+              <select id="sched-hijri-year" class="input" style="padding:8px 10px; width:96px;" onchange="onSchedHijriChange()"></select>
+              <button type="button" class="btn btn-outline btn-sm" onclick="shiftScheduleMonth(1)">التالي ▶️</button>
+            </div>
+          </div>
+        </div>
+        <div class="sched-month-bar">
+          <div>
+            <div id="sched-month-arabic" style="font-weight:800; font-size:15.5px; color:var(--primary);"></div>
+            <div id="sched-month-hijri" style="font-size:12px; color:var(--muted); font-weight:600;"></div>
+          </div>
+          <div id="sched-status-badge"></div>
+        </div>
+      </div>
+
+      <div id="sched-plan-card" class="card">
+        <details id="sched-plan-details" open>
+          <summary style="cursor:pointer; font-weight:800; font-size:15px; color:var(--primary); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+            <span>⚙️ إعداد خطة المجموعة الشهرية (تُضبط مرة وتستمر كل شهر هجري تلقائياً)</span>
+            <span style="font-size:12px; color:var(--muted); font-weight:600;">اضغط للإخفاء / الإظهار</span>
+          </summary>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+            <label style="display:flex; align-items:center; gap:8px; background:var(--primary-soft); border:1px solid #a7f3d0; padding:10px 12px; border-radius:12px; font-size:13px; font-weight:800; color:var(--primary); cursor:pointer; margin-bottom:10px;">
+              <input type="checkbox" id="sched-auto-gen" checked style="width:18px; height:18px;" onchange="markSchedPlanDirty()" />
+              <span>🔄 توليد جدول كل شهر هجري جديد تلقائياً استكمالاً من حيث انتهى الشهر السابق</span>
+            </label>
+
+            <div style="font-size:12px; font-weight:800; color:var(--primary); margin-bottom:6px;">⚡ قوالب سريعة مطابقة لجداولكم (اضغطي لاختيار أقرب شكل لمجموعتك ثم عدّلي البداية):</div>
+            <div class="sched-preset-row">
+              <button type="button" class="btn btn-soft btn-xs" onclick="applySchedulePreset('repeat_blocks')">🌹 حفظ بالتكرار (مثل م٣ و م٥)</button>
+              <button type="button" class="btn btn-soft btn-xs" onclick="applySchedulePreset('cumulative_extra')">📖 تراكمي + سورة مساندة + حزب (مثل م١)</button>
+              <button type="button" class="btn btn-soft btn-xs" onclick="applySchedulePreset('khatmat_hizb')">👑 الخاتمات + مراجعة أحزاب/أجزاء (مثل م٢ و م٤)</button>
+              <button type="button" class="btn btn-soft btn-xs" onclick="applySchedulePreset('pages')">🌓 نصف صفحة بالآيات</button>
+            </div>
+
+            <div style="font-size:12.5px; font-weight:800; color:var(--primary);">📖 طريقة التوزيع التلقائي للورد:</div>
+            <div class="sched-mode-grid">
+              <button type="button" class="sched-mode-btn active" data-mode="surahs_repeat" onclick="setSchedMode('surahs_repeat')">🔁 سور بالتكرار التدريجي</button>
+              <button type="button" class="sched-mode-btn" data-mode="ayahs_cumulative" onclick="setSchedMode('ayahs_cumulative')">📚 آيات متصلة / تراكمي</button>
+              <button type="button" class="sched-mode-btn" data-mode="pages" onclick="setSchedMode('pages')">📖 صفحات المصحف</button>
+              <button type="button" class="sched-mode-btn" data-mode="khatma" onclick="setSchedMode('khatma')">👑 مراجعة خاتمات</button>
+              <button type="button" class="sched-mode-btn" data-mode="free" onclick="setSchedMode('free')">✍️ جدول حر للتعديل</button>
+            </div>
+
+            <!-- Mode: Surahs Repeat (like Groups 3 & 5) -->
+            <div id="sched-mode-surahs_repeat" class="sched-subbox sched-form-grid">
+              <div class="sched-field">
+                <label for="sched-rep-surah">البداية من سورة:</label>
+                <select id="sched-rep-surah" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()"></select>
+              </div>
+              <div class="sched-field">
+                <label for="sched-rep-ayahs">مقدار المقطع (آيات كل مرحلة):</label>
+                <input type="number" id="sched-rep-ayahs" min="1" max="150" value="12" class="input" style="padding:8px 10px;" oninput="markSchedPlanDirty()" />
+              </div>
+              <div class="sched-field">
+                <label for="sched-rep-days">عدد أيام تكرار نفس المقطع:</label>
+                <select id="sched-rep-days" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()">
+                  <option value="1">يوم واحد لكل مقطع</option>
+                  <option value="2">يومان لكل مقطع</option>
+                  <option value="3" selected>٣ أيام لكل مقطع (مثل م٣ وم٥)</option>
+                  <option value="4">٤ أيام لكل مقطع</option>
+                </select>
+              </div>
+              <div class="sched-field">
+                <label for="sched-rep-dir">اتجاه الترتيب:</label>
+                <select id="sched-rep-dir" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()">
+                  <option value="forward">تصاعدي (الفاتحة ← الناس)</option>
+                  <option value="reverse" selected>تنازلي (من الناس ← الفاتحة / عمّ وتبارك)</option>
+                </select>
+              </div>
+              <label style="grid-column:1/-1; display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; cursor:pointer;">
+                <input type="checkbox" id="sched-rep-cumul" checked style="width:16px; height:16px;" onchange="markSchedPlanDirty()" />
+                <span>تجميع تدريجي داخل السورة (مثلاً: ١:١٠ البروج ثم ١:٢٢ البروج كما في جداولكم)</span>
+              </label>
+            </div>
+
+            <!-- Mode: Ayahs Cumulative (like Group 1 & 2) -->
+            <div id="sched-mode-ayahs_cumulative" class="sched-subbox sched-form-grid hidden">
+              <div class="sched-field">
+                <label for="sched-start-surah">البداية من سورة:</label>
+                <select id="sched-start-surah" class="input" style="padding:8px 10px;" onchange="updateSchedSurahAyahMax(); markSchedPlanDirty()"></select>
+              </div>
+              <div class="sched-field">
+                <label for="sched-start-ayah">من آية رقم:</label>
+                <input type="number" id="sched-start-ayah" min="1" value="1" class="input" style="padding:8px 10px;" oninput="markSchedPlanDirty()" />
+              </div>
+              <div class="sched-field">
+                <label for="sched-ayahs-per-day">عدد الآيات الجديدة يومياً:</label>
+                <input type="number" id="sched-ayahs-per-day" min="1" max="300" value="7" class="input" style="padding:8px 10px;" oninput="markSchedPlanDirty()" />
+              </div>
+              <div class="sched-field">
+                <label for="sched-surah-dir">اتجاه السور:</label>
+                <select id="sched-surah-dir" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()">
+                  <option value="forward" selected>من الفاتحة ← الناس</option>
+                  <option value="reverse">من الناس ← الفاتحة</option>
+                </select>
+              </div>
+              <label style="grid-column:1/-1; display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; cursor:pointer;">
+                <input type="checkbox" id="sched-weekly-accum" checked style="width:16px; height:16px;" onchange="markSchedPlanDirty()" />
+                <span>تراكم أسبوعي في خانة الحفظ (مثلاً: ١:٦ ثم ١:١٣ ثم ١:٢٠ كما في جدول م١)</span>
+              </label>
+            </div>
+
+            <!-- Mode: Pages / Half-page by Ayahs -->
+            <div id="sched-mode-pages" class="sched-subbox sched-form-grid hidden">
+              <div class="sched-field">
+                <label for="sched-start-page">البداية من صفحة (١ - ٦٠٤):</label>
+                <input type="number" id="sched-start-page" min="1" max="604" value="2" class="input" style="padding:8px 10px;" oninput="updateSchedPageHint(); markSchedPlanDirty()" />
+                <div id="sched-start-page-hint" style="font-size:11.5px; color:var(--primary); font-weight:700; margin-top:4px;"></div>
+              </div>
+              <div class="sched-field">
+                <label for="sched-pages-half-start">البداية من نصف الصفحة:</label>
+                <select id="sched-pages-half-start" class="input" style="padding:8px 10px;" onchange="updateSchedPageHint(); markSchedPlanDirty()">
+                  <option value="0" selected>النصف الأول من الصفحة</option>
+                  <option value="1">النصف الثاني من الصفحة</option>
+                </select>
+              </div>
+              <div class="sched-field">
+                <label for="sched-pages-per-day">المقدار اليومي:</label>
+                <select id="sched-pages-per-day" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()">
+                  <option value="0.5" selected>نصف صفحة يومياً (نصف وجه)</option>
+                  <option value="1">صفحة كاملة (وجه واحد)</option>
+                  <option value="1.5">صفحة ونصف (١.٥ وجه)</option>
+                  <option value="2">صفحتان يومياً (وجهان)</option>
+                  <option value="3">٣ صفحات يومياً</option>
+                  <option value="4">٤ صفحات يومياً</option>
+                </select>
+              </div>
+              <div class="sched-field">
+                <label for="sched-pages-format">شكل الكتابة في خانة الحفظ:</label>
+                <select id="sched-pages-format" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()">
+                  <option value="ayahs" selected>✍️ كتابة أرقام الآيات (مثل: ١ : ٣ البقرة)</option>
+                  <option value="page_num">📖 كتابة رقم الصفحة (مثل: النصف الأول ص ٢)</option>
+                </select>
+              </div>
+              <label style="grid-column:1/-1; display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; cursor:pointer;">
+                <input type="checkbox" id="sched-pages-accum" style="width:16px; height:16px;" onchange="markSchedPlanDirty()" />
+                <span>🔁 تجميع نصفَي نفس الصفحة معاً عند الحفظ بنصف صفحة (مثلاً: ١ : ٣ البقرة ثم ١ : ٥ البقرة)</span>
+              </label>
+            </div>
+
+            <!-- Mode: Khatma -->
+            <div id="sched-mode-khatma" class="sched-subbox sched-form-grid hidden">
+              <div class="sched-field">
+                <label for="sched-kh-surah">مراجعة قريب — البداية من سورة:</label>
+                <select id="sched-kh-surah" class="input" style="padding:8px 10px;" onchange="markSchedPlanDirty()"></select>
+              </div>
+              <div class="sched-field">
+                <label for="sched-kh-ayahs">عدد الآيات يومياً (قريب):</label>
+                <input type="number" id="sched-kh-ayahs" min="1" max="200" value="20" class="input" style="padding:8px 10px;" oninput="markSchedPlanDirty()" />
+              </div>
+              <div class="sched-field">
+                <label for="sched-kh-juz">مراجعة بعيد — البداية من الجزء (١ - ٣٠):</label>
+                <input type="number" id="sched-kh-juz" min="1" max="30" value="9" class="input" style="padding:8px 10px;" oninput="markSchedPlanDirty()" />
+              </div>
+            </div>
+
+            <!-- Mode: Free -->
+            <div id="sched-mode-free" class="sched-subbox hidden" style="font-size:13px; color:var(--primary); font-weight:700;">
+              ✍️ سيتم إنشاء جدول الشهر الهجري كاملاً بأيام الجمعة مدمجة (قراءة سورة الكهف) والألوان الأسبوعية، ويمكنك الضغط على أي يوم لتعبئته أو تعديله مباشرة.
+            </div>
+
+            <!-- Automated Hizb Exam Settings -->
+            <div class="sched-subbox" style="background:#fef2f2; border-color:#fecaca;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800; color:#991b1b; cursor:pointer;">
+                <input type="checkbox" id="sched-exam-enabled" checked style="width:17px; height:17px;" onchange="markSchedPlanDirty()" />
+                <span>🔴 جدولة اختبار تلقائي بعد كل نصف جزء (حزب)</span>
+              </label>
+              <div class="sched-form-grid" style="margin-top:8px;">
+                <div class="sched-field">
+                  <label for="sched-exam-delay" style="color:#991b1b;">موعد الاختبار بعد إنهاء الحزب:</label>
+                  <select id="sched-exam-delay" class="input" style="padding:7px 10px;" onchange="markSchedPlanDirty()">
+                    <option value="5">بعد ٥ أيام تقريباً</option>
+                    <option value="6">بعد ٦ أيام تقريباً</option>
+                    <option value="7" selected>بعد أسبوع تقريباً (٧ أيام)</option>
+                    <option value="8">بعد ٨ أيام</option>
+                  </select>
+                </div>
+                <div class="sched-field">
+                  <label for="sched-exam-weekday" style="color:#991b1b;">اليوم المفضل للاختبار:</label>
+                  <select id="sched-exam-weekday" class="input" style="padding:7px 10px;" onchange="markSchedPlanDirty()">
+                    <option value="4" selected>الخميس (الأقرب بعد انتهاء المدة)</option>
+                    <option value="3">الأربعاء</option>
+                    <option value="2">الثلاثاء</option>
+                    <option value="-1">أي يوم بعد انتهاء المدة (عدا الجمعة)</option>
+                  </select>
+                </div>
+                <div class="sched-field">
+                  <label for="sched-exam-prep-days" style="color:#991b1b;">أيام التسميع قبل الاختبار:</label>
+                  <select id="sched-exam-prep-days" class="input" style="padding:7px 10px;" onchange="markSchedPlanDirty()">
+                    <option value="0">بدون أيام تسميع مسبقة</option>
+                    <option value="1">يوم واحد تسميع قبل الاختبار</option>
+                    <option value="2" selected>يومان تسميع قبل الاختبار (مثل م٥)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Revision, Extra Column, Columns & Labels Customization -->
+            <div class="sched-subbox">
+              <div style="font-weight:800; font-size:13px; color:var(--primary); margin-bottom:8px;">🧩 أعمدة الجدول والمراجعة وتذييل اسم المجموعة:</div>
+              <div class="sched-form-grid">
+                <div class="sched-field">
+                  <label for="sched-col-listen">عنوان عمود الاستماع:</label>
+                  <input type="text" id="sched-col-listen" class="input" style="padding:7px 10px;" value="الإستماع ٣ مرات" oninput="markSchedPlanDirty()" />
+                </div>
+                <div class="sched-field">
+                  <label for="sched-col-hifz">عنوان عمود الحفظ:</label>
+                  <input type="text" id="sched-col-hifz" class="input" style="padding:7px 10px;" value="الحفظ" oninput="markSchedPlanDirty()" />
+                </div>
+                <div class="sched-field">
+                  <label for="sched-col-review">عنوان عمود المراجعة:</label>
+                  <input type="text" id="sched-col-review" class="input" style="padding:7px 10px;" value="المراجعة" oninput="markSchedPlanDirty()" />
+                </div>
+                <div class="sched-field">
+                  <label for="sched-col-free">عنوان العمود الأخير:</label>
+                  <input type="text" id="sched-col-free" class="input" style="padding:7px 10px;" value="قراءة ما تيسر" oninput="markSchedPlanDirty()" />
+                </div>
+              </div>
+
+              <div class="sched-form-grid" style="margin-top:8px;">
+                <div class="sched-field">
+                  <label for="sched-rev-style">نظام عمود المراجعة:</label>
+                  <select id="sched-rev-style" class="input" style="padding:7px 10px;" onchange="onSchedRevStyleChange(); markSchedPlanDirty()">
+                    <option value="hizb_rotate" selected>دوران أحزاب متتالية (مثل: حزب ٥٨ / ٥٩ / ٦٠)</option>
+                    <option value="surah_range">مراجعة ما سبق من السور (مثل: الأعلى : الناس)</option>
+                    <option value="hizb_daily">تقدم حزب يومي (حزب ٥، ٦، ٧...)</option>
+                    <option value="fixed">نص ثابت</option>
+                  </select>
+                </div>
+                <div id="sched-rev-hizbs-wrap" class="sched-field">
+                  <label for="sched-rev-hizbs">الأحزاب (من رقم / أو قائمة مثل 59,60,58):</label>
+                  <input type="text" id="sched-rev-hizbs" class="input" style="padding:7px 10px;" value="59, 60, 58" oninput="markSchedPlanDirty()" />
+                </div>
+                <div id="sched-rev-anchor-wrap" class="sched-field hidden">
+                  <label for="sched-rev-anchor">نهاية نطاق المراجعة (أو النص الثابت):</label>
+                  <input type="text" id="sched-rev-anchor" class="input" style="padding:7px 10px;" value="الناس" oninput="markSchedPlanDirty()" />
+                </div>
+                <div class="sched-field">
+                  <label for="sched-hifz-shift">أيام السماح بإزاحة الهلال:</label>
+                  <select id="sched-hilal-shift" class="input" style="padding:7px 10px;" onchange="markSchedPlanDirty()">
+                    <option value="0" selected>تقويم أم القرى التلقائي (٠)</option>
+                    <option value="-1">تقديم يوم (-١)</option>
+                    <option value="1">تأخير يوم (+١)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="sched-form-grid" style="margin-top:8px;">
+                <div class="sched-field">
+                  <label for="sched-footer-text">النص أسفل الجدول (اسم المجموعة):</label>
+                  <input type="text" id="sched-footer-text" class="input" style="padding:7px 10px;" placeholder="مثال: مجموعة تعاهدوا القرءان -٥-" oninput="markSchedPlanDirty()" />
+                </div>
+                <div class="sched-field">
+                  <label style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                    <input type="checkbox" id="sched-extra-enabled" style="width:15px; height:15px;" onchange="onSchedExtraToggle(); markSchedPlanDirty()" />
+                    <span>إضافة عمود إضافي (مثل عمود الأنفال في م١)</span>
+                  </label>
+                  <div id="sched-extra-inputs" class="hidden" style="display:flex; gap:6px;">
+                    <input type="text" id="sched-extra-label" class="input" style="padding:7px 8px; flex:1;" value="مراجعة سورة" placeholder="اسم العمود" oninput="markSchedPlanDirty()" />
+                    <input type="text" id="sched-extra-surah" class="input" style="padding:7px 8px; flex:1;" value="الأنفال" placeholder="مثال: الأنفال" oninput="markSchedPlanDirty()" />
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:8px;">
+                <label style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; cursor:pointer;">
+                  <input type="checkbox" id="sched-number-free-col" style="width:16px; height:16px;" onchange="markSchedPlanDirty()" />
+                  <span>ترقيم خانة «قراءة ما تيسر» تلقائياً بالأرقام (١، ٢، ٣... مثل جدول الخاتمات ٤)</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+              <button type="button" class="btn btn-primary" style="flex:1; min-width:210px;" onclick="generateAndSaveSchedule(false)">✨ توليد جدول الشهر وحفظ الخطة</button>
+              <button type="button" class="btn btn-soft btn-sm" onclick="generateAndSaveSchedule(true)">🔄 استكمال تلقائي من الشهر السابق</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div id="sched-preview-card" class="card">
+        <div id="sched-actions-bar" class="sched-actions-bar">
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveCurrentMonthSchedule()">💾 حفظ وتثبيت للشهر</button>
+          <button type="button" class="btn btn-gold btn-sm" onclick="downloadScheduleImage()">🖼️ تحميل صورة الجدول (PNG)</button>
+          <button type="button" class="btn btn-soft btn-sm" onclick="toggleSchedFillPanel()">⬇️ تكرار خانة (Fill إكسل)</button>
+          <button type="button" class="btn btn-soft btn-sm" onclick="copyScheduleWhatsApp()">📋 نسخ الجدول كنص</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="window.print()">🖨️ طباعة / PDF</button>
+        </div>
+
+        <div id="sched-fill-panel" class="sched-subbox hidden" style="background:#f0fdf4; border:1.5px solid #86efac; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+            <strong style="font-size:14px; color:var(--primary);">⬇️ أداة التكرار التلقائي على الجدول (مثل Excel Fill)</strong>
+            <button type="button" class="btn btn-outline btn-xs" onclick="toggleSchedFillPanel(false)">إغلاق</button>
+          </div>
+          <div class="sched-form-grid" style="margin-bottom:8px;">
+            <div class="sched-field">
+              <label for="sched-fill-col">العمود المراد تكراره:</label>
+              <select id="sched-fill-col" class="input" style="padding:7px 10px;">
+                <option value="reviewText">المراجعة</option>
+                <option value="hifzText">الحفظ</option>
+                <option value="listenText">الإستماع</option>
+                <option value="extraText">العمود الإضافي</option>
+                <option value="freeText">قراءة ما تيسر</option>
+                <option value="mergedText">النص المدمج (التسميع/الاختبار)</option>
+              </select>
+            </div>
+            <div class="sched-field">
+              <label for="sched-fill-mode">طريقة التكرار:</label>
+              <select id="sched-fill-mode" class="input" style="padding:7px 10px;" onchange="onSchedFillModeChange()">
+                <option value="same" selected>تكرار نفس القيمة (ثابت)</option>
+                <option value="alternate">تبديل بالتناوب (افصلي بـ / أو سطر جديد)</option>
+                <option value="series">تسلسل أرقام تلقائي (١، ٢، ٣...)</option>
+              </select>
+            </div>
+            <div class="sched-field">
+              <label for="sched-fill-from">من يوم:</label>
+              <select id="sched-fill-from" class="input" style="padding:7px 10px;"></select>
+            </div>
+            <div class="sched-field">
+              <label for="sched-fill-to">إلى يوم:</label>
+              <select id="sched-fill-to" class="input" style="padding:7px 10px;"></select>
+            </div>
+          </div>
+          <div id="sched-fill-text-wrap" style="margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
+              <label for="sched-fill-value" style="font-size:12px; font-weight:800; color:var(--primary);">النص أو القيم للتكرار:</label>
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-xs" onclick="pullSchedFillFromStartRow()">📥 سحب من يوم البداية</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setSchedFillEndOfWeek()">📅 لنهاية الأسبوع</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setSchedFillEndOfMonth()">🗓️ لنهاية الشهر</button>
+              </div>
+            </div>
+            <textarea id="sched-fill-value" rows="2" class="input" style="padding:8px 10px; font-size:13.5px;" placeholder="مثال للتكرار الثابت: الأعلى : الناس&#10;أو للتناوب: الحزب ٥٩ / الحزب ٦٠ / الحزب ٥٨"></textarea>
+          </div>
+          <div id="sched-fill-series-wrap" class="sched-form-grid hidden" style="margin-bottom:8px;">
+            <div class="sched-field">
+              <label for="sched-fill-series-start">بداية الرقم:</label>
+              <input type="number" id="sched-fill-series-start" value="1" class="input" style="padding:7px 10px;" />
+            </div>
+            <div class="sched-field">
+              <label for="sched-fill-series-step">الزيادة كل يوم:</label>
+              <input type="number" id="sched-fill-series-step" value="1" class="input" style="padding:7px 10px;" />
+            </div>
+            <div class="sched-field">
+              <label for="sched-fill-series-tpl">الصيغة (استخدمي {n} للرقم):</label>
+              <input type="text" id="sched-fill-series-tpl" value="{n}" placeholder="مثال: حزب {n} أو الجزء {n}" class="input" style="padding:7px 10px;" />
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer;">
+              <input type="checkbox" id="sched-fill-skip-friday" checked style="width:16px; height:16px;" />
+              <span>تخطي أيام الجمعة</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer;">
+              <input type="checkbox" id="sched-fill-skip-exam" checked style="width:16px; height:16px;" />
+              <span>تخطي أيام الاختبار والتسميع</span>
+            </label>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm btn-block" onclick="applySchedFillPanel()">✨ تنفيذ التكرار على الخانات المحددة</button>
+        </div>
+
+        <p id="sched-edit-hint" style="font-size:12.5px; color:var(--primary); font-weight:700; margin-bottom:8px;">💡 اضغطي على أي يوم داخل الجدول بالأسفل لتعديله أو تحويله لاختبار / تسميع / تكرار:</p>
+        <div class="sched-excel-wrap">
+          <table class="sched-excel-table" id="sched-excel-table"></table>
+        </div>
+        <div id="sched-end-banner" class="sched-end-banner hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال تعديل أي يوم داخل الجدول -->
+  <div id="sched-day-modal" class="modal-backdrop" onclick="if(event.target===this) closeSchedDayModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="sched-day-modal-title" style="color:var(--primary); font-size:17px;">✏️ تعديل يوم في الجدول</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeSchedDayModal()">✕</button>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+        <button type="button" class="btn btn-danger btn-xs" onclick="setSchedModalRowType('exam')">🔴 اجعله يوم اختبار</button>
+        <button type="button" class="btn btn-soft btn-xs" onclick="setSchedModalRowType('friday')">💚 قراءة سورة الكهف</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="setSchedModalRowType('merged_review')">🔁 تسميع مدمج</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="setSchedModalRowType('normal')">📖 يوم عادي</button>
+      </div>
+      <div class="sched-form-grid" style="margin-bottom:10px;">
+        <div class="sched-field">
+          <label for="sched-edit-dayname">اليوم:</label>
+          <input type="text" id="sched-edit-dayname" class="input" style="padding:8px 10px;" />
+        </div>
+        <div class="sched-field">
+          <label for="sched-edit-hijridate">التاريخ الهجري:</label>
+          <input type="text" id="sched-edit-hijridate" class="input" style="padding:8px 10px;" />
+        </div>
+      </div>
+      <div id="sched-edit-merged-wrap" class="hidden" style="margin-bottom:10px;">
+        <div class="sched-field">
+          <label for="sched-edit-merged-text">النص المدمج (الاختبار / الكهف / التسميع):</label>
+          <input type="text" id="sched-edit-merged-text" class="input" style="padding:9px 10px;" placeholder="مثال: إختبار من سورة الأعلى : سورة الناس" />
+        </div>
+      </div>
+      <div id="sched-edit-normal-wrap" class="sched-form-grid" style="margin-bottom:10px;">
+        <div class="sched-field">
+          <label id="sched-edit-lbl-listen" for="sched-edit-listen">الإستماع:</label>
+          <input type="text" id="sched-edit-listen" class="input" style="padding:8px 10px;" />
+        </div>
+        <div class="sched-field">
+          <label id="sched-edit-lbl-hifz" for="sched-edit-hifz">الحفظ:</label>
+          <input type="text" id="sched-edit-hifz" class="input" style="padding:8px 10px;" />
+        </div>
+        <div class="sched-field">
+          <label id="sched-edit-lbl-review" for="sched-edit-review">المراجعة:</label>
+          <input type="text" id="sched-edit-review" class="input" style="padding:8px 10px;" />
+        </div>
+        <div id="sched-edit-extra-wrap" class="sched-field hidden">
+          <label id="sched-edit-lbl-extra" for="sched-edit-extra">عمود إضافي:</label>
+          <input type="text" id="sched-edit-extra" class="input" style="padding:8px 10px;" />
+        </div>
+      </div>
+      <div class="sched-field" style="margin-bottom:10px;">
+        <label id="sched-edit-lbl-free" for="sched-edit-free">قراءة ما تيسر:</label>
+        <input type="text" id="sched-edit-free" class="input" style="padding:8px 10px;" />
+      </div>
+
+      <details id="sched-modal-fill-box" style="background:#f0fdf4; border:1px solid #a7f3d0; border-radius:12px; padding:10px; margin-bottom:12px;">
+        <summary style="cursor:pointer; font-weight:800; font-size:13px; color:var(--primary);">⬇️ تكرار خانة على الأيام التالية (مثل Fill في الإكسل)</summary>
+        <div class="sched-form-grid" style="margin-top:8px;">
+          <div class="sched-field">
+            <label for="sched-modal-fill-col">الخانة المراد تكرارها:</label>
+            <select id="sched-modal-fill-col" class="input" style="padding:7px 9px; font-size:13px;">
+              <option value="reviewText">المراجعة</option>
+              <option value="hifzText">الحفظ</option>
+              <option value="listenText">الإستماع</option>
+              <option value="extraText">العمود الإضافي</option>
+              <option value="freeText">قراءة ما تيسر</option>
+              <option value="all">الصف بالكامل (جميع الخانات)</option>
+            </select>
+          </div>
+          <div class="sched-field">
+            <label for="sched-modal-fill-scope">التكرار حتى:</label>
+            <select id="sched-modal-fill-scope" class="input" style="padding:7px 9px; font-size:13px;" onchange="document.getElementById('sched-modal-fill-count-wrap').classList.toggle('hidden', this.value!=='count')">
+              <option value="week" selected>نهاية الأسبوع الحالي (قبل الجمعة)</option>
+              <option value="count">عدد محدد من الأيام التالية</option>
+              <option value="month">نهاية الشهر بالكامل</option>
+            </select>
+          </div>
+          <div id="sched-modal-fill-count-wrap" class="sched-field hidden">
+            <label for="sched-modal-fill-count">عدد الأيام التالية:</label>
+            <input type="number" id="sched-modal-fill-count" min="1" max="31" value="3" class="input" style="padding:7px 9px;" />
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin:8px 0;">
+          <label style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="sched-modal-fill-inc" style="width:15px; height:15px;" />
+            <span>زيادة الأرقام تلقائياً (مثلاً ١، ٢، ٣)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="sched-modal-fill-skip" checked style="width:15px; height:15px;" />
+            <span>تخطي الجمعة والاختبار</span>
+          </label>
+        </div>
+        <button type="button" class="btn btn-soft btn-sm btn-block" onclick="saveAndFillSchedModalDay()">💾⬇️ حفظ وتكرار للأسفل الآن</button>
+      </details>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="saveSchedModalDay()">💾 حفظ التعديل</button>
+        <button type="button" class="btn btn-soft btn-sm" onclick="insertSchedDayAfter()">➕ إضافة يوم بعده</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="deleteSchedModalDay()">🗑️ حذف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال باسورد الدخول إلى جزئية الجداول -->
+  <div id="sched-auth-modal" class="modal-backdrop" onclick="if(event.target===this) closeSchedAuthModal()">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h3 style="color:var(--primary); font-size:17.5px;">🔐 الدخول إلى جزئية الجداول</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeSchedAuthModal()">✕</button>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:10px;">أدخلي كلمة مرور الجداول للوصول إلى إنشاء وتعديل الجداول الشهرية.</p>
+      <div class="pw-wrap" style="margin-bottom:8px;">
+        <input type="password" id="sched-auth-pass-input" class="input" style="padding-left:40px;" placeholder="أدخل كلمة مرور الجداول..." onkeypress="if(event.key==='Enter') submitSchedAuth()" />
+        <button type="button" class="pw-toggle" onclick="togglePwVisibility('sched-auth-pass-input', this)">👁️</button>
+      </div>
+      <p id="sched-auth-default-hint" class="hidden" style="font-size:12px; color:var(--primary); background:var(--primary-soft); padding:6px 10px; border-radius:9px; margin-bottom:10px;">💡 كلمة المرور الافتراضية أول مرة: <strong>123</strong> (يمكنكِ تغييرها من داخل الجداول)</p>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="submitSchedAuth()">دخول 🔓</button>
+        <button type="button" class="btn btn-outline" onclick="closeSchedAuthModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال تغيير باسورد الجداول -->
+  <div id="sched-pw-modal" class="modal-backdrop" onclick="if(event.target===this) closeSchedPasswordModal()">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h3 style="color:var(--primary); font-size:17.5px;">🔐 تغيير باسورد الجداول</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeSchedPasswordModal()">✕</button>
+      </div>
+      <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:5px;">كلمة المرور الجديدة للدخول للجداول:</label>
+      <input type="text" id="sched-pw-new" class="input" style="margin-bottom:10px;" placeholder="اكتبي كلمة المرور الجديدة..." onkeypress="if(event.key==='Enter') saveSchedPassword()" />
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="saveSchedPassword()">💾 حفظ كلمة المرور</button>
+        <button type="button" class="btn btn-outline" onclick="closeSchedPasswordModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
   <div id="ocr-modal" class="modal-backdrop" onclick="if(event.target===this) closeOcrModal()">
     <div class="modal">
       <div class="modal-header">
@@ -577,6 +1157,7 @@
 
     const defaultData = {
       headSupervisor: { name: 'المشرف الرئيسي', password: '123' },
+      schedulesPassword: '123',
       groups: [
         { id: 'g1', name: 'جروب الفجر - تعاهدوا القرءان', supervisors: [{ id: 's1', name: 'أحمد', password: '123' }, { id: 's2', name: 'محمود', password: '123' }], absenceStartDate: '' },
         { id: 'g2', name: 'جروب الهمة - تعاهدوا القرءان', supervisors: [{ id: 's3', name: 'سارة', password: '123' }], absenceStartDate: '' }
@@ -596,7 +1177,8 @@
         { id: 'p2', groupId: 'g1', number: 2, memberIds: ['m3', 'm4', 'm5'] },
         { id: 'p3', groupId: 'g2', number: 1, memberIds: ['m6', 'm7', 'm8'] }
       ],
-      attendance: {}
+      attendance: {},
+      schedules: {}
     };
 
     let db = loadLocalDB();
@@ -626,6 +1208,16 @@
     let currentWeeklyMessage = '';
     let deferredPrompt = null;
     let lastCloudSnapshot = '';
+    let scheduleReturnScreen = 'login';
+    let schedUnlocked = false;
+    let pendingSchedTarget = null;
+    let schedGroupId = '';
+    let schedMonthKey = '';
+    let schedPlanMode = 'surahs_repeat';
+    let schedDaysOfWeek = [6, 0, 1, 2, 3, 4];
+    let currentRenderedSchedule = null;
+    let editingScheduleRowIdx = null;
+    let schedPlanDirty = false;
 
     let ocrFiles = [];
     let ocrIsProcessing = false;
@@ -744,9 +1336,34 @@
       if (val && typeof val === 'object') return Object.values(val).filter(Boolean);
       return [];
     }
+    function normalizeSchedulesMap(raw) {
+      const out = {};
+      if (!raw || typeof raw !== 'object') return out;
+      Object.keys(raw).forEach(gId => {
+        const entry = raw[gId];
+        if (!entry || typeof entry !== 'object') return;
+        const plan = entry.plan ? {
+          ...entry.plan,
+          daysOfWeek: objToArray(entry.plan.daysOfWeek).map(Number).filter(n => !Number.isNaN(n))
+        } : null;
+        if (plan && !plan.daysOfWeek.length) plan.daysOfWeek = [6, 0, 1, 2, 3, 4];
+        const months = {};
+        if (entry.months && typeof entry.months === 'object') {
+          Object.keys(entry.months).forEach(mk => {
+            const mObj = entry.months[mk];
+            if (mObj && typeof mObj === 'object') {
+              months[mk] = { ...mObj, rows: objToArray(mObj.rows) };
+            }
+          });
+        }
+        out[gId] = { plan, months };
+      });
+      return out;
+    }
     function normalizeDB(data) {
       const out = {
         headSupervisor: data.headSupervisor || { name: 'المشرف الرئيسي', password: '123' },
+        schedulesPassword: (data.schedulesPassword !== undefined && data.schedulesPassword !== '') ? String(data.schedulesPassword) : '123',
         groups: objToArray(data.groups).map(g => ({
           id: g.id, name: g.name,
           supervisors: g.supervisors ? objToArray(g.supervisors) : [{ id: uid('s'), name: g.supervisorName || 'مشرف', password: (g.password !== undefined && g.password !== '') ? String(g.password) : '123' }],
@@ -754,7 +1371,8 @@
         })),
         members: objToArray(data.members).map(m => ({ ...m, recitationOnly: Boolean(m.recitationOnly) })),
         partnerships: objToArray(data.partnerships).map(p => ({ ...p, memberIds: objToArray(p.memberIds) })),
-        attendance: data.attendance || {}
+        attendance: data.attendance || {},
+        schedules: normalizeSchedulesMap(data.schedules)
       };
       const counts = {};
       out.partnerships.forEach(p => { if (!p.number) { counts[p.groupId] = (counts[p.groupId] || 0) + 1; p.number = counts[p.groupId]; } });
@@ -768,7 +1386,7 @@
       });
       localDb.members.forEach(m => { membersMap[m.id] = m; });
       localDb.partnerships.forEach(p => { partsMap[p.id] = p; });
-      return { headSupervisor: localDb.headSupervisor, groups: groupsMap, members: membersMap, partnerships: partsMap, attendance: localDb.attendance || {} };
+      return { headSupervisor: localDb.headSupervisor, schedulesPassword: localDb.schedulesPassword || '123', groups: groupsMap, members: membersMap, partnerships: partsMap, attendance: localDb.attendance || {}, schedules: localDb.schedules || {} };
     }
     function loadLocalDB() {
       try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return normalizeDB(JSON.parse(raw)); } catch (e) {}
@@ -794,7 +1412,11 @@
         if (snap !== lastCloudSnapshot) {
           lastCloudSnapshot = snap; db = normalized; saveLocalDB();
           const loginVisible = !document.getElementById('login-screen').classList.contains('hidden');
-          if (loginVisible) renderLogin();
+          const schedVisible = !document.getElementById('schedules-screen').classList.contains('hidden');
+          if (schedVisible) {
+            const tag = document.activeElement ? document.activeElement.tagName : '';
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT' && editingScheduleRowIdx === null && !schedPlanDirty) renderSchedulesScreen();
+          } else if (loginVisible) renderLogin();
           else {
             const tag = document.activeElement ? document.activeElement.tagName : '';
             if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT' && editingGroupId === null && editingPartnerNumId === null && editingMemberId === null) refreshCurrentView();
@@ -805,6 +1427,7 @@
     }
     function manualSync() { syncFromCloud(false); }
     function refreshCurrentView() {
+      if (!document.getElementById('schedules-screen').classList.contains('hidden')) { renderSchedulesScreen(); return; }
       if (session && session.role === 'head') {
         if (currentGroupId && getCurrentGroup()) renderAll();
         else if (!document.getElementById('head-screen').classList.contains('hidden')) renderHeadDashboard();
@@ -842,6 +1465,7 @@
     function cloudSetAttendance(date, type, mId, status) { cloudExec(() => status ? cloudRequest(`/attendance/${date}/${type}/${mId}`, 'PUT', status) : cloudRequest(`/attendance/${date}/${type}/${mId}`, 'DELETE')); }
     function cloudPatchAttendance(date, type, patch) { cloudExec(() => cloudRequest(`/attendance/${date}/${type}`, 'PATCH', patch)); }
     function cloudSaveHead() { cloudExec(() => cloudRequest('/headSupervisor', 'PUT', db.headSupervisor)); }
+    function cloudSaveSchedulesPassword() { cloudExec(() => cloudRequest('/schedulesPassword', 'PUT', db.schedulesPassword || '123')); }
 
     function loadSession() { try { const r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
     function saveSession(s) { session = s; if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); }
@@ -944,7 +1568,7 @@
       currentGroupId = groupId; editingMemberId = null; assigningSoloMemberId = null; editingPartnerNumId = null; addingPartnerToPId = null; addingPartnerSelectedIds = []; addingPartnerSearchQuery = ''; pendingRosterSync = null; listeningFilter = 'all'; recitationFilter = 'all';
       const bulkPreview = document.getElementById('bulk-sync-preview'); if (bulkPreview) { bulkPreview.classList.add('hidden'); bulkPreview.innerHTML = ''; }
       if (session) saveSession({ ...session, groupId });
-      document.getElementById('login-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
+      document.getElementById('login-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('schedules-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
       document.getElementById('date-picker').value = currentDate;
       document.getElementById('back-to-head-btn').classList.toggle('hidden', !(session && session.role === 'head'));
       initQuickGuideState(); updateSwitchGroupBtn(); renderAll();
@@ -962,14 +1586,14 @@
     }
     function closeSwitchGroupModal() { document.getElementById('switch-group-modal').classList.remove('open'); }
     function logout() {
-      currentGroupId = null; quickSelectedGroupId = null; editingMemberId = null; saveSession(null);
-      document.getElementById('app-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden');
+      currentGroupId = null; quickSelectedGroupId = null; editingMemberId = null; schedUnlocked = false; saveSession(null);
+      document.getElementById('app-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('schedules-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden');
       document.getElementById('supervisor-input').value = ''; document.getElementById('password-input').value = '';
       cancelPickGroup(); cancelNewSupervisor(); renderLogin();
     }
     function openHeadDashboard() {
       currentGroupId = null; if (session) saveSession({ role: 'head', groupId: null, supervisorName: db.headSupervisor.name });
-      document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-screen').classList.add('hidden'); document.getElementById('head-screen').classList.remove('hidden');
+      document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-screen').classList.add('hidden'); document.getElementById('schedules-screen').classList.add('hidden'); document.getElementById('head-screen').classList.remove('hidden');
       renderHeadDashboard();
     }
     function backToHeadDashboard() { openHeadDashboard(); }
@@ -980,6 +1604,8 @@
       document.getElementById('head-today-date').textContent = formatArabicDate(currentDate);
       document.getElementById('head-edit-name').value = db.headSupervisor.name;
       document.getElementById('head-edit-pass').value = db.headSupervisor.password;
+      const headSchedEl = document.getElementById('head-sched-pass');
+      if (headSchedEl) headSchedEl.value = db.schedulesPassword || '123';
       const list = document.getElementById('head-groups-list');
       if (!db.groups.length) { list.innerHTML = `<div class="empty-state">لا توجد جروبات مسجلة بعد.</div>`; return; }
       const dayRecord = db.attendance[currentDate] || { listening: {}, recitation: {} };
@@ -1037,8 +1663,11 @@
     }
     function saveHeadCredentials() {
       const name = document.getElementById('head-edit-name').value.trim(), pass = normalizePassword(document.getElementById('head-edit-pass').value.trim());
+      const schedEl = document.getElementById('head-sched-pass'), schedPass = schedEl ? normalizePassword(schedEl.value.trim()) : '';
       if (!name || !pass) return showToast('اكتب الاسم وكلمة المرور');
-      db.headSupervisor.name = name; db.headSupervisor.password = pass; cloudSaveHead(); renderHeadDashboard(); showToast('تم تحديث بيانات المشرف الرئيسي');
+      db.headSupervisor.name = name; db.headSupervisor.password = pass; cloudSaveHead();
+      if (schedPass) { db.schedulesPassword = schedPass; cloudSaveSchedulesPassword(); }
+      renderHeadDashboard(); showToast('تم تحديث بيانات وكلمات المرور بنجاح');
     }
 
     function openWeeklyStarsModal() {
@@ -2638,6 +3267,1477 @@
     function closeDownloadModal() { document.getElementById('download-modal').classList.remove('open'); }
     async function installPWA() { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; document.getElementById('pwa-install-section').classList.add('hidden'); }
     function escapeHtml(str) { return String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s])); }
+
+    // ==================== صانع الجداول الشهرية الهجرية التلقائي (منفصل عن الغياب) ====================
+    // بيانات مصحف المدينة المنورة: [رقم السورة, الاسم, عدد الآيات, أول صفحة]
+    const QURAN_SURAHS = [
+      [1,'الفاتحة',7,1],[2,'البقرة',286,2],[3,'آل عمران',200,50],[4,'النساء',176,77],[5,'المائدة',120,106],
+      [6,'الأنعام',165,128],[7,'الأعراف',206,151],[8,'الأنفال',75,177],[9,'التوبة',129,187],[10,'يونس',109,208],
+      [11,'هود',123,221],[12,'يوسف',111,235],[13,'الرعد',43,249],[14,'إبراهيم',52,255],[15,'الحجر',99,262],
+      [16,'النحل',128,267],[17,'الإسراء',111,282],[18,'الكهف',110,293],[19,'مريم',98,305],[20,'طه',135,312],
+      [21,'الأنبياء',112,322],[22,'الحج',78,332],[23,'المؤمنون',118,342],[24,'النور',64,350],[25,'الفرقان',77,359],
+      [26,'الشعراء',227,367],[27,'النمل',93,377],[28,'القصص',88,385],[29,'العنكبوت',69,396],[30,'الروم',60,404],
+      [31,'لقمان',34,411],[32,'السجدة',30,415],[33,'الأحزاب',73,418],[34,'سبأ',54,428],[35,'فاطر',45,434],
+      [36,'يس',83,440],[37,'الصافات',182,446],[38,'ص',88,453],[39,'الزمر',75,458],[40,'غافر',85,467],
+      [41,'فصلت',54,477],[42,'الشورى',53,483],[43,'الزخرف',89,489],[44,'الدخان',59,496],[45,'الجاثية',37,499],
+      [46,'الأحقاف',35,502],[47,'محمد',38,507],[48,'الفتح',29,511],[49,'الحجرات',18,515],[50,'ق',45,518],
+      [51,'الذاريات',60,520],[52,'الطور',49,523],[53,'النجم',62,526],[54,'القمر',55,528],[55,'الرحمن',78,531],
+      [56,'الواقعة',96,534],[57,'الحديد',29,537],[58,'المجادلة',22,542],[59,'الحشر',24,545],[60,'الممتحنة',13,549],
+      [61,'الصف',14,551],[62,'الجمعة',11,553],[63,'المنافقون',11,554],[64,'التغابن',18,556],[65,'الطلاق',12,558],
+      [66,'التحريم',12,560],[67,'الملك',30,562],[68,'القلم',52,564],[69,'الحاقة',52,566],[70,'المعارج',44,568],
+      [71,'نوح',28,570],[72,'الجن',28,572],[73,'المزمل',20,574],[74,'المدثر',56,575],[75,'القيامة',40,577],
+      [76,'الإنسان',31,578],[77,'المرسلات',50,580],[78,'النبأ',40,582],[79,'النازعات',46,583],[80,'عبس',42,585],
+      [81,'التكوير',29,586],[82,'الانفطار',19,587],[83,'المطففين',36,587],[84,'الانشقاق',25,589],[85,'البروج',22,590],
+      [86,'الطارق',17,591],[87,'الأعلى',19,591],[88,'الغاشية',26,592],[89,'الفجر',30,593],[90,'البلد',20,594],
+      [91,'الشمس',15,595],[92,'الليل',21,595],[93,'الضحى',11,596],[94,'الشرح',8,596],[95,'التين',8,597],
+      [96,'العلق',19,597],[97,'القدر',5,598],[98,'البينة',8,598],[99,'الزلزلة',8,599],[100,'العاديات',11,599],
+      [101,'القارعة',11,600],[102,'التكاثر',8,600],[103,'العصر',3,601],[104,'الهمزة',9,601],[105,'الفيل',5,601],
+      [106,'قريش',4,602],[107,'الماعون',7,602],[108,'الكوثر',3,602],[109,'الكافرون',6,603],[110,'النصر',3,603],
+      [111,'المسد',5,603],[112,'الإخلاص',4,604],[113,'الفلق',5,604],[114,'الناس',6,604]
+    ].map(([num, name, ayahs, page]) => ({ num, name, ayahs, page }));
+    const ARABIC_WEEKDAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const HIJRI_MONTHS_AR = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخر', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+    // ألوان الأسابيع المطابقة بالضبط لصور جداول المجموعات (أخضر، أزرق، أصفر دافئ، وردي، خوخي)
+    const SCHED_WEEK_COLORS = [
+      { accent: '#a9d08e', tint: '#e2efda' },
+      { accent: '#9bc2e6', tint: '#ddebf7' },
+      { accent: '#ffe699', tint: '#fff2cc' },
+      { accent: '#f4b0d0', tint: '#fce4f0' },
+      { accent: '#f4b084', tint: '#fce4d6' }
+    ];
+
+    function getHijriPartsUTC(dateObj) {
+      try {
+        const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { timeZone: 'UTC', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(dateObj);
+        const get = t => Number(parts.find(p => p.type === t)?.value || 0);
+        return { year: get('year'), month: get('month'), day: get('day') };
+      } catch (e) {
+        return { year: 1448, month: 6, day: 1 };
+      }
+    }
+    function getCurrentHijriMonthKey() {
+      const now = new Date();
+      const utcNow = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+      const p = getHijriPartsUTC(utcNow);
+      return `${p.year}-${String(p.month).padStart(2, '0')}`;
+    }
+    function isValidHijriMonthKey(mk) {
+      if (!/^\d{4}-\d{2}$/.test(String(mk || ''))) return false;
+      const y = Number(mk.slice(0, 4));
+      return y >= 1400 && y <= 1600;
+    }
+    function addHijriMonthsKey(monthKey, delta) {
+      const [y, m] = monthKey.split('-').map(Number);
+      const total = (y * 12 + (m - 1)) + delta;
+      const ny = Math.floor(total / 12), nm = (total % 12) + 1;
+      return `${ny}-${String(nm).padStart(2, '0')}`;
+    }
+    function formatHijriMonthTitle(monthKey) {
+      const [y, m] = monthKey.split('-').map(Number);
+      const mName = HIJRI_MONTHS_AR[Math.max(0, Math.min(11, m - 1))];
+      return `جدول شهر ${mName} ${toArabicDigits(y)} هـ`;
+    }
+    function getHijriMonthDaysUTC(hYear, hMonth, shiftDays = 0) {
+      const approxDays = Math.floor((hYear - 1) * 354.367056 + (hMonth - 1) * 29.530588 + 15);
+      const epoch = Date.UTC(622, 6, 19);
+      let probe = new Date(epoch + approxDays * 86400000);
+      for (let i = 0; i < 90; i++) {
+        const p = getHijriPartsUTC(probe);
+        const cmp = (p.year - hYear) * 12 + (p.month - hMonth);
+        if (cmp === 0) break;
+        probe = new Date(probe.getTime() + (cmp < 0 ? 12 : -12) * 86400000);
+      }
+      for (let i = 0; i < 35; i++) {
+        const prev = new Date(probe.getTime() - 86400000);
+        const p = getHijriPartsUTC(prev);
+        if (p.year === hYear && p.month === hMonth) probe = prev;
+        else break;
+      }
+      const mName = HIJRI_MONTHS_AR[Math.max(0, Math.min(11, hMonth - 1))];
+      const days = [];
+      let cur = new Date(probe.getTime());
+      while (true) {
+        const p = getHijriPartsUTC(cur);
+        if (p.year !== hYear || p.month !== hMonth) break;
+        const shifted = new Date(cur.getTime() + (Number(shiftDays) || 0) * 86400000);
+        days.push({
+          hDay: p.day,
+          hMonth,
+          hYear,
+          weekdayNum: shifted.getUTCDay(),
+          dayName: ARABIC_WEEKDAYS[shifted.getUTCDay()],
+          hijriText: `${toArabicDigits(p.day)} ${mName}`,
+          gregDate: shifted
+        });
+        cur = new Date(cur.getTime() + 86400000);
+        if (days.length > 32) break;
+      }
+      return days;
+    }
+    function formatGregSpanForHijri(days) {
+      if (!days || !days.length) return '';
+      try {
+        const fmt = new Intl.DateTimeFormat('ar-EG', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric' });
+        return `يوافق ميلادياً: ${fmt.format(days[0].gregDate)} — ${fmt.format(days[days.length - 1].gregDate)}`;
+      } catch (e) { return ''; }
+    }
+
+    function getSurahPageEstimate(surahNum, ayahNum) {
+      const sObj = QURAN_SURAHS[Math.max(0, Math.min(113, surahNum - 1))];
+      const nextS = QURAN_SURAHS[surahNum];
+      const nextPage = nextS ? nextS.page : 605;
+      const pageSpan = Math.max(0.25, nextPage - sObj.page);
+      const frac = Math.max(0, Math.min(1, (ayahNum - 1) / Math.max(1, sObj.ayahs)));
+      return sObj.page + frac * pageSpan;
+    }
+    const HIZB_START_PAGES = [
+      1, 11, 22, 32, 42, 51, 62, 72, 82, 92,
+      102, 112, 121, 132, 142, 151, 162, 173, 182, 192,
+      201, 212, 222, 231, 242, 252, 262, 272, 282, 292,
+      302, 312, 322, 332, 342, 352, 362, 371, 382, 392,
+      402, 413, 422, 431, 442, 451, 462, 472, 482, 491,
+      502, 513, 522, 531, 542, 553, 562, 572, 582, 591
+    ];
+    const MUSHAF_PAGES_CHUNKS = [
+      "1,1,1,5,1,6,1,7;2,1,2,3,2,4,2,5;2,6,2,11,2,12,2,16;2,17,2,20,2,21,2,24;2,25,2,26,2,27,2,29;2,30,2,33,2,34,2,37;2,38,2,42,2,43,2,48;2,49,2,53,2,54,2,57;2,58,2,60,2,61,2,61;2,62,2,65,2,66,2,69;2,70,2,73,2,74,2,76;2,77,2,80,2,81,2,83;2,84,2,85,2,86,2,88;2,89,2,90,2,91,2,93;2,94,2,97,2,98,2,101;2,102,2,102,2,103,2,105;2,106,2,109,2,110,2,112;2,113,2,115,2,116,2,119;2,120,2,123,2,124,2,126;2,127,2,130,2,131,2,134;2,135,2,137,2,138,2,141;2,142,2,143,2,144,2,145;2,146,2,149,2,150,2,153;2,154,2,158,2,159,2,163;2,164,2,165,2,166,2,169;2,170,2,173,2,174,2,176;2,177,2,177,2,178,2,181;2,182,2,184,2,185,2,186;2,187,2,187,2,188,2,190;2,191,2,194,2,195,2,196;2,197,2,198,2,199,2,202;2,203,2,206,2,207,2,210;2,211,2,213,2,214,2,215;2,216,2,217,2,218,2,219;2,220,2,221,2,222,2,224;2,225,2,228,2,229,2,230;2,231,2,232,2,233,2,233;2,234,2,235,2,236,2,237;2,238,2,241,2,242,2,245;2,246,2,246,2,247,2,248;2,249,2,249,2,250,2,252;2,253,2,254,2,255,2,256;2,257,2,258,2,259,2,259;2,260,2,261,2,262,2,264;2,265,2,266,2,267,2,269;2,270,2,272,2,273,2,274;2,275,2,276,2,277,2,281;2,282,2,282,2,282,2,282;2,283,2,284,2,285,2,286;3,1,3,6,3,7,3,9",
+      "3,10,3,13,3,14,3,15;3,16,3,19,3,20,3,22;3,23,3,26,3,27,3,29;3,30,3,34,3,35,3,37;3,38,3,41,3,42,3,45;3,46,3,49,3,50,3,52;3,53,3,56,3,57,3,61;3,62,3,65,3,66,3,70;3,71,3,74,3,75,3,77;3,78,3,80,3,81,3,83;3,84,3,86,3,87,3,91;3,92,3,96,3,97,3,100;3,101,3,103,3,104,3,108;3,109,3,111,3,112,3,115;3,116,3,118,3,119,3,121;3,122,3,126,3,127,3,132;3,133,3,136,3,137,3,140;3,141,3,144,3,145,3,148;3,149,3,151,3,152,3,153;3,154,3,154,3,155,3,157;3,158,3,161,3,162,3,165;3,166,3,169,3,170,3,173;3,174,3,178,3,179,3,180;3,181,3,183,3,184,3,186;3,187,3,190,3,191,3,194;3,195,3,197,3,198,3,200;4,1,4,3,4,4,4,6;4,7,4,10,4,11,4,11;4,12,4,12,4,13,4,14;4,15,4,17,4,18,4,19;4,20,4,22,4,23,4,23;4,24,4,24,4,25,4,26;4,27,4,30,4,31,4,33;4,34,4,35,4,36,4,37;4,38,4,42,4,43,4,44;4,45,4,47,4,48,4,51;4,52,4,56,4,57,4,59;4,60,4,62,4,63,4,65;4,66,4,70,4,71,4,74;4,75,4,77,4,78,4,79;4,80,4,83,4,84,4,86;4,87,4,89,4,90,4,91;4,92,4,92,4,93,4,94;4,95,4,97,4,98,4,101;4,102,4,102,4,103,4,105;4,106,4,110,4,111,4,113;4,114,4,116,4,117,4,121;4,122,4,124,4,125,4,127;4,128,4,130,4,131,4,134;4,135,4,136,4,137,4,140",
+      "4,141,4,143,4,144,4,147;4,148,4,152,4,153,4,154;4,155,4,158,4,159,4,162;4,163,4,165,4,166,4,170;4,171,4,172,4,173,4,175;4,176,5,1,5,2,5,2;5,3,5,3,5,4,5,5;5,6,5,6,5,7,5,9;5,10,5,12,5,13,5,13;5,14,5,15,5,16,5,17;5,18,5,19,5,20,5,23;5,24,5,27,5,28,5,31;5,32,5,33,5,34,5,36;5,37,5,40,5,41,5,41;5,42,5,43,5,44,5,45;5,46,5,47,5,48,5,50;5,51,5,53,5,54,5,57;5,58,5,61,5,62,5,64;5,65,5,67,5,68,5,70;5,71,5,72,5,73,5,76;5,77,5,80,5,81,5,82;5,83,5,87,5,88,5,89;5,90,5,93,5,94,5,95;5,96,5,99,5,100,5,103;5,104,5,106,5,107,5,108;5,109,5,110,5,111,5,113;5,114,5,116,5,117,5,120;6,1,6,5,6,6,6,8;6,9,6,13,6,14,6,18;6,19,6,22,6,23,6,27;6,28,6,31,6,32,6,35;6,36,6,39,6,40,6,44;6,45,6,49,6,50,6,52;6,53,6,56,6,57,6,59;6,60,6,63,6,64,6,68;6,69,6,70,6,71,6,73;6,74,6,78,6,79,6,81;6,82,6,86,6,87,6,90;6,91,6,92,6,93,6,94;6,95,6,98,6,99,6,101;6,102,6,107,6,108,6,110;6,111,6,113,6,114,6,118;6,119,6,121,6,122,6,124;6,125,6,128,6,129,6,131;6,132,6,135,6,136,6,137;6,138,6,140,6,141,6,142;6,143,6,144,6,145,6,146;6,147,6,149,6,150,6,151;6,152,6,154,6,155,6,157;6,158,6,160,6,161,6,165",
+      "7,1,7,6,7,7,7,11;7,12,7,18,7,19,7,22;7,23,7,27,7,28,7,30;7,31,7,34,7,35,7,37;7,38,7,40,7,41,7,43;7,44,7,47,7,48,7,51;7,52,7,54,7,55,7,57;7,58,7,62,7,63,7,67;7,68,7,70,7,71,7,73;7,74,7,76,7,77,7,81;7,82,7,85,7,86,7,87;7,88,7,90,7,91,7,95;7,96,7,100,7,101,7,104;7,105,7,112,7,113,7,120;7,121,7,126,7,127,7,130;7,131,7,134,7,135,7,137;7,138,7,141,7,142,7,143;7,144,7,146,7,147,7,149;7,150,7,152,7,153,7,155;7,156,7,157,7,158,7,159;7,160,7,160,7,161,7,163;7,164,7,167,7,168,7,170;7,171,7,174,7,175,7,178;7,179,7,183,7,184,7,187;7,188,7,190,7,191,7,195;7,196,7,201,7,202,7,206;8,1,8,4,8,5,8,8;8,9,8,12,8,13,8,16;8,17,8,20,8,21,8,25;8,26,8,29,8,30,8,33;8,34,8,36,8,37,8,40;8,41,8,42,8,43,8,45;8,46,8,48,8,49,8,52;8,53,8,57,8,58,8,61;8,62,8,65,8,66,8,69;8,70,8,72,8,73,8,75;9,1,9,3,9,4,9,6;9,7,9,10,9,11,9,13;9,14,9,17,9,18,9,20;9,21,9,24,9,25,9,26;9,27,9,29,9,30,9,31;9,32,9,34,9,35,9,36;9,37,9,38,9,39,9,40;9,41,9,43,9,44,9,47;9,48,9,51,9,52,9,54;9,55,9,58,9,59,9,61;9,62,9,65,9,66,9,68;9,69,9,70,9,71,9,72;9,73,9,74,9,75,9,79;9,80,9,82,9,83,9,86",
+      "9,87,9,90,9,91,9,93;9,94,9,96,9,97,9,99;9,100,9,102,9,103,9,106;9,107,9,109,9,110,9,111;9,112,9,114,9,115,9,117;9,118,9,120,9,121,9,122;9,123,9,125,9,126,9,129;10,1,10,3,10,4,10,6;10,7,10,11,10,12,10,14;10,15,10,17,10,18,10,20;10,21,10,22,10,23,10,25;10,26,10,28,10,29,10,33;10,34,10,37,10,38,10,42;10,43,10,47,10,48,10,53;10,54,10,58,10,59,10,61;10,62,10,66,10,67,10,70;10,71,10,73,10,74,10,78;10,79,10,84,10,85,10,88;10,89,10,92,10,93,10,97;10,98,10,101,10,102,10,106;10,107,11,1,11,2,11,5;11,6,11,8,11,9,11,12;11,13,11,16,11,17,11,19;11,20,11,24,11,25,11,28;11,29,11,32,11,33,11,37;11,38,11,41,11,42,11,45;11,46,11,49,11,50,11,53;11,54,11,58,11,59,11,62;11,63,11,66,11,67,11,71;11,72,11,77,11,78,11,81;11,82,11,85,11,86,11,88;11,89,11,92,11,93,11,97;11,98,11,102,11,103,11,108;11,109,11,112,11,113,11,117;11,118,11,122,11,123,12,4;12,5,12,8,12,9,12,14;12,15,12,18,12,19,12,22;12,23,12,25,12,26,12,30;12,31,12,33,12,34,12,37;12,38,12,40,12,41,12,43;12,44,12,48,12,49,12,52;12,53,12,58,12,59,12,63;12,64,12,66,12,67,12,69;12,70,12,75,12,76,12,78;12,79,12,81,12,82,12,86;12,87,12,89,12,90,12,95;12,96,12,99,12,100,12,103;12,104,12,108,12,109,12,111;13,1,13,3,13,4,13,5;13,6,13,10,13,11,13,13",
+      "13,14,13,16,13,17,13,18;13,19,13,23,13,24,13,28;13,29,13,31,13,32,13,34;13,35,13,37,13,38,13,42;13,43,14,2,14,3,14,5;14,6,14,8,14,9,14,10;14,11,14,13,14,14,14,18;14,19,14,21,14,22,14,24;14,25,14,29,14,30,14,33;14,34,14,37,14,38,14,42;14,43,14,46,14,47,14,52;15,1,15,7,15,8,15,15;15,16,15,22,15,23,15,31;15,32,15,41,15,42,15,51;15,52,15,60,15,61,15,70;15,71,15,82,15,83,15,90;15,91,16,1,16,2,16,6;16,7,16,11,16,12,16,14;16,15,16,22,16,23,16,26;16,27,16,30,16,31,16,34;16,35,16,37,16,38,16,42;16,43,16,48,16,49,16,54;16,55,16,60,16,61,16,64;16,65,16,69,16,70,16,72;16,73,16,76,16,77,16,79;16,80,16,82,16,83,16,87;16,88,16,90,16,91,16,93;16,94,16,97,16,98,16,102;16,103,16,106,16,107,16,110;16,111,16,114,16,115,16,118;16,119,16,123,16,124,16,128;17,1,17,4,17,5,17,7;17,8,17,12,17,13,17,17;17,18,17,22,17,23,17,27;17,28,17,33,17,34,17,38;17,39,17,44,17,45,17,49;17,50,17,54,17,55,17,58;17,59,17,61,17,62,17,66;17,67,17,70,17,71,17,75;17,76,17,80,17,81,17,86;17,87,17,92,17,93,17,96;17,97,17,99,17,100,17,104;17,105,17,110,17,111,18,4;18,5,18,10,18,11,18,15;18,16,18,18,18,19,18,20;18,21,18,22,18,23,18,27;18,28,18,30,18,31,18,34;18,35,18,40,18,41,18,45;18,46,18,49,18,50,18,53;18,54,18,56,18,57,18,61",
+      "18,62,18,67,18,68,18,74;18,75,18,79,18,80,18,83;18,84,18,90,18,91,18,97;18,98,18,104,18,105,18,110;19,1,19,6,19,7,19,11;19,12,19,19,19,20,19,25;19,26,19,31,19,32,19,38;19,39,19,45,19,46,19,51;19,52,19,58,19,59,19,64;19,65,19,71,19,72,19,76;19,77,19,85,19,86,19,95;19,96,20,5,20,6,20,12;20,13,20,21,20,22,20,37;20,38,20,42,20,43,20,51;20,52,20,57,20,58,20,64;20,65,20,71,20,72,20,76;20,77,20,82,20,83,20,87;20,88,20,93,20,94,20,98;20,99,20,107,20,108,20,113;20,114,20,119,20,120,20,125;20,126,20,130,20,131,20,135;21,1,21,5,21,6,21,10;21,11,21,18,21,19,21,24;21,25,21,29,21,30,21,35;21,36,21,40,21,41,21,44;21,45,21,49,21,50,21,57;21,58,21,65,21,66,21,72;21,73,21,77,21,78,21,81;21,82,21,86,21,87,21,90;21,91,21,96,21,97,21,101;21,102,21,106,21,107,21,112;22,1,22,4,22,5,22,5;22,6,22,11,22,12,22,15;22,16,22,18,22,19,22,23;22,24,22,27,22,28,22,30;22,31,22,35,22,36,22,38;22,39,22,41,22,42,22,46;22,47,22,52,22,53,22,55;22,56,22,60,22,61,22,64;22,65,22,69,22,70,22,72;22,73,22,76,22,77,22,78;23,1,23,10,23,11,23,17;23,18,23,23,23,24,23,27;23,28,23,33,23,34,23,42;23,43,23,49,23,50,23,59;23,60,23,67,23,68,23,74;23,75,23,81,23,82,23,89;23,90,23,97,23,98,23,104;23,105,23,111,23,112,23,118;24,1,24,4,24,5,24,10",
+      "24,11,24,14,24,15,24,20;24,21,24,23,24,24,24,27;24,28,24,30,24,31,24,31;24,32,24,33,24,34,24,36;24,37,24,40,24,41,24,43;24,44,24,48,24,49,24,53;24,54,24,56,24,57,24,58;24,59,24,60,24,61,24,61;24,62,24,63,24,64,25,2;25,3,25,6,25,7,25,11;25,12,25,17,25,18,25,20;25,21,25,26,25,27,25,32;25,33,25,38,25,39,25,43;25,44,25,49,25,50,25,55;25,56,25,60,25,61,25,67;25,68,25,71,25,72,25,77;26,1,26,9,26,10,26,19;26,20,26,28,26,29,26,39;26,40,26,48,26,49,26,60;26,61,26,70,26,71,26,83;26,84,26,97,26,98,26,111;26,112,26,123,26,124,26,136;26,137,26,149,26,150,26,159;26,160,26,171,26,172,26,183;26,184,26,193,26,194,26,206;26,207,26,218,26,219,26,227;27,1,27,7,27,8,27,13;27,14,27,18,27,19,27,22;27,23,27,28,27,29,27,35;27,36,27,40,27,41,27,44;27,45,27,49,27,50,27,55;27,56,27,60,27,61,27,63;27,64,27,68,27,69,27,76;27,77,27,83,27,84,27,88;27,89,27,92,27,93,28,5;28,6,28,9,28,10,28,13;28,14,28,17,28,18,28,21;28,22,28,25,28,26,28,28;28,29,28,31,28,32,28,35;28,36,28,38,28,39,28,43;28,44,28,47,28,48,28,50;28,51,28,56,28,57,28,59;28,60,28,63,28,64,28,70;28,71,28,74,28,75,28,77;28,78,28,80,28,81,28,84;28,85,28,88,29,1,29,6;29,7,29,10,29,11,29,14;29,15,29,18,29,19,29,23;29,24,29,26,29,27,29,30;29,31,29,33,29,34,29,38",
+      "29,39,29,41,29,42,29,45;29,46,29,48,29,49,29,52;29,53,29,58,29,59,29,63;29,64,29,67,29,68,30,5;30,6,30,9,30,10,30,15;30,16,30,21,30,22,30,24;30,25,30,28,30,29,30,32;30,33,30,37,30,38,30,41;30,42,30,46,30,47,30,50;30,51,30,55,30,56,30,60;31,1,31,7,31,8,31,11;31,12,31,15,31,16,31,19;31,20,31,22,31,23,31,28;31,29,31,31,31,32,31,34;32,1,32,5,32,6,32,11;32,12,32,15,32,16,32,20;32,21,32,25,32,26,32,30;33,1,33,4,33,5,33,6;33,7,33,10,33,11,33,15;33,16,33,19,33,20,33,22;33,23,33,26,33,27,33,30;33,31,33,33,33,34,33,35;33,36,33,37,33,38,33,43;33,44,33,49,33,50,33,50;33,51,33,52,33,53,33,54;33,55,33,58,33,59,33,62;33,63,33,69,33,70,33,73;34,1,34,3,34,4,34,7;34,8,34,11,34,12,34,14;34,15,34,18,34,19,34,22;34,23,34,27,34,28,34,31;34,32,34,34,34,35,34,39;34,40,34,43,34,44,34,48;34,49,34,54,35,1,35,3;35,4,35,8,35,9,35,11;35,12,35,13,35,14,35,18;35,19,35,26,35,27,35,30;35,31,35,34,35,35,35,38;35,39,35,41,35,42,35,44;35,45,36,7,36,8,36,12;36,13,36,19,36,20,36,27;36,28,36,34,36,35,36,40;36,41,36,47,36,48,36,54;36,55,36,63,36,64,36,70;36,71,36,77,36,78,36,83;37,1,37,11,37,12,37,24;37,25,37,36,37,37,37,51;37,52,37,64,37,65,37,76;37,77,37,92,37,93,37,102;37,103,37,114,37,115,37,126",
+      "37,127,37,141,37,142,37,153;37,154,37,168,37,169,37,182;38,1,38,7,38,8,38,16;38,17,38,23,38,24,38,26;38,27,38,33,38,34,38,42;38,43,38,50,38,51,38,61;38,62,38,71,38,72,38,83;38,84,39,2,39,3,39,5;39,6,39,7,39,8,39,10;39,11,39,17,39,18,39,21;39,22,39,24,39,25,39,31;39,32,39,36,39,37,39,40;39,41,39,43,39,44,39,47;39,48,39,52,39,53,39,56;39,57,39,62,39,63,39,67;39,68,39,71,39,72,39,74;39,75,40,4,40,5,40,7;40,8,40,11,40,12,40,16;40,17,40,21,40,22,40,25;40,26,40,28,40,29,40,33;40,34,40,36,40,37,40,40;40,41,40,45,40,46,40,49;40,50,40,54,40,55,40,58;40,59,40,62,40,63,40,66;40,67,40,70,40,71,40,77;40,78,40,81,40,82,40,85;41,1,41,6,41,7,41,11;41,12,41,15,41,16,41,20;41,21,41,24,41,25,41,29;41,30,41,34,41,35,41,38;41,39,41,42,41,43,41,46;41,47,41,50,41,51,41,54;42,1,42,6,42,7,42,10;42,11,42,13,42,14,42,15;42,16,42,19,42,20,42,22;42,23,42,26,42,27,42,31;42,32,42,38,42,39,42,44;42,45,42,47,42,48,42,51;42,52,43,3,43,4,43,10;43,11,43,16,43,17,43,22;43,23,43,28,43,29,43,33;43,34,43,40,43,41,43,47;43,48,43,53,43,54,43,60;43,61,43,66,43,67,43,73;43,74,43,82,43,83,43,89;44,1,44,10,44,11,44,18;44,19,44,30,44,31,44,39;44,40,44,50,44,51,44,59;45,1,45,8,45,9,45,13;45,14,45,17,45,18,45,22",
+      "45,23,45,26,45,27,45,32;45,33,46,1,46,2,46,5;46,6,46,9,46,10,46,14;46,15,46,16,46,17,46,20;46,21,46,24,46,25,46,28;46,29,46,32,46,33,46,35;47,1,47,4,47,5,47,11;47,12,47,15,47,16,47,19;47,20,47,24,47,25,47,29;47,30,47,34,47,35,47,38;48,1,48,5,48,6,48,9;48,10,48,11,48,12,48,15;48,16,48,18,48,19,48,23;48,24,48,25,48,26,48,28;48,29,48,29,49,1,49,4;49,5,49,8,49,9,49,11;49,12,49,14,49,15,49,18;50,1,50,7,50,8,50,15;50,16,50,25,50,26,50,35;50,36,50,41,50,42,51,6;51,7,51,21,51,22,51,30;51,31,51,41,51,42,51,51;51,52,51,59,51,60,52,14;52,15,52,21,52,22,52,31;52,32,52,41,52,42,52,49;53,1,53,17,53,18,53,26;53,27,53,31,53,32,53,44;53,45,53,58,53,59,54,6;54,7,54,16,54,17,54,27;54,28,54,37,54,38,54,49;54,50,55,6,55,7,55,16;55,17,55,30,55,31,55,40;55,41,55,53,55,54,55,67;55,68,56,1,56,2,56,16;56,17,56,34,56,35,56,50;56,51,56,63,56,64,56,76;56,77,56,90,56,91,57,3;57,4,57,7,57,8,57,11;57,12,57,14,57,15,57,18;57,19,57,20,57,21,57,24;57,25,57,26,57,27,57,29;58,1,58,3,58,4,58,6;58,7,58,8,58,9,58,11;58,12,58,15,58,16,58,21;58,22,59,1,59,2,59,3;59,4,59,7,59,8,59,9;59,10,59,12,59,13,59,16;59,17,59,20,59,21,59,24;60,1,60,2,60,3,60,5;60,6,60,9,60,10,60,11",
+      "60,12,60,13,61,1,61,5;61,6,61,10,61,11,61,14;62,1,62,4,62,5,62,8;62,9,62,11,63,1,63,4;63,5,63,7,63,8,63,11;64,1,64,5,64,6,64,9;64,10,64,13,64,14,64,18;65,1,65,2,65,3,65,5;65,6,65,9,65,10,65,12;66,1,66,3,66,4,66,7;66,8,66,9,66,10,66,12;67,1,67,5,67,6,67,12;67,13,67,19,67,20,67,26;67,27,68,2,68,3,68,15;68,16,68,30,68,31,68,42;68,43,68,50,68,51,69,8;69,9,69,18,69,19,69,34;69,35,69,48,69,49,70,10;70,11,70,27,70,28,70,39;70,40,71,2,71,3,71,10;71,11,71,21,71,22,71,28;72,1,72,7,72,8,72,13;72,14,72,21,72,22,72,28;73,1,73,11,73,12,73,19;73,20,73,20,74,1,74,17;74,18,74,31,74,32,74,47;74,48,75,3,75,4,75,19;75,20,75,37,75,38,76,5;76,6,76,15,76,16,76,25;76,26,77,1,77,2,77,19;77,20,77,35,77,36,77,50;78,1,78,16,78,17,78,30;78,31,78,39,78,40,79,15;79,16,79,31,79,32,79,46;80,1,80,22,80,23,80,42;81,1,81,15,81,16,81,29;82,1,82,14,82,15,83,6;83,7,83,20,83,21,83,34;83,35,84,10,84,11,84,25;85,1,85,10,85,11,85,22;86,1,86,17,87,1,87,15;87,16,88,10,88,11,88,26;89,1,89,14,89,15,89,23;89,24,90,6,90,7,90,20;91,1,91,14,91,15,92,14;92,15,93,5,93,6,94,8;95,1,96,3,96,4,96,19;97,1,98,2,98,3,98,7;98,8,99,6,99,7,100,9;100,10,101,8,101,9,102,8",
+      "103,1,104,4,104,5,105,5;106,1,107,2,107,3,108,3;109,1,110,1,110,2,111,5;112,1,113,3,113,4,114,6"
+    ];
+    let _mushafPagesCache = null;
+    function getMushafPagesData() {
+      if (!_mushafPagesCache) {
+        _mushafPagesCache = MUSHAF_PAGES_CHUNKS.join(';').split(';').filter(Boolean).map(rec => rec.split(',').map(Number));
+      }
+      return _mushafPagesCache;
+    }
+    function formatAyahRangeArabic(sStart, aStart, sEnd, aEnd) {
+      if (sStart > sEnd) {
+        return `${formatAyahRangeArabic(sStart, aStart, 114, QURAN_SURAHS[113].ayahs)} + ${formatAyahRangeArabic(1, 1, sEnd, aEnd)}`;
+      }
+      const parts = [];
+      for (let s = sStart; s <= sEnd; s++) {
+        const sObj = QURAN_SURAHS[s - 1];
+        if (!sObj) continue;
+        const fromA = s === sStart ? aStart : 1;
+        const toA = s === sEnd ? aEnd : sObj.ayahs;
+        if (fromA === 1 && toA === sObj.ayahs && sEnd > sStart) {
+          parts.push(`سورة ${sObj.name}`);
+        } else if (fromA === toA) {
+          parts.push(`${toArabicDigits(fromA)} ${sObj.name}`);
+        } else {
+          parts.push(`${toArabicDigits(fromA)} : ${toArabicDigits(toA)} ${sObj.name}`);
+        }
+      }
+      return parts.join(' + ');
+    }
+    function getHizbNumberForPage(pageNum) {
+      const p = Math.max(1, Math.min(604, Math.floor(pageNum)));
+      let hizb = 1;
+      for (let i = 0; i < HIZB_START_PAGES.length; i++) {
+        if (p >= HIZB_START_PAGES[i]) hizb = i + 1;
+        else break;
+      }
+      return hizb;
+    }
+    function getSurahNamesForPage(pageNum) {
+      const p = Math.max(1, Math.min(604, Math.round(pageNum)));
+      const startingOnPage = QURAN_SURAHS.filter(s => s.page === p).map(s => s.name);
+      let active = QURAN_SURAHS[0];
+      for (const s of QURAN_SURAHS) { if (s.page <= p) active = s; else break; }
+      const list = startingOnPage.length ? (active.page < p ? [active.name, ...startingOnPage] : startingOnPage) : [active.name];
+      return Array.from(new Set(list));
+    }
+    function getSurahSpanText(p1, p2) {
+      const n1 = getSurahNamesForPage(p1), n2 = getSurahNamesForPage(p2);
+      const first = n1[0], last = n2[n2.length - 1];
+      return first === last ? first : `${first} : ${last}`;
+    }
+
+    function defaultSchedulePlan(groupId) {
+      const g = db.groups.find(x => x.id === groupId);
+      const gName = g ? g.name : 'تعاهدوا القرءان';
+      return {
+        autoGenerate: true,
+        mode: 'surahs_repeat',
+        repSurah: 87,
+        repAyahs: 12,
+        repDays: 3,
+        repDir: 'reverse',
+        repCumul: true,
+        startSurah: 9,
+        startAyah: 1,
+        ayahsPerDay: 7,
+        surahDir: 'forward',
+        weeklyAccum: true,
+        startPage: 2,
+        pagesStartHalf: 0,
+        pagesPerDay: 0.5,
+        pagesFormat: 'ayahs',
+        pagesPairAccum: false,
+        khSurah: 24,
+        khAyahs: 20,
+        khJuz: 9,
+        examEnabled: true,
+        examDelayDays: 7,
+        examWeekday: 4,
+        examPrepDays: 2,
+        colListenLabel: 'الإستماع ٣ مرات',
+        colHifzLabel: 'الحفظ',
+        colReviewLabel: 'المراجعة',
+        colFreeLabel: 'قراءة ما تيسر',
+        extraEnabled: false,
+        extraLabel: 'مراجعة سورة',
+        extraSurah: 'الأنفال',
+        numberFreeCol: false,
+        revStyle: 'hizb_rotate',
+        revHizbs: '59, 60, 58',
+        revAnchor: 'الناس',
+        hilalShift: 0,
+        footerText: `مجموعة ${gName}`
+      };
+    }
+    function getInitialCursorFromPlan(plan) {
+      const mode = plan.mode || 'surahs_repeat';
+      let sNum = 2, ay = 1;
+      if (mode === 'surahs_repeat') { sNum = Number(plan.repSurah) || 87; ay = 1; }
+      else if (mode === 'ayahs_cumulative') { sNum = Number(plan.startSurah) || 9; ay = Number(plan.startAyah) || 1; }
+      else if (mode === 'khatma') { sNum = Number(plan.khSurah) || 24; ay = 1; }
+      const initEstPage = mode === 'pages' ? (Math.max(1, Math.min(604, Number(plan.startPage) || 2))) : getSurahPageEstimate(sNum, ay);
+      const startHalfOffset = Number(plan.pagesStartHalf) === 1 ? 1 : 0;
+      const initHalfIdx = Math.max(0, Math.min(1207, (Math.max(1, Math.min(604, Number(plan.startPage) || 2)) - 1) * 2 + startHalfOffset));
+      const dir = mode === 'surahs_repeat' ? (plan.repDir || 'reverse') : (plan.surahDir || 'forward');
+      const prevSurahNum = dir === 'reverse' ? (sNum < 114 ? sNum + 1 : 114) : (sNum > 1 ? sNum - 1 : 1);
+      const initSurahName = mode === 'pages'
+        ? getSurahNamesForPage(initEstPage)[0]
+        : (QURAN_SURAHS[sNum - 1] || QURAN_SURAHS[0]).name;
+      return {
+        surahNum: sNum,
+        ayah: ay,
+        chunkEndAyah: 0,
+        repDayCounter: 0,
+        halfIdx: initHalfIdx,
+        khJuz: Math.max(1, Math.min(30, Number(plan.khJuz) || 9)),
+        revRotIdx: 0,
+        revHizbNum: Number((String(plan.revHizbs || '5').match(/\d+/) || [5])[0]) || 5,
+        lastHizbId: getHizbNumberForPage(initEstPage),
+        hizbStartSurah: initSurahName,
+        pendingExamQueue: [],
+        completedSurahLast: (QURAN_SURAHS[prevSurahNum - 1] || QURAN_SURAHS[sNum - 1] || QURAN_SURAHS[0]).name,
+        accumStartAyah: ay,
+        accumBaseRange: ''
+      };
+    }
+    function stepSurahAyahsRaw(surahNum, ayah, count, dir) {
+      let s = surahNum, a = ayah, rem = Math.max(1, count);
+      const segs = [];
+      while (rem > 0) {
+        const sObj = QURAN_SURAHS[s - 1] || QURAN_SURAHS[0];
+        const safeA = Math.max(1, Math.min(sObj.ayahs, a));
+        const take = Math.min(rem, sObj.ayahs - safeA + 1);
+        const toA = safeA + take - 1;
+        segs.push({ num: sObj.num, name: sObj.name, from: safeA, to: toA, total: sObj.ayahs });
+        rem -= take;
+        if (toA >= sObj.ayahs) {
+          s = dir === 'reverse' ? (s > 1 ? s - 1 : 114) : (s < 114 ? s + 1 : 1);
+          a = 1;
+        } else {
+          a = toA + 1;
+        }
+      }
+      return { segs, nextSurahNum: s, nextAyah: a };
+    }
+    function advancePageUnits(startHalfIdx, stepHalves, formatMode = 'ayahs', pairAccum = false) {
+      const totalHalves = 604 * 2;
+      const startHalf = ((startHalfIdx % totalHalves) + totalHalves) % totalHalves;
+      const startPage = Math.floor(startHalf / 2) + 1;
+      const endHalfInc = (startHalf + stepHalves - 1) % totalHalves;
+      const endPage = Math.floor(endHalfInc / 2) + 1;
+      const pages = getMushafPagesData();
+      const recStart = pages[startPage - 1];
+      const recEnd = pages[endPage - 1];
+      const isSecondHalfStart = (startHalf % 2) === 1;
+      const isFirstHalfEnd = (endHalfInc % 2) === 0;
+      const sStart = isSecondHalfStart ? recStart[4] : recStart[0];
+      const aStart = isSecondHalfStart ? recStart[5] : recStart[1];
+      const sEnd = isFirstHalfEnd ? recEnd[2] : recEnd[6];
+      const aEnd = isFirstHalfEnd ? recEnd[3] : recEnd[7];
+
+      const isSingleAyahWholePage = (recStart[0] === recStart[6] && recStart[1] === recStart[7]);
+      const rawAyahLabel = (stepHalves === 1 && sStart === sEnd && aStart === aEnd && isSingleAyahWholePage)
+        ? `${toArabicDigits(aStart)} ${(QURAN_SURAHS[sStart - 1] || QURAN_SURAHS[0]).name} (${isSecondHalfStart ? 'النصف الثاني' : 'النصف الأول'})`
+        : formatAyahRangeArabic(sStart, aStart, sEnd, aEnd);
+
+      let accumAyahLabel = rawAyahLabel;
+      if (pairAccum && stepHalves === 1 && isSecondHalfStart) {
+        accumAyahLabel = (isSingleAyahWholePage && recStart[0] === sEnd && recStart[1] === aEnd)
+          ? `${toArabicDigits(aEnd)} ${(QURAN_SURAHS[sEnd - 1] || QURAN_SURAHS[0]).name}`
+          : formatAyahRangeArabic(recStart[0], recStart[1], sEnd, aEnd);
+      }
+
+      let pageLabel = '';
+      if (stepHalves === 1) {
+        pageLabel = `${isSecondHalfStart ? 'النصف الثاني' : 'النصف الأول'} ص ${toArabicDigits(startPage)} (${getSurahSpanText(startPage, startPage)})`;
+      } else {
+        pageLabel = startPage === endPage
+          ? `ص ${toArabicDigits(startPage)} (${getSurahSpanText(startPage, startPage)})`
+          : `ص ${toArabicDigits(startPage)} - ${toArabicDigits(endPage)} (${getSurahSpanText(startPage, endPage)})`;
+      }
+
+      const label = formatMode === 'page_num' ? pageLabel : accumAyahLabel;
+      const listenLabel = formatMode === 'page_num'
+        ? `ص ${toArabicDigits(startPage)}${endPage !== startPage ? ' : ' + toArabicDigits(endPage) : ''}`
+        : rawAyahLabel;
+
+      return {
+        label,
+        listenLabel,
+        rawAyahLabel,
+        startPage,
+        endPage,
+        sStart,
+        aStart,
+        sEnd,
+        aEnd,
+        nextHalfIdx: (startHalf + stepHalves) % totalHalves
+      };
+    }
+
+    function computeRowColorsForSchedule(rows) {
+      let wIdx = 0;
+      return rows.map((r, i) => {
+        if (i > 0 && rows[i - 1].weekdayNum === 5) wIdx = (wIdx + 1) % SCHED_WEEK_COLORS.length;
+        return { ...r, weekColorIdx: wIdx };
+      });
+    }
+
+    function buildScheduleMonth(groupId, monthKey, plan, startCursor) {
+      const [hYear, hMonth] = monthKey.split('-').map(Number);
+      const monthDays = getHijriMonthDaysUTC(hYear, hMonth, plan.hilalShift || 0);
+      const cur = JSON.parse(JSON.stringify(startCursor || getInitialCursorFromPlan(plan)));
+      if (!Array.isArray(cur.pendingExamQueue)) cur.pendingExamQueue = [];
+      const group = db.groups.find(g => g.id === groupId);
+      const gName = group ? group.name : 'تعاهدوا القرءان';
+      const hizbRotateList = toEnglishDigits(String(plan.revHizbs || '59,60,58')).match(/\d+/g)?.map(Number) || [59, 60, 58];
+      const rows = [];
+      let extraDayAyah = 1;
+
+      function predictExamOffsetNonFriday(daysLeftAfterToday, startWeekday, prefWd) {
+        let dl = daysLeftAfterToday;
+        let wd = startWeekday;
+        let nonFridaySteps = 0;
+        for (let step = 1; step <= 21; step++) {
+          wd = (wd + 1) % 7;
+          dl--;
+          if (wd === 5) continue;
+          nonFridaySteps++;
+          if (dl <= 0 && (prefWd < 0 || wd === prefWd || dl <= -5)) return nonFridaySteps;
+        }
+        return 99;
+      }
+
+      monthDays.forEach((dInfo, idx) => {
+        const isFriday = dInfo.weekdayNum === 5;
+        // All pending exams count down calendar days (including Friday)
+        if (plan.examEnabled !== false && cur.pendingExamQueue.length) {
+          cur.pendingExamQueue.forEach(item => { item.daysLeft--; });
+        }
+        if (isFriday) {
+          rows.push({
+            type: 'friday',
+            weekdayNum: 5,
+            dayName: dInfo.dayName,
+            hijriText: dInfo.hijriText,
+            mergedText: 'قراءة سورة الكهف',
+            listenText: '',
+            hifzText: '',
+            reviewText: '',
+            extraText: '',
+            freeText: plan.numberFreeCol ? toArabicDigits(idx + 1) : ''
+          });
+          // Friday resets weekly accumulation cleanly on Saturday
+          cur.accumStartAyah = cur.ayah;
+          return;
+        }
+
+        // Check if an exam lands TODAY
+        const prefWd = Number(plan.examWeekday ?? 4);
+        let examTriggeredToday = null;
+        if (plan.examEnabled !== false && cur.pendingExamQueue.length) {
+          const readyIdx = cur.pendingExamQueue.findIndex(item => item.daysLeft <= 0 && (prefWd < 0 || dInfo.weekdayNum === prefWd || item.daysLeft <= -5));
+          if (readyIdx > -1) {
+            examTriggeredToday = cur.pendingExamQueue.splice(readyIdx, 1)[0];
+          }
+        }
+
+        if (examTriggeredToday) {
+          rows.push({
+            type: 'exam',
+            weekdayNum: dInfo.weekdayNum,
+            dayName: dInfo.dayName,
+            hijriText: dInfo.hijriText,
+            mergedText: `إختبار ${examTriggeredToday.scopeText}`,
+            listenText: '',
+            hifzText: '',
+            reviewText: '',
+            extraText: '',
+            freeText: plan.numberFreeCol ? toArabicDigits(idx + 1) : ''
+          });
+          return;
+        }
+
+        // Check BEFORE generating a lesson if today falls within pre-exam recitation (تسميع) window
+        const prepCount = Math.max(0, Number(plan.examPrepDays) || 0);
+        if (plan.examEnabled !== false && prepCount > 0 && cur.pendingExamQueue.length) {
+          const prepTarget = cur.pendingExamQueue.find(item => {
+            const off = predictExamOffsetNonFriday(item.daysLeft, dInfo.weekdayNum, prefWd);
+            return off >= 1 && off <= prepCount;
+          });
+          if (prepTarget) {
+            rows.push({
+              type: 'merged_review',
+              weekdayNum: dInfo.weekdayNum,
+              dayName: dInfo.dayName,
+              hijriText: dInfo.hijriText,
+              listenText: '─────',
+              hifzText: '',
+              reviewText: '',
+              extraText: '',
+              mergedText: `تسميع ${prepTarget.scopeText}`,
+              freeText: plan.numberFreeCol ? toArabicDigits(idx + 1) : ''
+            });
+            return;
+          }
+        }
+
+        // Normal lesson generation
+        let listenText = '', hifzText = '', reviewText = '', extraText = '';
+        let prevPageEst = plan.mode === 'pages' ? (Math.floor(cur.halfIdx / 2) + 1) : getSurahPageEstimate(cur.surahNum, cur.ayah);
+        let newPageEst = prevPageEst;
+        let currentSurahObj = QURAN_SURAHS[Math.max(0, Math.min(113, cur.surahNum - 1))];
+
+        if (plan.mode === 'free') {
+          listenText = ''; hifzText = ''; reviewText = '';
+        } else if (plan.mode === 'surahs_repeat') {
+          const sObj = currentSurahObj;
+          const blockSize = Math.max(1, Number(plan.repAyahs) || 12);
+          const repDays = Math.max(1, Number(plan.repDays) || 3);
+          const isWholeShortSurah = sObj.ayahs <= blockSize;
+          if (!cur.chunkEndAyah || cur.chunkEndAyah > sObj.ayahs || cur.chunkStartAyah === undefined) {
+            cur.chunkStartAyah = cur.ayah;
+            cur.chunkEndAyah = Math.min(sObj.ayahs, cur.ayah + blockSize - 1);
+            cur.repDayCounter = 0;
+          }
+          const displayFrom = plan.repCumul ? 1 : cur.chunkStartAyah;
+          const displayTo = cur.chunkEndAyah;
+          hifzText = (displayFrom === 1 && displayTo === sObj.ayahs && isWholeShortSurah)
+            ? `سورة ${sObj.name}`
+            : `${toArabicDigits(displayFrom)} : ${toArabicDigits(displayTo)} ${sObj.name}`;
+          listenText = `سورة ${sObj.name}`;
+          cur.repDayCounter++;
+          newPageEst = getSurahPageEstimate(sObj.num, displayTo);
+          if (cur.repDayCounter >= repDays) {
+            cur.repDayCounter = 0;
+            if (cur.chunkEndAyah >= sObj.ayahs) {
+              cur.completedSurahLast = sObj.name;
+              cur.surahNum = (plan.repDir === 'reverse')
+                ? (sObj.num > 1 ? sObj.num - 1 : 114)
+                : (sObj.num < 114 ? sObj.num + 1 : 1);
+              cur.ayah = 1;
+              cur.chunkStartAyah = undefined;
+              cur.chunkEndAyah = 0;
+            } else {
+              cur.ayah = cur.chunkEndAyah + 1;
+              cur.chunkStartAyah = cur.ayah;
+              cur.chunkEndAyah = Math.min(sObj.ayahs, cur.ayah + blockSize - 1);
+            }
+          }
+        } else if (plan.mode === 'ayahs_cumulative') {
+          const dailyCount = Math.max(1, Number(plan.ayahsPerDay) || 7);
+          const dir = plan.surahDir || 'forward';
+          const step = stepSurahAyahsRaw(cur.surahNum, cur.ayah, dailyCount, dir);
+          const firstSeg = step.segs[0], lastSeg = step.segs[step.segs.length - 1];
+          listenText = step.segs.map(g => `${toArabicDigits(g.from)} : ${toArabicDigits(g.to)} ${g.name}`).join(' + ');
+          if (plan.weeklyAccum) {
+            if (!cur.accumSurah || cur.accumSurah !== firstSeg.num) { cur.accumStartAyah = firstSeg.from; cur.accumSurah = firstSeg.num; }
+            hifzText = step.segs.length > 1
+              ? `${toArabicDigits(cur.accumStartAyah)} : ${toArabicDigits(firstSeg.to)} ${firstSeg.name} + ${toArabicDigits(lastSeg.from)} : ${toArabicDigits(lastSeg.to)} ${lastSeg.name}`
+              : `${toArabicDigits(cur.accumStartAyah)} : ${toArabicDigits(lastSeg.to)} ${lastSeg.name}`;
+          } else {
+            hifzText = listenText;
+          }
+          cur.surahNum = step.nextSurahNum;
+          cur.ayah = step.nextAyah;
+          if (cur.surahNum !== firstSeg.num) cur.accumStartAyah = 1;
+          newPageEst = getSurahPageEstimate(lastSeg.num, lastSeg.to);
+          if (plan.extraEnabled) {
+            const eFrom = extraDayAyah, eTo = eFrom + 7;
+            extraText = `${toArabicDigits(eFrom)} : ${toArabicDigits(eTo)}`;
+            extraDayAyah = eTo + 1;
+          }
+        } else if (plan.mode === 'pages') {
+          const stepHalves = Math.max(1, Math.round((Number(plan.pagesPerDay) || 0.5) * 2));
+          const res = advancePageUnits(cur.halfIdx, stepHalves, plan.pagesFormat || 'ayahs', Boolean(plan.pagesPairAccum));
+          hifzText = res.label;
+          listenText = res.listenLabel;
+          cur.halfIdx = res.nextHalfIdx;
+          cur.lastPageEndSurah = res.sEnd;
+          newPageEst = res.endPage;
+        } else if (plan.mode === 'khatma') {
+          const count = Math.max(1, Number(plan.khAyahs) || 20);
+          const step = stepSurahAyahsRaw(cur.surahNum, cur.ayah, count, 'forward');
+          const segLast = step.segs[step.segs.length - 1];
+          listenText = step.segs.map(g => `${toArabicDigits(g.from)} : ${toArabicDigits(g.to)} ${g.name}`).join(' + ');
+          hifzText = listenText;
+          reviewText = `الجزء ${toArabicDigits(cur.khJuz)} بالتبادل`;
+          cur.khJuz = (cur.khJuz % 30) + 1;
+          cur.surahNum = step.nextSurahNum;
+          cur.ayah = step.nextAyah;
+          newPageEst = getSurahPageEstimate(segLast.num, segLast.to);
+        }
+
+        // Fill revision column if not already set by khatma mode
+        if (plan.mode !== 'free' && plan.mode !== 'khatma') {
+          if (plan.revStyle === 'hizb_rotate') {
+            const hz = hizbRotateList[cur.revRotIdx % hizbRotateList.length];
+            reviewText = `حزب ${toArabicDigits(hz)}`;
+            cur.revRotIdx++;
+          } else if (plan.revStyle === 'hizb_daily') {
+            reviewText = `حزب ${toArabicDigits(cur.revHizbNum)}`;
+            cur.revHizbNum = (cur.revHizbNum % 60) + 1;
+          } else if (plan.revStyle === 'surah_range') {
+            const anchor = (plan.revAnchor || 'الناس').trim();
+            const revSurah = cur.completedSurahLast || currentSurahObj.name;
+            reviewText = revSurah === anchor ? `سورة ${revSurah}` : `${revSurah} : ${anchor}`;
+          } else {
+            reviewText = (plan.revAnchor || 'مراجعة الماضي').trim();
+          }
+        }
+
+        // Check Hizb boundary crossing -> enqueue automatic Exam after ~7 days
+        if (plan.examEnabled !== false && plan.mode !== 'free') {
+          const newHizbId = getHizbNumberForPage(newPageEst);
+          if (newHizbId !== cur.lastHizbId) {
+            const pageSurahs = getSurahNamesForPage(newPageEst);
+            const pageEndSurahName = cur.lastPageEndSurah
+              ? ((QURAN_SURAHS[cur.lastPageEndSurah - 1] || {}).name || pageSurahs[pageSurahs.length - 1])
+              : pageSurahs[pageSurahs.length - 1];
+            const scopeSurahEnd = plan.mode === 'pages' ? pageEndSurahName : currentSurahObj.name;
+            const scopeStart = cur.hizbStartSurah || currentSurahObj.name;
+            const scopeText = scopeStart === scopeSurahEnd
+              ? `سورة ${scopeStart}`
+              : `من سورة ${scopeStart} : سورة ${scopeSurahEnd}`;
+            cur.pendingExamQueue.push({
+              daysLeft: Math.max(2, Number(plan.examDelayDays) || 7),
+              scopeText
+            });
+            cur.lastHizbId = newHizbId;
+            cur.hizbStartSurah = plan.mode === 'pages'
+              ? pageEndSurahName
+              : (QURAN_SURAHS[Math.max(0, Math.min(113, cur.surahNum - 1))] || currentSurahObj).name;
+          }
+        }
+
+        rows.push({
+          type: 'normal',
+          weekdayNum: dInfo.weekdayNum,
+          dayName: dInfo.dayName,
+          hijriText: dInfo.hijriText,
+          listenText,
+          hifzText,
+          reviewText,
+          extraText,
+          freeText: plan.numberFreeCol ? toArabicDigits(idx + 1) : '',
+          mergedText: ''
+        });
+      });
+
+      const coloredRows = computeRowColorsForSchedule(rows);
+      const endSurahName = (QURAN_SURAHS[Math.max(0, Math.min(113, cur.surahNum - 1))] || QURAN_SURAHS[0]).name;
+      let nextSummary = 'جدول حر';
+      if (plan.mode === 'pages') {
+        const nextPreview = advancePageUnits(cur.halfIdx, 1, 'ayahs', false);
+        const halfWord = (cur.halfIdx % 2) ? 'النصف الثاني' : 'النصف الأول';
+        nextSummary = `ص ${toArabicDigits(nextPreview.startPage)} (${halfWord}: ${nextPreview.rawAyahLabel})`;
+      } else if (plan.mode !== 'free') {
+        nextSummary = `سورة ${endSurahName} آية ${toArabicDigits(cur.ayah)}`;
+      }
+
+      return {
+        monthKey,
+        title: formatHijriMonthTitle(monthKey),
+        footerText: (plan.footerText || `مجموعة ${gName}`).trim(),
+        gregSpan: formatGregSpanForHijri(monthDays),
+        autoGenerated: true,
+        updatedAt: new Date().toISOString(),
+        colListenLabel: plan.colListenLabel || 'الإستماع ٣ مرات',
+        colHifzLabel: plan.colHifzLabel || 'الحفظ',
+        colReviewLabel: plan.colReviewLabel || 'المراجعة',
+        colFreeLabel: plan.colFreeLabel || 'قراءة ما تيسر',
+        extraEnabled: Boolean(plan.extraEnabled),
+        extraLabel: plan.extraLabel || 'مراجعة سورة',
+        endState: cur,
+        nextSummary,
+        rows: coloredRows
+      };
+    }
+
+    function resolveMonthSchedule(groupId, targetMonthKey, forceRecomputeFromPrev = false) {
+      if (!db.schedules) db.schedules = {};
+      const entry = db.schedules[groupId] || { plan: null, months: {} };
+      const plan = { ...defaultSchedulePlan(groupId), ...(entry.plan || {}) };
+      const months = entry.months || {};
+      if (!forceRecomputeFromPrev && months[targetMonthKey] && Array.isArray(months[targetMonthKey].rows)) {
+        return { schedule: months[targetMonthKey], source: months[targetMonthKey].autoGenerated ? 'auto_saved' : 'saved', hasPlan: Boolean(entry.plan), prevMonthUsed: null };
+      }
+      const savedKeys = Object.keys(months).filter(k => isValidHijriMonthKey(k) && k < targetMonthKey).sort();
+      let cursor = getInitialCursorFromPlan(plan);
+      let prevUsed = null;
+      if (savedKeys.length) {
+        const lastSavedKey = savedKeys[savedKeys.length - 1];
+        prevUsed = lastSavedKey;
+        if (months[lastSavedKey]?.endState) cursor = JSON.parse(JSON.stringify(months[lastSavedKey].endState));
+        let walkKey = addHijriMonthsKey(lastSavedKey, 1);
+        let guard = 0;
+        while (walkKey < targetMonthKey && guard < 24) {
+          const stepRes = buildScheduleMonth(groupId, walkKey, plan, cursor);
+          cursor = stepRes.endState;
+          walkKey = addHijriMonthsKey(walkKey, 1);
+          guard++;
+        }
+      }
+      const generated = buildScheduleMonth(groupId, targetMonthKey, plan, cursor);
+      const isNewAuto = Boolean(entry.plan && plan.autoGenerate && targetMonthKey <= addHijriMonthsKey(getCurrentHijriMonthKey(), 1) && prevUsed);
+      return { schedule: generated, source: prevUsed ? 'continued' : 'preview', hasPlan: Boolean(entry.plan), prevMonthUsed: prevUsed, shouldAutoPersist: isNewAuto };
+    }
+
+    function cloudSaveGroupSchedule(groupId) {
+      if (!db.schedules || !db.schedules[groupId]) return;
+      const payload = db.schedules[groupId];
+      cloudExec(() => cloudRequest(`/schedules/${encodeURIComponent(groupId)}`, 'PUT', payload));
+    }
+
+    function populateHijriSelectors() {
+      const mSel = document.getElementById('sched-hijri-month'), ySel = document.getElementById('sched-hijri-year');
+      if (mSel && !mSel.options.length) {
+        mSel.innerHTML = HIJRI_MONTHS_AR.map((n, i) => `<option value="${String(i + 1).padStart(2, '0')}">${toArabicDigits(i + 1)} - ${n}</option>`).join('');
+      }
+      if (ySel && !ySel.options.length) {
+        const curY = Number(getCurrentHijriMonthKey().slice(0, 4));
+        const years = [];
+        for (let y = curY - 2; y <= curY + 5; y++) years.push(`<option value="${y}">${toArabicDigits(y)} هـ</option>`);
+        ySel.innerHTML = years.join('');
+      }
+      if (!isValidHijriMonthKey(schedMonthKey)) schedMonthKey = getCurrentHijriMonthKey();
+      const [yy, mm] = schedMonthKey.split('-');
+      if (mSel) mSel.value = mm;
+      if (ySel) ySel.value = yy;
+    }
+    function populateSurahDropdown() {
+      const opts = QURAN_SURAHS.map(s => `<option value="${s.num}">${toArabicDigits(s.num)}. ${s.name} (${toArabicDigits(s.ayahs)} آية)</option>`).join('');
+      ['sched-start-surah', 'sched-rep-surah', 'sched-kh-surah'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel && sel.options.length !== 114) sel.innerHTML = opts;
+      });
+    }
+
+    function openSchedulesScreen(groupId, fromScreen) {
+      const targetReturn = fromScreen || (session && session.role === 'head' ? 'head' : (currentGroupId ? 'app' : 'login'));
+      if (!schedUnlocked) {
+        pendingSchedTarget = { groupId: groupId || null, fromScreen: targetReturn };
+        const inp = document.getElementById('sched-auth-pass-input');
+        if (inp) { inp.value = ''; inp.type = 'password'; }
+        const hintEl = document.getElementById('sched-auth-default-hint');
+        if (hintEl) hintEl.classList.toggle('hidden', normalizePassword(db.schedulesPassword || '123') !== '123');
+        document.getElementById('sched-auth-modal').classList.add('open');
+        setTimeout(() => { if (inp) inp.focus(); }, 60);
+        return;
+      }
+      scheduleReturnScreen = targetReturn;
+      if (groupId && db.groups.some(g => g.id === groupId)) schedGroupId = groupId;
+      else if (currentGroupId && db.groups.some(g => g.id === currentGroupId)) schedGroupId = currentGroupId;
+      else if (db.groups.length) schedGroupId = db.groups[0].id;
+      else schedGroupId = 'general';
+      if (!isValidHijriMonthKey(schedMonthKey)) schedMonthKey = getCurrentHijriMonthKey();
+      editingScheduleRowIdx = null;
+      schedPlanDirty = false;
+      populateSurahDropdown();
+      populateHijriSelectors();
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('head-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.add('hidden');
+      document.getElementById('schedules-screen').classList.remove('hidden');
+      renderSchedulesScreen();
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    function closeSchedAuthModal() {
+      document.getElementById('sched-auth-modal').classList.remove('open');
+    }
+    function submitSchedAuth() {
+      const raw = document.getElementById('sched-auth-pass-input').value;
+      if (!raw) return showToast('أدخلي كلمة مرور الجداول');
+      const expected = normalizePassword(db.schedulesPassword || '123');
+      if (normalizePassword(raw) !== expected) return showToast('❌ كلمة مرور الجداول غير صحيحة');
+      schedUnlocked = true;
+      const target = pendingSchedTarget || { groupId: null, fromScreen: 'login' };
+      pendingSchedTarget = null;
+      closeSchedAuthModal();
+      openSchedulesScreen(target.groupId, target.fromScreen);
+    }
+    function lockSchedulesScreen() {
+      schedUnlocked = false;
+      backFromSchedules();
+      showToast('🔒 تم قفل جزئية الجداول');
+    }
+    function openSchedPasswordModal() {
+      const inp = document.getElementById('sched-pw-new');
+      if (inp) inp.value = db.schedulesPassword || '123';
+      document.getElementById('sched-pw-modal').classList.add('open');
+      setTimeout(() => { if (inp) { inp.focus(); inp.select(); } }, 60);
+    }
+    function closeSchedPasswordModal() {
+      document.getElementById('sched-pw-modal').classList.remove('open');
+    }
+    function saveSchedPassword() {
+      const val = normalizePassword(document.getElementById('sched-pw-new').value);
+      if (!val) return showToast('اكتبي كلمة مرور صالحة للجداول');
+      db.schedulesPassword = val;
+      cloudSaveSchedulesPassword();
+      const headInp = document.getElementById('head-sched-pass');
+      if (headInp) headInp.value = val;
+      closeSchedPasswordModal();
+      showToast('🔐 تم تحديث باسورد الجداول وحفظه في السحابة!');
+    }
+    function backFromSchedules() {
+      document.getElementById('schedules-screen').classList.add('hidden');
+      if (scheduleReturnScreen === 'app' && currentGroupId && getCurrentGroup()) {
+        document.getElementById('app-screen').classList.remove('hidden');
+        renderAll();
+      } else if (scheduleReturnScreen === 'head' && session && session.role === 'head') {
+        openHeadDashboard();
+      } else {
+        document.getElementById('login-screen').classList.remove('hidden');
+        renderLogin();
+      }
+    }
+    function markSchedPlanDirty() { schedPlanDirty = true; }
+    function updateSchedPageHint() {
+      const inp = document.getElementById('sched-start-page'), el = document.getElementById('sched-start-page-hint');
+      if (!inp || !el) return;
+      const p = Math.max(1, Math.min(604, Number(inp.value) || 1));
+      const halfStart = Number(document.getElementById('sched-pages-half-start')?.value) === 1 ? 1 : 0;
+      const preview = advancePageUnits((p - 1) * 2 + halfStart, 1, 'ayahs', false);
+      el.textContent = `السورة: ${getSurahNamesForPage(p).join(' / ')} — ${halfStart ? 'النصف الثاني' : 'النصف الأول'}: ${preview.rawAyahLabel}`;
+    }
+    function updateSchedSurahAyahMax() {
+      const sSel = document.getElementById('sched-start-surah'), inp = document.getElementById('sched-start-ayah');
+      if (!sSel || !inp) return;
+      const sObj = QURAN_SURAHS[(Number(sSel.value) || 1) - 1] || QURAN_SURAHS[0];
+      inp.max = sObj.ayahs; if (Number(inp.value) > sObj.ayahs) inp.value = 1;
+    }
+    function setSchedMode(mode) {
+      schedPlanMode = mode;
+      document.querySelectorAll('.sched-mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+      ['surahs_repeat', 'ayahs_cumulative', 'pages', 'khatma', 'free'].forEach(m => {
+        const box = document.getElementById(`sched-mode-${m}`);
+        if (box) box.classList.toggle('hidden', m !== mode);
+      });
+      markSchedPlanDirty();
+    }
+    function onSchedRevStyleChange() {
+      const val = document.getElementById('sched-rev-style').value;
+      document.getElementById('sched-rev-hizbs-wrap').classList.toggle('hidden', val !== 'hizb_rotate' && val !== 'hizb_daily');
+      document.getElementById('sched-rev-anchor-wrap').classList.toggle('hidden', val !== 'surah_range' && val !== 'fixed');
+    }
+    function onSchedExtraToggle() {
+      const on = document.getElementById('sched-extra-enabled').checked;
+      document.getElementById('sched-extra-inputs').classList.toggle('hidden', !on);
+    }
+    function applySchedulePreset(kind) {
+      if (kind === 'repeat_blocks') {
+        setSchedMode('surahs_repeat');
+        document.getElementById('sched-col-listen').value = 'الإستماع ٣ مرات';
+        document.getElementById('sched-col-hifz').value = 'الحفظ';
+        document.getElementById('sched-col-review').value = 'المراجعة';
+        document.getElementById('sched-col-free').value = 'قراءة ما تيسر';
+        document.getElementById('sched-rev-style').value = 'surah_range';
+        document.getElementById('sched-rev-anchor').value = 'الناس';
+        document.getElementById('sched-extra-enabled').checked = false;
+        document.getElementById('sched-number-free-col').checked = false;
+        document.getElementById('sched-exam-enabled').checked = true;
+      } else if (kind === 'cumulative_extra') {
+        setSchedMode('ayahs_cumulative');
+        document.getElementById('sched-col-listen').value = 'الإستماع مرة يومياً';
+        document.getElementById('sched-col-hifz').value = 'الحفظ';
+        document.getElementById('sched-col-review').value = 'مراجعة حزب';
+        document.getElementById('sched-col-free').value = 'قراءة ما تيسر';
+        document.getElementById('sched-rev-style').value = 'hizb_daily';
+        document.getElementById('sched-rev-hizbs').value = '5';
+        document.getElementById('sched-extra-enabled').checked = true;
+        document.getElementById('sched-extra-label').value = 'الأنفال';
+        document.getElementById('sched-number-free-col').checked = false;
+        document.getElementById('sched-exam-enabled').checked = true;
+      } else if (kind === 'khatmat_hizb') {
+        setSchedMode('khatma');
+        document.getElementById('sched-col-listen').value = 'الإستماع مرة واحدة';
+        document.getElementById('sched-col-hifz').value = 'مراجعة قريب';
+        document.getElementById('sched-col-review').value = 'مراجعة بعيد';
+        document.getElementById('sched-col-free').value = 'قراءة ما تيسر (جزء يومياً)';
+        document.getElementById('sched-extra-enabled').checked = false;
+        document.getElementById('sched-number-free-col').checked = true;
+        document.getElementById('sched-exam-enabled').checked = true;
+      } else if (kind === 'pages') {
+        setSchedMode('pages');
+        document.getElementById('sched-pages-half-start').value = '0';
+        document.getElementById('sched-pages-per-day').value = '0.5';
+        document.getElementById('sched-pages-format').value = 'ayahs';
+        document.getElementById('sched-pages-accum').checked = false;
+        document.getElementById('sched-col-listen').value = 'الإستماع مرة يومياً';
+        document.getElementById('sched-col-hifz').value = 'الحفظ';
+        document.getElementById('sched-col-review').value = 'المراجعة';
+        document.getElementById('sched-extra-enabled').checked = false;
+        document.getElementById('sched-number-free-col').checked = false;
+        updateSchedPageHint();
+      }
+      onSchedRevStyleChange(); onSchedExtraToggle(); markSchedPlanDirty();
+      showToast('✨ تم تطبيق القالب — اضغطي «توليد جدول الشهر» للمعاينة');
+    }
+
+    function loadPlanInputsForGroup(groupId) {
+      const savedPlan = db.schedules?.[groupId]?.plan;
+      const plan = { ...defaultSchedulePlan(groupId), ...(savedPlan || {}) };
+      schedPlanMode = plan.mode || 'surahs_repeat';
+      if (!['surahs_repeat', 'ayahs_cumulative', 'pages', 'khatma', 'free'].includes(schedPlanMode)) schedPlanMode = 'surahs_repeat';
+      document.getElementById('sched-auto-gen').checked = plan.autoGenerate !== false;
+      document.getElementById('sched-rep-surah').value = String(plan.repSurah || 87);
+      document.getElementById('sched-rep-ayahs').value = plan.repAyahs || 12;
+      document.getElementById('sched-rep-days').value = String(plan.repDays || 3);
+      document.getElementById('sched-rep-dir').value = plan.repDir || 'reverse';
+      document.getElementById('sched-rep-cumul').checked = plan.repCumul !== false;
+      document.getElementById('sched-start-surah').value = String(plan.startSurah || 9);
+      document.getElementById('sched-start-ayah').value = plan.startAyah || 1;
+      document.getElementById('sched-ayahs-per-day').value = plan.ayahsPerDay || 7;
+      document.getElementById('sched-surah-dir').value = plan.surahDir || 'forward';
+      document.getElementById('sched-weekly-accum').checked = plan.weeklyAccum !== false;
+      document.getElementById('sched-start-page').value = plan.startPage || 2;
+      document.getElementById('sched-pages-half-start').value = String(Number(plan.pagesStartHalf) === 1 ? 1 : 0);
+      document.getElementById('sched-pages-per-day').value = String(plan.pagesPerDay || 0.5);
+      document.getElementById('sched-pages-format').value = plan.pagesFormat || 'ayahs';
+      document.getElementById('sched-pages-accum').checked = Boolean(plan.pagesPairAccum);
+      document.getElementById('sched-kh-surah').value = String(plan.khSurah || 24);
+      document.getElementById('sched-kh-ayahs').value = plan.khAyahs || 20;
+      document.getElementById('sched-kh-juz').value = plan.khJuz || 9;
+      document.getElementById('sched-exam-enabled').checked = plan.examEnabled !== false;
+      document.getElementById('sched-exam-delay').value = String(plan.examDelayDays || 7);
+      document.getElementById('sched-exam-weekday').value = String(plan.examWeekday ?? 4);
+      document.getElementById('sched-exam-prep-days').value = String(plan.examPrepDays ?? 2);
+      document.getElementById('sched-col-listen').value = plan.colListenLabel || 'الإستماع ٣ مرات';
+      document.getElementById('sched-col-hifz').value = plan.colHifzLabel || 'الحفظ';
+      document.getElementById('sched-col-review').value = plan.colReviewLabel || 'المراجعة';
+      document.getElementById('sched-col-free').value = plan.colFreeLabel || 'قراءة ما تيسر';
+      document.getElementById('sched-rev-style').value = plan.revStyle || 'hizb_rotate';
+      document.getElementById('sched-rev-hizbs').value = plan.revHizbs || '59, 60, 58';
+      document.getElementById('sched-rev-anchor').value = plan.revAnchor || 'الناس';
+      document.getElementById('sched-hilal-shift').value = String(plan.hilalShift || 0);
+      const g = db.groups.find(x => x.id === groupId);
+      document.getElementById('sched-footer-text').value = plan.footerText || (g ? `مجموعة ${g.name}` : 'مجموعة تعاهدوا القرءان');
+      document.getElementById('sched-extra-enabled').checked = Boolean(plan.extraEnabled);
+      document.getElementById('sched-extra-label').value = plan.extraLabel || 'مراجعة سورة';
+      document.getElementById('sched-extra-surah').value = plan.extraSurah || 'الأنفال';
+      document.getElementById('sched-number-free-col').checked = Boolean(plan.numberFreeCol);
+      setSchedMode(schedPlanMode);
+      onSchedRevStyleChange(); onSchedExtraToggle(); updateSchedPageHint(); updateSchedSurahAyahMax();
+      schedPlanDirty = false;
+      const det = document.getElementById('sched-plan-details');
+      if (det) det.open = !savedPlan;
+    }
+    function readPlanFromInputs() {
+      return {
+        autoGenerate: Boolean(document.getElementById('sched-auto-gen').checked),
+        mode: schedPlanMode,
+        repSurah: Number(document.getElementById('sched-rep-surah').value) || 87,
+        repAyahs: Math.max(1, Number(document.getElementById('sched-rep-ayahs').value) || 12),
+        repDays: Math.max(1, Number(document.getElementById('sched-rep-days').value) || 3),
+        repDir: document.getElementById('sched-rep-dir').value || 'reverse',
+        repCumul: Boolean(document.getElementById('sched-rep-cumul').checked),
+        startSurah: Number(document.getElementById('sched-start-surah').value) || 9,
+        startAyah: Math.max(1, Number(document.getElementById('sched-start-ayah').value) || 1),
+        ayahsPerDay: Math.max(1, Number(document.getElementById('sched-ayahs-per-day').value) || 7),
+        surahDir: document.getElementById('sched-surah-dir').value || 'forward',
+        weeklyAccum: Boolean(document.getElementById('sched-weekly-accum').checked),
+        startPage: Math.max(1, Math.min(604, Number(document.getElementById('sched-start-page').value) || 2)),
+        pagesStartHalf: Number(document.getElementById('sched-pages-half-start').value) === 1 ? 1 : 0,
+        pagesPerDay: Number(document.getElementById('sched-pages-per-day').value) || 0.5,
+        pagesFormat: document.getElementById('sched-pages-format').value || 'ayahs',
+        pagesPairAccum: Boolean(document.getElementById('sched-pages-accum').checked),
+        khSurah: Number(document.getElementById('sched-kh-surah').value) || 24,
+        khAyahs: Math.max(1, Number(document.getElementById('sched-kh-ayahs').value) || 20),
+        khJuz: Math.max(1, Math.min(30, Number(document.getElementById('sched-kh-juz').value) || 9)),
+        examEnabled: Boolean(document.getElementById('sched-exam-enabled').checked),
+        examDelayDays: Math.max(2, Number(document.getElementById('sched-exam-delay').value) || 7),
+        examWeekday: Number(document.getElementById('sched-exam-weekday').value),
+        examPrepDays: Math.max(0, Number(document.getElementById('sched-exam-prep-days').value) || 0),
+        colListenLabel: document.getElementById('sched-col-listen').value.trim() || 'الإستماع ٣ مرات',
+        colHifzLabel: document.getElementById('sched-col-hifz').value.trim() || 'الحفظ',
+        colReviewLabel: document.getElementById('sched-col-review').value.trim() || 'المراجعة',
+        colFreeLabel: document.getElementById('sched-col-free').value.trim() || 'قراءة ما تيسر',
+        revStyle: document.getElementById('sched-rev-style').value || 'hizb_rotate',
+        revHizbs: document.getElementById('sched-rev-hizbs').value.trim() || '59, 60, 58',
+        revAnchor: document.getElementById('sched-rev-anchor').value.trim() || 'الناس',
+        hilalShift: Number(document.getElementById('sched-hilal-shift').value) || 0,
+        footerText: document.getElementById('sched-footer-text').value.trim(),
+        extraEnabled: Boolean(document.getElementById('sched-extra-enabled').checked),
+        extraLabel: document.getElementById('sched-extra-label').value.trim() || 'مراجعة سورة',
+        extraSurah: document.getElementById('sched-extra-surah').value.trim() || 'الأنفال',
+        numberFreeCol: Boolean(document.getElementById('sched-number-free-col').checked)
+      };
+    }
+
+    function onSchedGroupChange() {
+      schedGroupId = document.getElementById('sched-group-select').value;
+      editingScheduleRowIdx = null;
+      loadPlanInputsForGroup(schedGroupId);
+      renderScheduleMonthView();
+    }
+    function onSchedHijriChange() {
+      const m = document.getElementById('sched-hijri-month').value, y = document.getElementById('sched-hijri-year').value;
+      if (m && y) { schedMonthKey = `${y}-${m}`; editingScheduleRowIdx = null; renderScheduleMonthView(); }
+    }
+    function shiftScheduleMonth(delta) {
+      schedMonthKey = addHijriMonthsKey(schedMonthKey, delta);
+      populateHijriSelectors();
+      editingScheduleRowIdx = null;
+      renderScheduleMonthView();
+    }
+    function renderSchedulesScreen() {
+      const gSel = document.getElementById('sched-group-select');
+      if (gSel) {
+        const opts = db.groups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`);
+        opts.push(`<option value="general">🌟 جدول عام / مجموعة مخصصة</option>`);
+        gSel.innerHTML = opts.join('');
+        if (!db.groups.some(g => g.id === schedGroupId) && schedGroupId !== 'general') schedGroupId = db.groups[0]?.id || 'general';
+        gSel.value = schedGroupId;
+      }
+      populateHijriSelectors();
+      loadPlanInputsForGroup(schedGroupId);
+      renderScheduleMonthView();
+    }
+    function renderScheduleMonthView() {
+      document.getElementById('sched-month-arabic').textContent = `🌙 ${formatHijriMonthTitle(schedMonthKey)}`;
+      const resolved = resolveMonthSchedule(schedGroupId, schedMonthKey, false);
+      if (resolved.shouldAutoPersist) {
+        if (!db.schedules) db.schedules = {};
+        if (!db.schedules[schedGroupId]) db.schedules[schedGroupId] = { plan: defaultSchedulePlan(schedGroupId), months: {} };
+        db.schedules[schedGroupId].months[schedMonthKey] = resolved.schedule;
+        cloudSaveGroupSchedule(schedGroupId);
+      }
+      currentRenderedSchedule = resolved.schedule;
+      document.getElementById('sched-month-hijri').textContent = resolved.schedule?.gregSpan || '';
+      const badgeEl = document.getElementById('sched-status-badge');
+      if (resolved.source === 'saved') {
+        badgeEl.innerHTML = `<span class="sched-badge-status sched-badge-saved">✅ جدول محفوظ ومعتمد</span>`;
+      } else if (resolved.source === 'auto_saved' || resolved.source === 'continued') {
+        const prevTitle = resolved.prevMonthUsed ? formatHijriMonthTitle(resolved.prevMonthUsed).replace('جدول ', '') : 'الشهر السابق';
+        badgeEl.innerHTML = `<span class="sched-badge-status sched-badge-auto">✨ مُولَّد تلقائياً استكمالاً بعد ${prevTitle}</span>`;
+      } else {
+        badgeEl.innerHTML = `<span class="sched-badge-status sched-badge-auto">📝 معاينة أولية (اضغطي توليد أو حفظ)</span>`;
+      }
+      renderScheduleTable();
+    }
+
+    function renderScheduleTable() {
+      const s = currentRenderedSchedule, table = document.getElementById('sched-excel-table');
+      if (!s || !table) return;
+      const rows = computeRowColorsForSchedule(s.rows || []);
+      s.rows = rows;
+      const hasExtra = Boolean(s.extraEnabled);
+      const totalCols = hasExtra ? 7 : 6;
+      const midSpan = hasExtra ? 4 : 3;
+      let html = `
+        <thead>
+          <tr><th colspan="${totalCols}" class="sched-excel-title-cell">${escapeHtml(s.title || formatHijriMonthTitle(schedMonthKey))}</th></tr>
+          <tr>
+            <th class="sched-excel-head-cell" style="width:76px;">اليوم</th>
+            <th class="sched-excel-head-cell" style="width:115px;">التاريخ</th>
+            <th class="sched-excel-head-cell">${escapeHtml(s.colListenLabel || 'الإستماع ٣ مرات')}</th>
+            <th class="sched-excel-head-cell">${escapeHtml(s.colHifzLabel || 'الحفظ')}</th>
+            ${hasExtra ? `<th class="sched-excel-head-cell">${escapeHtml(s.extraLabel || 'مراجعة')}</th>` : ''}
+            <th class="sched-excel-head-cell">${escapeHtml(s.colReviewLabel || 'المراجعة')}</th>
+            <th class="sched-excel-head-cell" style="width:110px;">${escapeHtml(s.colFreeLabel || 'قراءة ما تيسر')}</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+      rows.forEach((r, idx) => {
+        const wc = SCHED_WEEK_COLORS[r.weekColorIdx % SCHED_WEEK_COLORS.length];
+        if (r.type === 'friday') {
+          html += `<tr class="sched-excel-row" onclick="openSchedDayModal(${idx})" title="اضغط لتعديل هذا اليوم">
+            <td style="background:${wc.accent};">${escapeHtml(r.dayName)}</td>
+            <td style="background:${wc.accent};">${escapeHtml(r.hijriText)}</td>
+            <td colspan="${midSpan}" style="background:${wc.accent}; font-weight:800;">${escapeHtml(r.mergedText || 'قراءة سورة الكهف')}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.freeText || '')}</td>
+          </tr>`;
+        } else if (r.type === 'exam') {
+          html += `<tr class="sched-excel-row" onclick="openSchedDayModal(${idx})" title="اضغط لتعديل هذا اليوم">
+            <td style="background:${wc.accent};">${escapeHtml(r.dayName)}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.hijriText)}</td>
+            <td colspan="${midSpan}" class="sched-excel-exam-cell">${escapeHtml(r.mergedText || 'إختبار')}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.freeText || '')}</td>
+          </tr>`;
+        } else if (r.type === 'merged_review') {
+          html += `<tr class="sched-excel-row" onclick="openSchedDayModal(${idx})" title="اضغط لتعديل هذا اليوم">
+            <td style="background:${wc.accent};">${escapeHtml(r.dayName)}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.hijriText)}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.listenText || '─────')}</td>
+            <td colspan="${midSpan - 1}" style="background:${wc.tint}; font-weight:800;">${escapeHtml(r.mergedText || '')}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.freeText || '')}</td>
+          </tr>`;
+        } else {
+          html += `<tr class="sched-excel-row" onclick="openSchedDayModal(${idx})" title="اضغط لتعديل هذا اليوم">
+            <td style="background:${wc.accent};">${escapeHtml(r.dayName)}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.hijriText)}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.listenText || '')}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.hifzText || '')}</td>
+            ${hasExtra ? `<td style="background:${wc.tint};">${escapeHtml(r.extraText || '')}</td>` : ''}
+            <td style="background:${wc.tint};">${escapeHtml(r.reviewText || '')}</td>
+            <td style="background:${wc.tint};">${escapeHtml(r.freeText || '')}</td>
+          </tr>`;
+        }
+      });
+      html += `<tr><td colspan="${totalCols}" class="sched-excel-footer-cell">${escapeHtml(s.footerText || 'مجموعة تعاهدوا القرءان')}</td></tr></tbody>`;
+      table.innerHTML = html;
+
+      const endBanner = document.getElementById('sched-end-banner');
+      if (s.nextSummary) {
+        endBanner.innerHTML = `<span>📌 نهاية الشهر — سيكمل الشهر الهجري التالي تلقائياً من: <strong>${escapeHtml(s.nextSummary)}</strong></span><button type="button" class="btn btn-soft btn-xs" onclick="shiftScheduleMonth(1)">معاينة الشهر التالي ◀️</button>`;
+        endBanner.classList.remove('hidden');
+      } else endBanner.classList.add('hidden');
+      refreshSchedFillSelectors();
+    }
+
+    function generateAndSaveSchedule(continueFromPrev) {
+      const plan = readPlanFromInputs();
+      if (!db.schedules) db.schedules = {};
+      if (!db.schedules[schedGroupId]) db.schedules[schedGroupId] = { plan, months: {} };
+      db.schedules[schedGroupId].plan = plan;
+      let scheduleObj;
+      if (continueFromPrev) {
+        scheduleObj = resolveMonthSchedule(schedGroupId, schedMonthKey, true).schedule;
+      } else {
+        scheduleObj = buildScheduleMonth(schedGroupId, schedMonthKey, plan, getInitialCursorFromPlan(plan));
+      }
+      scheduleObj.autoGenerated = continueFromPrev;
+      db.schedules[schedGroupId].months[schedMonthKey] = scheduleObj;
+      currentRenderedSchedule = scheduleObj;
+      schedPlanDirty = false;
+      cloudSaveGroupSchedule(schedGroupId);
+      renderScheduleMonthView();
+      showToast(continueFromPrev ? '✨ تم التوليد التلقائي استكمالاً من الشهر الهجري السابق!' : '✅ تم توليد جدول الشهر الهجري وحفظ الخطة بنجاح!');
+    }
+    function saveCurrentMonthSchedule() {
+      if (!currentRenderedSchedule) return;
+      const plan = readPlanFromInputs();
+      if (!db.schedules) db.schedules = {};
+      if (!db.schedules[schedGroupId]) db.schedules[schedGroupId] = { plan, months: {} };
+      db.schedules[schedGroupId].plan = plan;
+      currentRenderedSchedule.autoGenerated = false;
+      currentRenderedSchedule.updatedAt = new Date().toISOString();
+      currentRenderedSchedule.footerText = plan.footerText || currentRenderedSchedule.footerText;
+      currentRenderedSchedule.colListenLabel = plan.colListenLabel;
+      currentRenderedSchedule.colHifzLabel = plan.colHifzLabel;
+      currentRenderedSchedule.colReviewLabel = plan.colReviewLabel;
+      currentRenderedSchedule.colFreeLabel = plan.colFreeLabel;
+      db.schedules[schedGroupId].months[schedMonthKey] = currentRenderedSchedule;
+      schedPlanDirty = false;
+      cloudSaveGroupSchedule(schedGroupId);
+      renderScheduleMonthView();
+      showToast('💾 تم حفظ جدول هذا الشهر (وسيكمل الشهر القادم من بعده تلقائياً)');
+    }
+
+    // ==================== أداة تكرار الخانات مثل Fill في إكسل ====================
+    function incrementArabicPattern(text, stepIndex) {
+      if (!stepIndex || !text) return text;
+      const str = String(text);
+      const matches = [...str.matchAll(/[0-9٠-٩]+/g)];
+      if (!matches.length) return str;
+      const m = matches[matches.length - 1];
+      const numVal = Number(toEnglishDigits(m[0]));
+      if (isNaN(numVal)) return str;
+      const nextVal = Math.max(1, numVal + stepIndex);
+      const hasArabicDigits = /[٠-٩]/.test(m[0]);
+      const formatted = hasArabicDigits ? toArabicDigits(nextVal) : String(nextVal);
+      return str.slice(0, m.index) + formatted + str.slice(m.index + m[0].length);
+    }
+    function toggleSchedFillPanel(forceOpen) {
+      const panel = document.getElementById('sched-fill-panel');
+      if (!panel) return;
+      const willOpen = typeof forceOpen === 'boolean' ? forceOpen : panel.classList.contains('hidden');
+      panel.classList.toggle('hidden', !willOpen);
+      if (willOpen) {
+        refreshSchedFillSelectors();
+        onSchedFillModeChange();
+      }
+    }
+    function onSchedFillModeChange() {
+      const mode = document.getElementById('sched-fill-mode')?.value || 'same';
+      document.getElementById('sched-fill-text-wrap')?.classList.toggle('hidden', mode === 'series');
+      document.getElementById('sched-fill-series-wrap')?.classList.toggle('hidden', mode !== 'series');
+    }
+    function refreshSchedFillSelectors() {
+      const rows = currentRenderedSchedule?.rows || [];
+      const fromSel = document.getElementById('sched-fill-from');
+      const toSel = document.getElementById('sched-fill-to');
+      if (!fromSel || !toSel) return;
+      const prevFrom = fromSel.value;
+      const prevTo = toSel.value;
+      const optsHtml = rows.map((r, idx) => `<option value="${idx}">${escapeHtml(r.dayName)} ${escapeHtml(r.hijriText)}${r.type === 'friday' ? ' (الجمعة)' : r.type === 'exam' ? ' (اختبار)' : ''}</option>`).join('');
+      fromSel.innerHTML = optsHtml;
+      toSel.innerHTML = optsHtml;
+      if (rows.length) {
+        fromSel.value = (prevFrom !== '' && Number(prevFrom) < rows.length) ? prevFrom : '0';
+        toSel.value = (prevTo !== '' && Number(prevTo) < rows.length) ? prevTo : String(rows.length - 1);
+      }
+      const colSel = document.getElementById('sched-fill-col');
+      const hasExtra = Boolean(currentRenderedSchedule?.extraEnabled);
+      if (colSel) {
+        const extraOpt = colSel.querySelector('option[value="extraText"]');
+        if (extraOpt) extraOpt.hidden = !hasExtra;
+        const listenOpt = colSel.querySelector('option[value="listenText"]');
+        if (listenOpt && currentRenderedSchedule?.colListenLabel) listenOpt.textContent = currentRenderedSchedule.colListenLabel;
+        const hifzOpt = colSel.querySelector('option[value="hifzText"]');
+        if (hifzOpt && currentRenderedSchedule?.colHifzLabel) hifzOpt.textContent = currentRenderedSchedule.colHifzLabel;
+        const revOpt = colSel.querySelector('option[value="reviewText"]');
+        if (revOpt && currentRenderedSchedule?.colReviewLabel) revOpt.textContent = currentRenderedSchedule.colReviewLabel;
+        const freeOpt = colSel.querySelector('option[value="freeText"]');
+        if (freeOpt && currentRenderedSchedule?.colFreeLabel) freeOpt.textContent = currentRenderedSchedule.colFreeLabel;
+        if (extraOpt && currentRenderedSchedule?.extraLabel) extraOpt.textContent = currentRenderedSchedule.extraLabel;
+      }
+    }
+    function pullSchedFillFromStartRow() {
+      const rows = currentRenderedSchedule?.rows || [];
+      const idx = Math.max(0, Number(document.getElementById('sched-fill-from')?.value) || 0);
+      const col = document.getElementById('sched-fill-col')?.value || 'reviewText';
+      const r = rows[idx];
+      if (!r) return showToast('اختاري يوم البداية أولاً');
+      const val = r[col] || '';
+      document.getElementById('sched-fill-value').value = val;
+      showToast(val ? '📥 تم سحب نص الخانة من يوم البداية' : 'هذه الخانة فارغة في يوم البداية');
+    }
+    function setSchedFillEndOfWeek() {
+      const rows = currentRenderedSchedule?.rows || [];
+      const fromIdx = Math.max(0, Number(document.getElementById('sched-fill-from')?.value) || 0);
+      let endIdx = rows.length - 1;
+      for (let i = fromIdx; i < rows.length; i++) {
+        if (rows[i].weekdayNum === 5 || rows[i].type === 'friday') {
+          endIdx = i > fromIdx ? i - 1 : i;
+          break;
+        }
+      }
+      const toSel = document.getElementById('sched-fill-to');
+      if (toSel && rows[endIdx]) toSel.value = String(endIdx);
+    }
+    function setSchedFillEndOfMonth() {
+      const rows = currentRenderedSchedule?.rows || [];
+      const toSel = document.getElementById('sched-fill-to');
+      if (toSel && rows.length) toSel.value = String(rows.length - 1);
+    }
+    function applySchedFillPanel() {
+      const rows = currentRenderedSchedule?.rows || [];
+      if (!rows.length) return showToast('لا يوجد جدول للتعديل');
+      const col = document.getElementById('sched-fill-col').value || 'reviewText';
+      const mode = document.getElementById('sched-fill-mode').value || 'same';
+      let fromIdx = Math.max(0, Number(document.getElementById('sched-fill-from').value) || 0);
+      let toIdx = Math.min(rows.length - 1, Number(document.getElementById('sched-fill-to').value) || (rows.length - 1));
+      if (fromIdx > toIdx) { const tmp = fromIdx; fromIdx = toIdx; toIdx = tmp; }
+      const skipFriday = Boolean(document.getElementById('sched-fill-skip-friday')?.checked);
+      const skipExam = Boolean(document.getElementById('sched-fill-skip-exam')?.checked);
+
+      let altItems = [];
+      const rawVal = (document.getElementById('sched-fill-value')?.value || '').trim();
+      if (mode === 'same' && !rawVal) return showToast('اكتبي النص المراد تكراره أو اضغطي «سحب من يوم البداية»');
+      if (mode === 'alternate') {
+        altItems = rawVal.split(/[\n/]+/).map(x => x.trim()).filter(Boolean);
+        if (!altItems.length) return showToast('اكتبي القيم مفصولة بـ / أو في أسطر منفصلة');
+      }
+      const seriesStart = Number(document.getElementById('sched-fill-series-start')?.value) || 1;
+      const seriesStep = Number(document.getElementById('sched-fill-series-step')?.value) || 1;
+      const seriesTpl = (document.getElementById('sched-fill-series-tpl')?.value || '{n}').trim() || '{n}';
+
+      let filled = 0;
+      for (let i = fromIdx; i <= toIdx; i++) {
+        const r = rows[i];
+        if (!r) continue;
+        if (skipFriday && (r.weekdayNum === 5 || r.type === 'friday')) continue;
+        if (skipExam && (r.type === 'exam' || r.type === 'merged_review')) continue;
+        let nextVal = rawVal;
+        if (mode === 'alternate') {
+          nextVal = altItems[filled % altItems.length];
+        } else if (mode === 'series') {
+          const nVal = seriesStart + filled * seriesStep;
+          nextVal = seriesTpl.replace(/\{n\}/g, toArabicDigits(nVal));
+        }
+        r[col] = nextVal;
+        filled++;
+      }
+      if (!filled) return showToast('لم تقع أي خانات غير متخطاة داخل النطاق المحدد');
+      saveCurrentMonthSchedule();
+      showToast(`⬇️ تم تكرار القيمة على ${toArabicDigits(filled)} خانة بنجاح!`);
+    }
+
+    // ==================== تعديل أي يوم في الجدول ====================
+    let modalEditRowType = 'normal';
+    function openSchedDayModal(idx) {
+      if (!currentRenderedSchedule || !currentRenderedSchedule.rows[idx]) return;
+      editingScheduleRowIdx = idx;
+      const r = currentRenderedSchedule.rows[idx];
+      document.getElementById('sched-day-modal-title').textContent = `✏️ تعديل يوم ${r.dayName} (${r.hijriText})`;
+      document.getElementById('sched-edit-dayname').value = r.dayName || '';
+      document.getElementById('sched-edit-hijridate').value = r.hijriText || '';
+      document.getElementById('sched-edit-listen').value = r.listenText || '';
+      document.getElementById('sched-edit-hifz').value = r.hifzText || '';
+      document.getElementById('sched-edit-review').value = r.reviewText || '';
+      document.getElementById('sched-edit-extra').value = r.extraText || '';
+      document.getElementById('sched-edit-free').value = r.freeText || '';
+      document.getElementById('sched-edit-merged-text').value = r.mergedText || '';
+      document.getElementById('sched-edit-lbl-listen').textContent = currentRenderedSchedule.colListenLabel || 'الإستماع:';
+      document.getElementById('sched-edit-lbl-hifz').textContent = currentRenderedSchedule.colHifzLabel || 'الحفظ:';
+      document.getElementById('sched-edit-lbl-review').textContent = currentRenderedSchedule.colReviewLabel || 'المراجعة:';
+      document.getElementById('sched-edit-lbl-free').textContent = currentRenderedSchedule.colFreeLabel || 'قراءة ما تيسر:';
+      const hasExtra = Boolean(currentRenderedSchedule.extraEnabled);
+      document.getElementById('sched-edit-extra-wrap').classList.toggle('hidden', !hasExtra);
+      if (hasExtra) document.getElementById('sched-edit-lbl-extra').textContent = currentRenderedSchedule.extraLabel || 'عمود إضافي:';
+      const modalFillBox = document.getElementById('sched-modal-fill-box');
+      if (modalFillBox) modalFillBox.open = false;
+      const modalFillExtraOpt = document.querySelector('#sched-modal-fill-col option[value="extraText"]');
+      if (modalFillExtraOpt) modalFillExtraOpt.hidden = !hasExtra;
+      setSchedModalRowType(r.type || 'normal');
+      document.getElementById('sched-day-modal').classList.add('open');
+    }
+    function closeSchedDayModal() {
+      editingScheduleRowIdx = null;
+      document.getElementById('sched-day-modal').classList.remove('open');
+    }
+    function setSchedModalRowType(type) {
+      modalEditRowType = type;
+      const isMergedAll = type === 'exam' || type === 'friday';
+      const isMergedRev = type === 'merged_review';
+      document.getElementById('sched-edit-merged-wrap').classList.toggle('hidden', type === 'normal');
+      document.getElementById('sched-edit-normal-wrap').classList.toggle('hidden', isMergedAll);
+      document.getElementById('sched-edit-hifz').closest('.sched-field').classList.toggle('hidden', isMergedRev);
+      document.getElementById('sched-edit-review').closest('.sched-field').classList.toggle('hidden', isMergedRev);
+      document.getElementById('sched-edit-extra-wrap').classList.toggle('hidden', isMergedRev || !currentRenderedSchedule?.extraEnabled);
+      const mInp = document.getElementById('sched-edit-merged-text');
+      if (type === 'friday' && !mInp.value) mInp.value = 'قراءة سورة الكهف';
+      if (type === 'exam' && (!mInp.value || mInp.value === 'قراءة سورة الكهف')) mInp.value = 'إختبار ';
+      if (type === 'merged_review' && (!mInp.value || mInp.value === 'قراءة سورة الكهف')) mInp.value = 'تسميع ';
+      if (isMergedRev && !document.getElementById('sched-edit-listen').value) document.getElementById('sched-edit-listen').value = '─────';
+    }
+    function saveSchedModalDay() {
+      if (editingScheduleRowIdx === null || !currentRenderedSchedule?.rows[editingScheduleRowIdx]) return;
+      const r = currentRenderedSchedule.rows[editingScheduleRowIdx];
+      r.type = modalEditRowType;
+      r.dayName = document.getElementById('sched-edit-dayname').value.trim() || r.dayName;
+      r.hijriText = document.getElementById('sched-edit-hijridate').value.trim() || r.hijriText;
+      r.mergedText = document.getElementById('sched-edit-merged-text').value.trim();
+      r.listenText = document.getElementById('sched-edit-listen').value.trim();
+      r.hifzText = document.getElementById('sched-edit-hifz').value.trim();
+      r.reviewText = document.getElementById('sched-edit-review').value.trim();
+      r.extraText = document.getElementById('sched-edit-extra').value.trim();
+      r.freeText = document.getElementById('sched-edit-free').value.trim();
+      const wdIdx = ARABIC_WEEKDAYS.indexOf(r.dayName);
+      if (wdIdx > -1) r.weekdayNum = wdIdx;
+      closeSchedDayModal();
+      saveCurrentMonthSchedule();
+    }
+    function saveAndFillSchedModalDay() {
+      if (editingScheduleRowIdx === null || !currentRenderedSchedule?.rows[editingScheduleRowIdx]) return;
+      const startIdx = editingScheduleRowIdx;
+      const rows = currentRenderedSchedule.rows;
+      const r = rows[startIdx];
+      r.type = modalEditRowType;
+      r.dayName = document.getElementById('sched-edit-dayname').value.trim() || r.dayName;
+      r.hijriText = document.getElementById('sched-edit-hijridate').value.trim() || r.hijriText;
+      r.mergedText = document.getElementById('sched-edit-merged-text').value.trim();
+      r.listenText = document.getElementById('sched-edit-listen').value.trim();
+      r.hifzText = document.getElementById('sched-edit-hifz').value.trim();
+      r.reviewText = document.getElementById('sched-edit-review').value.trim();
+      r.extraText = document.getElementById('sched-edit-extra').value.trim();
+      r.freeText = document.getElementById('sched-edit-free').value.trim();
+      const wdIdx = ARABIC_WEEKDAYS.indexOf(r.dayName);
+      if (wdIdx > -1) r.weekdayNum = wdIdx;
+
+      const col = document.getElementById('sched-modal-fill-col').value || 'reviewText';
+      const scope = document.getElementById('sched-modal-fill-scope').value || 'week';
+      const countLimit = Math.max(1, Number(document.getElementById('sched-modal-fill-count').value) || 3);
+      const incNums = Boolean(document.getElementById('sched-modal-fill-inc').checked);
+      const skipSpecial = Boolean(document.getElementById('sched-modal-fill-skip').checked);
+
+      let filled = 0;
+      for (let i = startIdx + 1; i < rows.length; i++) {
+        const target = rows[i];
+        if (scope === 'week' && (target.weekdayNum === 5 || target.type === 'friday')) break;
+        if (skipSpecial && (target.weekdayNum === 5 || target.type === 'friday' || target.type === 'exam' || target.type === 'merged_review')) continue;
+        const step = filled + 1;
+        if (col === 'all') {
+          ['listenText', 'hifzText', 'reviewText', 'extraText', 'freeText'].forEach(f => {
+            target[f] = incNums ? incrementArabicPattern(r[f] || '', step) : (r[f] || '');
+          });
+          if (r.type === 'normal') target.type = 'normal';
+        } else {
+          target[col] = incNums ? incrementArabicPattern(r[col] || '', step) : (r[col] || '');
+        }
+        filled++;
+        if (scope === 'count' && filled >= countLimit) break;
+      }
+      closeSchedDayModal();
+      saveCurrentMonthSchedule();
+      showToast(filled > 0 ? `💾⬇️ تم الحفظ وتكرار الخانة على ${toArabicDigits(filled)} يوم بنجاح!` : '💾 تم حفظ اليوم (لا توجد أيام متاحة بعده في هذا النطاق)');
+    }
+    function insertSchedDayAfter() {
+      if (editingScheduleRowIdx === null || !currentRenderedSchedule) return;
+      const curRow = currentRenderedSchedule.rows[editingScheduleRowIdx];
+      const nextWd = ((curRow.weekdayNum ?? 3) + 1) % 7;
+      currentRenderedSchedule.rows.splice(editingScheduleRowIdx + 1, 0, {
+        type: nextWd === 5 ? 'friday' : 'normal',
+        weekdayNum: nextWd,
+        dayName: ARABIC_WEEKDAYS[nextWd],
+        hijriText: curRow.hijriText,
+        listenText: '',
+        hifzText: '',
+        reviewText: '',
+        extraText: '',
+        freeText: '',
+        mergedText: nextWd === 5 ? 'قراءة سورة الكهف' : ''
+      });
+      closeSchedDayModal();
+      saveCurrentMonthSchedule();
+      showToast('➕ تمت إضافة صف يوم جديد — اضغطي عليه لتعديله');
+    }
+    function deleteSchedModalDay() {
+      if (editingScheduleRowIdx === null || !currentRenderedSchedule) return;
+      if (currentRenderedSchedule.rows.length <= 1) return showToast('لا يمكن حذف آخر صف');
+      currentRenderedSchedule.rows.splice(editingScheduleRowIdx, 1);
+      closeSchedDayModal();
+      saveCurrentMonthSchedule();
+      showToast('🗑️ تم حذف الصف');
+    }
+
+    function copyScheduleWhatsApp() {
+      const s = currentRenderedSchedule;
+      if (!s || !(s.rows || []).length) return showToast('لا يوجد جدول لنسخه');
+      const lines = [s.title || formatHijriMonthTitle(schedMonthKey), s.footerText || '', ''];
+      s.rows.forEach(r => {
+        if (r.type === 'friday') lines.push(`💚 *${r.dayName} ${r.hijriText}*: ${r.mergedText}`);
+        else if (r.type === 'exam') lines.push(`🔴 *${r.dayName} ${r.hijriText}*: ${r.mergedText}`);
+        else if (r.type === 'merged_review') lines.push(`🔁 *${r.dayName} ${r.hijriText}*: ${r.mergedText}`);
+        else lines.push(`🍃 *${r.dayName} ${r.hijriText}*: ${r.hifzText || ''}${r.reviewText ? ' | مراجعة: ' + r.reviewText : ''}`);
+      });
+      copyTextSilently(lines.filter(x => x !== undefined).join('\n'), '✅ تم نسخ الجدول منسقاً للواتساب!');
+    }
+
+    // رسم صورة الجدول مطابقة لشكل الإكسل تماماً (الألوان الأسبوعية، عمود اليوم، الأصفر للعناوين، الأحمر للاختبار، دمج الكهف)
+    async function downloadScheduleImage() {
+      const s = currentRenderedSchedule;
+      if (!s || !(s.rows || []).length) return showToast('لا يوجد جدول لتحويله إلى صورة');
+      try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+      const rows = computeRowColorsForSchedule(s.rows);
+      const hasExtra = Boolean(s.extraEnabled);
+      const cols = [
+        { key: 'day', label: 'اليوم', w: 108 },
+        { key: 'date', label: 'التاريخ', w: 162 },
+        { key: 'listen', label: s.colListenLabel || 'الإستماع ٣ مرات', w: hasExtra ? 185 : 215 },
+        { key: 'hifz', label: s.colHifzLabel || 'الحفظ', w: hasExtra ? 225 : 265 },
+        ...(hasExtra ? [{ key: 'extra', label: s.extraLabel || 'مراجعة', w: 135 }] : []),
+        { key: 'review', label: s.colReviewLabel || 'المراجعة', w: hasExtra ? 175 : 225 },
+        { key: 'free', label: s.colFreeLabel || 'قراءة ما تيسر', w: 145 }
+      ];
+      const pad = 20, tableW = cols.reduce((acc, c) => acc + c.w, 0), W = tableW + pad * 2;
+      const topH = 48, headH = 44, rowH = 38, footH = 46;
+      const H = pad * 2 + topH + headH + rows.length * rowH + footH;
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+      ctx.direction = 'rtl'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+
+      function drawCell(x, y, w, h, bg, text, textColor = '#111827', fontWeight = '700', baseSize = 17) {
+        ctx.fillStyle = bg; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = '#374151'; ctx.lineWidth = 1.25; ctx.strokeRect(x, y, w, h);
+        if (!text) return;
+        ctx.fillStyle = textColor;
+        let fSize = baseSize;
+        ctx.font = `${fontWeight} ${fSize}px Tajawal, Arial, sans-serif`;
+        while (fSize > 11 && ctx.measureText(text).width > w - 12) {
+          fSize -= 1;
+          ctx.font = `${fontWeight} ${fSize}px Tajawal, Arial, sans-serif`;
+        }
+        ctx.fillText(text, x + w / 2, y + h / 2);
+      }
+
+      // Compute RTL x-positions cleanly (cols[0] 'اليوم' is on far RIGHT!)
+      const colRects = [];
+      let curRight = W - pad;
+      cols.forEach(col => { colRects.push({ ...col, x: curRight - col.w }); curRight -= col.w; });
+
+      // Title row
+      let y = pad;
+      drawCell(pad, y, tableW, topH, '#ffffff', s.title || formatHijriMonthTitle(schedMonthKey), '#000000', '800', 22);
+      y += topH;
+      // Yellow headers row
+      colRects.forEach(cr => drawCell(cr.x, y, cr.w, headH, '#ffff00', cr.label, '#000000', '800', 17));
+      y += headH;
+
+      const midStartX = colRects[colRects.length - 2].x;
+      const midEndRight = colRects[2].x + colRects[2].w;
+      const midW = midEndRight - midStartX;
+      const hifzToRevLeft = colRects[colRects.length - 2].x;
+      const hifzToRevW = (colRects[3].x + colRects[3].w) - hifzToRevLeft;
+
+      rows.forEach(r => {
+        const wc = SCHED_WEEK_COLORS[r.weekColorIdx % SCHED_WEEK_COLORS.length];
+        if (r.type === 'friday') {
+          drawCell(colRects[0].x, y, colRects[0].w, rowH, wc.accent, r.dayName, '#000000', '800', 16);
+          drawCell(colRects[1].x, y, colRects[1].w, rowH, wc.accent, r.hijriText, '#000000', '700', 16);
+          drawCell(midStartX, y, midW, rowH, wc.accent, r.mergedText || 'قراءة سورة الكهف', '#000000', '800', 17);
+          drawCell(colRects[colRects.length - 1].x, y, colRects[colRects.length - 1].w, rowH, wc.tint, r.freeText || '', '#000000', '700', 16);
+        } else if (r.type === 'exam') {
+          drawCell(colRects[0].x, y, colRects[0].w, rowH, wc.accent, r.dayName, '#000000', '800', 16);
+          drawCell(colRects[1].x, y, colRects[1].w, rowH, wc.tint, r.hijriText, '#000000', '700', 16);
+          drawCell(midStartX, y, midW, rowH, '#ff0000', r.mergedText || 'إختبار', '#ffffff', '800', 17);
+          drawCell(colRects[colRects.length - 1].x, y, colRects[colRects.length - 1].w, rowH, wc.tint, r.freeText || '', '#000000', '700', 16);
+        } else if (r.type === 'merged_review') {
+          drawCell(colRects[0].x, y, colRects[0].w, rowH, wc.accent, r.dayName, '#000000', '800', 16);
+          drawCell(colRects[1].x, y, colRects[1].w, rowH, wc.tint, r.hijriText, '#000000', '700', 16);
+          drawCell(colRects[2].x, y, colRects[2].w, rowH, wc.tint, r.listenText || '─────', '#000000', '700', 16);
+          drawCell(hifzToRevLeft, y, hifzToRevW, rowH, wc.tint, r.mergedText || '', '#000000', '800', 16);
+          drawCell(colRects[colRects.length - 1].x, y, colRects[colRects.length - 1].w, rowH, wc.tint, r.freeText || '', '#000000', '700', 16);
+        } else {
+          colRects.forEach(cr => {
+            const val = cr.key === 'day' ? r.dayName : cr.key === 'date' ? r.hijriText : cr.key === 'listen' ? r.listenText : cr.key === 'hifz' ? r.hifzText : cr.key === 'extra' ? r.extraText : cr.key === 'review' ? r.reviewText : r.freeText;
+            drawCell(cr.x, y, cr.w, rowH, cr.key === 'day' ? wc.accent : wc.tint, val || '', '#000000', cr.key === 'day' ? '800' : '700', 15.5);
+          });
+        }
+        y += rowH;
+      });
+      // Footer row + outer bold frame
+      drawCell(pad, y, tableW, footH, '#ffffff', s.footerText || 'مجموعة تعاهدوا القرءان', '#000000', '800', 19);
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2.5;
+      ctx.strokeRect(pad, pad, tableW, topH + headH + rows.length * rowH + footH);
+
+      const a = document.createElement('a');
+      a.download = `جدول_${schedMonthKey}.png`;
+      a.href = c.toDataURL('image/png');
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      showToast('🖼️ تم تحميل صورة الجدول مطابقة للقالب بنجاح!');
+    }
 
     (async function initApp() {
       if (session && session.role === 'head') {
