@@ -460,14 +460,11 @@
             <summary style="cursor:pointer; font-size:13.5px; font-weight:700; color:var(--primary);">📋 إضافة أو تحديث كشف الأسماء دفعة واحدة (وتنظيم الأرقام والرفقاء)</summary>
             <p style="font-size:12px; color:var(--muted); margin-top:6px;">الصق الكشف المرقّم مباشرة (مثل <code>١ 🌹الاسم / 🍃الاسم</code>) أو الأسماء سطرين سطرين، وسيتم ربط الرفقاء بأرقامهم تلقائياً. لتعديل الكشف وإعادة ترتيبه دون فقدان سجل الحضور والغياب، الصق الكشف المعدّل واضغط على <strong>«تحديث وترتيب الكشف الحالي»</strong>.</p>
             <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-              <button type="button" class="btn btn-outline btn-xs" onclick="loadCurrentRosterIntoBulk()">📥 تعبئة الكشف الحالي هنا للتعديل</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="copyCurrentRosterText()">📋 نسخ الكشف الحالي</button>
             </div>
             <textarea id="bulk-members-input" class="input" rows="5" style="margin-top:6px; font-size:14px;" placeholder="الصق الكشف هنا..."></textarea>
             <label style="display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; margin-top:8px; cursor:pointer;"><input type="checkbox" id="bulk-auto-pair" checked style="width:17px; height:17px;" /><span>تكوين الرفقاء تلقائياً بأرقامهم (ثنائي / ثلاثي)</span></label>
-            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
-              <button class="btn btn-primary btn-sm" style="flex:1; min-width:170px;" onclick="addBulkMembers()">✅ إضافة كأعضاء جدد فقط</button>
-              <button class="btn btn-soft btn-sm" style="flex:1; min-width:190px;" onclick="previewRosterSync()">🔄 تحديث وترتيب الكشف الحالي</button>
-            </div>
+            <button class="btn btn-primary btn-sm btn-block" style="margin-top:10px;" onclick="previewRosterSync()">🔄 تحديث وترتيب الكشف الحالي</button>
             <div id="bulk-sync-preview" class="hidden" style="margin-top:10px; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px;"></div>
           </details>
         </div>
@@ -2362,10 +2359,15 @@
       });
       return normalized;
     }
-    function loadCurrentRosterIntoBulk() {
-      const area = document.getElementById('bulk-members-input'); if (!area) return;
-      const members = getGroupMembers(), memberMap = Object.fromEntries(members.map(m => [m.id, m]));
-      const partnerships = getGroupPartnerships(), used = new Set(), lines = [];
+    function toArabicDigits(str) {
+      return String(str ?? '').replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
+    }
+    function copyCurrentRosterText() {
+      const members = getGroupMembers();
+      if (!members.length) return showToast('لا يوجد أعضاء في الكشف الحالي لنسخهم');
+      const memberMap = Object.fromEntries(members.map(m => [m.id, m]));
+      const partnerships = getGroupPartnerships(), used = new Set();
+      const lines = ['🌹كشف أسماء الأميرات🌹', ''];
       partnerships.forEach((p, idx) => {
         const valid = (p.memberIds || []).map(id => memberMap[id]).filter(Boolean);
         if (!valid.length) return;
@@ -2373,22 +2375,20 @@
         valid.forEach((m, i) => {
           used.add(m.id);
           const suffix = m.recitationOnly ? ' - تسميع فقط' : '';
-          lines.push(i === 0 ? `${pNum} 🌹 ${m.name}${suffix}` : `🍃 ${m.name}${suffix}`);
+          lines.push(i === 0 ? `${toArabicDigits(pNum)} 🌹${m.name}${suffix}` : `🍃${m.name}${suffix}`);
         });
-        lines.push('');
+        if (valid.length === 1) lines.push('🍃');
       });
       const unnumbered = members.filter(m => !used.has(m.id));
       if (unnumbered.length) {
         let nextNum = partnerships.reduce((max, p) => Math.max(max, Number(p.number) || 0), 0) + 1;
         unnumbered.forEach(m => {
           const suffix = m.recitationOnly ? ' - تسميع فقط' : '';
-          lines.push(`${nextNum++} 🌹 ${m.name}${suffix}`);
+          lines.push(`${toArabicDigits(nextNum++)} 🌹${m.name}${suffix}`);
+          lines.push('🍃');
         });
       }
-      area.value = lines.join('\n').trim();
-      area.focus();
-      cancelRosterSyncPreview();
-      showToast('📥 تم تعبئة الكشف الحالي، عدّلي عليه ثم اضغطي «تحديث وترتيب الكشف الحالي»');
+      copyTextSilently(lines.join('\n').trim(), '✅ تم نسخ الكشف الحالي بنجاح!');
     }
     function cancelRosterSyncPreview() {
       pendingRosterSync = null;
