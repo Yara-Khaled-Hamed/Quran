@@ -457,11 +457,18 @@
             <button class="btn btn-primary" onclick="addSingleMember()">إضافة</button>
           </div>
           <details style="margin-top:12px;" open>
-            <summary style="cursor:pointer; font-size:13.5px; font-weight:700; color:var(--primary);">📋 إضافة قائمة / كشف أسماء دفعة واحدة (وتكوين الرفقاء تلقائياً)</summary>
-            <p style="font-size:12px; color:var(--muted); margin-top:6px;">الصق الكشف المرقّم مباشرة (مثل <code>١ 🌹الاسم / 🍃الاسم</code>) أو الأسماء سطرين سطرين، وسيتم ربط الرفقاء بأرقامهم تلقائياً.</p>
-            <textarea id="bulk-members-input" class="input" rows="5" style="margin-top:8px; font-size:14px;" placeholder="الصق الكشف هنا..."></textarea>
+            <summary style="cursor:pointer; font-size:13.5px; font-weight:700; color:var(--primary);">📋 إضافة أو تحديث كشف الأسماء دفعة واحدة (وتنظيم الأرقام والرفقاء)</summary>
+            <p style="font-size:12px; color:var(--muted); margin-top:6px;">الصق الكشف المرقّم مباشرة (مثل <code>١ 🌹الاسم / 🍃الاسم</code>) أو الأسماء سطرين سطرين، وسيتم ربط الرفقاء بأرقامهم تلقائياً. لتعديل الكشف وإعادة ترتيبه دون فقدان سجل الحضور والغياب، الصق الكشف المعدّل واضغط على <strong>«تحديث وترتيب الكشف الحالي»</strong>.</p>
+            <div style="display:flex; justify-content:flex-end; margin-top:6px;">
+              <button type="button" class="btn btn-outline btn-xs" onclick="loadCurrentRosterIntoBulk()">📥 تعبئة الكشف الحالي هنا للتعديل</button>
+            </div>
+            <textarea id="bulk-members-input" class="input" rows="5" style="margin-top:6px; font-size:14px;" placeholder="الصق الكشف هنا..."></textarea>
             <label style="display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; margin-top:8px; cursor:pointer;"><input type="checkbox" id="bulk-auto-pair" checked style="width:17px; height:17px;" /><span>تكوين الرفقاء تلقائياً بأرقامهم (ثنائي / ثلاثي)</span></label>
-            <button class="btn btn-primary btn-sm btn-block" style="margin-top:10px;" onclick="addBulkMembers()">✅ إضافة القائمة وتكوين الرفقاء</button>
+            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" style="flex:1; min-width:170px;" onclick="addBulkMembers()">✅ إضافة كأعضاء جدد فقط</button>
+              <button class="btn btn-soft btn-sm" style="flex:1; min-width:190px;" onclick="previewRosterSync()">🔄 تحديث وترتيب الكشف الحالي</button>
+            </div>
+            <div id="bulk-sync-preview" class="hidden" style="margin-top:10px; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px;"></div>
           </details>
         </div>
         <div class="card">
@@ -617,6 +624,7 @@
     let addingPartnerToPId = null;
     let addingPartnerSelectedIds = [];
     let addingPartnerSearchQuery = '';
+    let pendingRosterSync = null;
     let editingMemberId = null;
     let currentWeeklyMessage = '';
     let deferredPrompt = null;
@@ -936,7 +944,8 @@
       try { localStorage.setItem(GUIDE_STORAGE_KEY, '1'); } catch (e) {}
     }
     function openGroupScreen(groupId) {
-      currentGroupId = groupId; editingMemberId = null; assigningSoloMemberId = null; editingPartnerNumId = null; addingPartnerToPId = null; addingPartnerSelectedIds = []; addingPartnerSearchQuery = ''; listeningFilter = 'all'; recitationFilter = 'all';
+      currentGroupId = groupId; editingMemberId = null; assigningSoloMemberId = null; editingPartnerNumId = null; addingPartnerToPId = null; addingPartnerSelectedIds = []; addingPartnerSearchQuery = ''; pendingRosterSync = null; listeningFilter = 'all'; recitationFilter = 'all';
+      const bulkPreview = document.getElementById('bulk-sync-preview'); if (bulkPreview) { bulkPreview.classList.add('hidden'); bulkPreview.innerHTML = ''; }
       if (session) saveSession({ ...session, groupId });
       document.getElementById('login-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
       document.getElementById('date-picker').value = currentDate;
@@ -2294,40 +2303,245 @@
       const m = { id: uid('m'), groupId: currentGroupId, name: parsed.name, recitationOnly: parsed.recitationOnly };
       db.members.push(m); cloudSaveMember(m); inp.value = ''; renderAll(); showToast('تمت إضافة العضو');
     }
-    function addBulkMembers() {
-      const area = document.getElementById('bulk-members-input'), autoPair = document.getElementById('bulk-auto-pair').checked;
-      const rawText = area.value, rawLines = rawText.split(/\r?\n/); if (!rawText.trim()) return showToast('الصق الأسماء أولاً');
+    function splitRosterLineItems(text) {
+      return String(text || '')
+        .split(/\s*\/\s*/)
+        .map(part => parseMemberNameAndFlags(part))
+        .filter(p => p.name);
+    }
+    function parseBulkRosterGroups(rawText, autoPair, startSeq = 1) {
+      const rawLines = String(rawText || '').split(/\r?\n/);
       const hasStructured = rawLines.some(l => /^\d+\s*[🌹🍃\-–.)]*/.test(toEnglishDigits(l.trim())) || /^[🌹🍃]/.test(l.trim()));
-      let nextSeq = getGroupPartnerships().reduce((max, p) => Math.max(max, Number(p.number) || 0), 0) + 1;
+      let nextSeq = startSeq;
       const parsedGroups = [];
       if (hasStructured && autoPair) {
         let cur = null;
         rawLines.forEach(orig => {
           const line = orig.trim(); if (!line) return;
-          if ((/^🌹.*🌹$/.test(line) || /كشف\s+أسماء/i.test(line)) && !/^\d/.test(toEnglishDigits(line))) return;
-          const m = toEnglishDigits(line).match(/^(\d+)\s*[-–.)ـ]*\s*(.*)$/);
-          if (m) { const parsed = parseMemberNameAndFlags(m[2]); cur = { number: parseInt(m[1], 10), items: [] }; if (parsed.name) cur.items.push(parsed); parsedGroups.push(cur); }
-          else if (/^🌹/.test(line) && (!cur || cur.items.length >= 2)) { const parsed = parseMemberNameAndFlags(line); if (parsed.name) { cur = { number: nextSeq++, items: [parsed] }; parsedGroups.push(cur); } }
-          else { const parsed = parseMemberNameAndFlags(line); if (!parsed.name) return; if (!cur) { cur = { number: nextSeq++, items: [] }; parsedGroups.push(cur); } cur.items.push(parsed); }
+          const cleanedNumLine = toEnglishDigits(line).replace(/^[🌹🍃✨•▪▫\s]+(?=\d)/, '');
+          if ((/^🌹.*🌹$/.test(line) || /كشف\s+أسماء/i.test(line)) && !/^\d/.test(cleanedNumLine)) return;
+          const m = cleanedNumLine.match(/^(\d+)\s*[-–.)ـ:]*\s*(.*)$/);
+          if (m) {
+            const items = splitRosterLineItems(m[2]);
+            cur = { number: parseInt(m[1], 10), items: [...items] };
+            parsedGroups.push(cur);
+          } else if (/^🌹/.test(line) && (!cur || cur.items.length >= 2)) {
+            const items = splitRosterLineItems(line);
+            if (items.length) { cur = { number: nextSeq++, items: [...items] }; parsedGroups.push(cur); }
+          } else {
+            const items = splitRosterLineItems(line);
+            if (!items.length) return;
+            if (!cur || cur.items.length >= 3) { cur = { number: nextSeq++, items: [] }; parsedGroups.push(cur); }
+            cur.items.push(...items);
+          }
         });
       } else if (autoPair) {
-        if (/\n\s*\n/.test(rawText.trim())) rawText.trim().split(/\n\s*\n+/).forEach(blk => { const items = blk.split(/\r?\n/).map(parseMemberNameAndFlags).filter(p => p.name); if (items.length) parsedGroups.push({ number: nextSeq++, items }); });
-        else { const items = rawLines.map(parseMemberNameAndFlags).filter(p => p.name); for (let i = 0; i < items.length; i += 2) parsedGroups.push({ number: nextSeq++, items: items.slice(i, i + 2) }); }
+        if (/\n\s*\n/.test(rawText.trim())) {
+          rawText.trim().split(/\n\s*\n+/).forEach(blk => {
+            const items = blk.split(/\r?\n/).flatMap(splitRosterLineItems);
+            if (items.length) parsedGroups.push({ number: nextSeq++, items });
+          });
+        } else {
+          const items = rawLines.flatMap(splitRosterLineItems);
+          for (let i = 0; i < items.length; i += 2) parsedGroups.push({ number: nextSeq++, items: items.slice(i, i + 2) });
+        }
       } else {
-        const items = rawLines.map(l => parseMemberNameAndFlags(toEnglishDigits(l.trim()).replace(/^\d+\s*[-–.)ـ]*\s*/, ''))).filter(p => p.name);
+        const items = rawLines.flatMap(l => splitRosterLineItems(toEnglishDigits(l.trim()).replace(/^[🌹🍃✨•▪▫\s]+(?=\d)/, '').replace(/^\d+\s*[-–.)ـ:]*\s*/, '')));
         if (items.length) parsedGroups.push({ number: null, items });
       }
+      const normalized = [];
+      parsedGroups.forEach(pg => {
+        if (!pg.items.length) return;
+        if (!autoPair || pg.number === null || pg.items.length <= 3) normalized.push(pg);
+        else {
+          for (let i = 0; i < pg.items.length; i += 2) {
+            const sl = pg.items.slice(i, i + 2);
+            if (sl.length) normalized.push({ number: pg.number + Math.floor(i / 2), items: sl });
+          }
+        }
+      });
+      return normalized;
+    }
+    function loadCurrentRosterIntoBulk() {
+      const area = document.getElementById('bulk-members-input'); if (!area) return;
+      const members = getGroupMembers(), memberMap = Object.fromEntries(members.map(m => [m.id, m]));
+      const partnerships = getGroupPartnerships(), used = new Set(), lines = [];
+      partnerships.forEach((p, idx) => {
+        const valid = (p.memberIds || []).map(id => memberMap[id]).filter(Boolean);
+        if (!valid.length) return;
+        const pNum = p.number || (idx + 1);
+        valid.forEach((m, i) => {
+          used.add(m.id);
+          const suffix = m.recitationOnly ? ' - تسميع فقط' : '';
+          lines.push(i === 0 ? `${pNum} 🌹 ${m.name}${suffix}` : `🍃 ${m.name}${suffix}`);
+        });
+        lines.push('');
+      });
+      const unnumbered = members.filter(m => !used.has(m.id));
+      if (unnumbered.length) {
+        let nextNum = partnerships.reduce((max, p) => Math.max(max, Number(p.number) || 0), 0) + 1;
+        unnumbered.forEach(m => {
+          const suffix = m.recitationOnly ? ' - تسميع فقط' : '';
+          lines.push(`${nextNum++} 🌹 ${m.name}${suffix}`);
+        });
+      }
+      area.value = lines.join('\n').trim();
+      area.focus();
+      cancelRosterSyncPreview();
+      showToast('📥 تم تعبئة الكشف الحالي، عدّلي عليه ثم اضغطي «تحديث وترتيب الكشف الحالي»');
+    }
+    function cancelRosterSyncPreview() {
+      pendingRosterSync = null;
+      const box = document.getElementById('bulk-sync-preview');
+      if (box) { box.classList.add('hidden'); box.innerHTML = ''; }
+    }
+    function previewRosterSync() {
+      const area = document.getElementById('bulk-members-input'), autoPair = document.getElementById('bulk-auto-pair').checked;
+      const rawText = area ? area.value : '';
+      if (!rawText.trim()) return showToast('الصق الكشف المعدّل أولاً');
+      const parsedGroups = parseBulkRosterGroups(rawText, autoPair, 1);
+      const allItems = parsedGroups.flatMap(pg => pg.items);
+      if (!allItems.length) return showToast('لم يتم العثور على أسماء صالحة في الكشف');
+      const existingMembers = getGroupMembers();
+      const usedMemberIds = new Set();
+      // Pass 1: Exact normalized match
+      allItems.forEach(it => {
+        const normNew = normalizeArabicText(it.name);
+        const exact = existingMembers.find(m => !usedMemberIds.has(m.id) && normalizeArabicText(m.name) === normNew);
+        if (exact) { it.matchedMember = exact; usedMemberIds.add(exact.id); }
+      });
+      // Pass 2: High-confidence similarity / word-prefix match (e.g. minor spelling edit or added surname)
+      allItems.forEach(it => {
+        if (it.matchedMember) return;
+        const normNew = normalizeArabicText(it.name), newWords = normNew.split(' ').filter(Boolean);
+        let bestM = null, bestScore = 0, secondScore = 0;
+        existingMembers.forEach(m => {
+          if (usedMemberIds.has(m.id)) return;
+          const normOld = normalizeArabicText(m.name), oldWords = normOld.split(' ').filter(Boolean);
+          let sc = nameSimilarity(normNew, normOld);
+          if (newWords.length >= 2 && oldWords.length >= 2) {
+            const minLen = Math.min(newWords.length, oldWords.length);
+            const prefixMatches = newWords.slice(0, minLen).every((w, i) => w === oldWords[i]);
+            if (prefixMatches) sc = Math.max(sc, 0.90);
+          }
+          if (sc > bestScore) { secondScore = bestScore; bestScore = sc; bestM = m; }
+          else if (sc > secondScore) secondScore = sc;
+        });
+        if (bestM && bestScore >= 0.86 && (bestScore - secondScore >= 0.08 || bestScore >= 0.94)) {
+          it.matchedMember = bestM;
+          usedMemberIds.add(bestM.id);
+        }
+      });
+      const matchedItems = allItems.filter(it => it.matchedMember);
+      const renamedItems = matchedItems.filter(it => it.name !== it.matchedMember.name);
+      const newItems = allItems.filter(it => !it.matchedMember);
+      const leftoverMembers = existingMembers.filter(m => !usedMemberIds.has(m.id));
+      const numCounts = {};
+      parsedGroups.forEach(pg => { if (pg.number !== null) numCounts[pg.number] = (numCounts[pg.number] || 0) + 1; });
+      const dupNums = Object.keys(numCounts).filter(k => numCounts[k] > 1);
+      pendingRosterSync = { parsedGroups, autoPair, leftoverMembers };
+      const box = document.getElementById('bulk-sync-preview');
+      if (!box) return;
+      box.innerHTML = `
+        <div style="font-weight:800; color:var(--primary); font-size:14px; margin-bottom:8px;">📋 معاينة تحديث وترتيب الكشف:</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:6px; font-size:12.5px; margin-bottom:8px;">
+          <div style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px 8px;">🔗 مطابقة (يُحفظ سجلها): <strong>${matchedItems.length}</strong></div>
+          <div style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px 8px;">✨ أسماء جديدة ستُضاف: <strong>${newItems.length}</strong></div>
+          <div style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px 8px;">🔢 مجموعات/أرقام: <strong>${autoPair ? parsedGroups.filter(pg => pg.number !== null).length : 0}</strong></div>
+          <div style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px 8px;">👤 غير مذكورة بالكشف: <strong>${leftoverMembers.length}</strong></div>
+        </div>
+        ${dupNums.length ? `<div style="font-size:12px; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:6px 8px; margin-bottom:6px;">⚠️ تنبيه: يوجد تكرار في أرقام الكشف (${dupNums.join('، ')}).</div>` : ''}
+        ${renamedItems.length ? `<div style="font-size:12px; color:var(--primary); margin-bottom:6px;"><strong>✏️ تعديلات أسماء (${renamedItems.length}):</strong> ${renamedItems.slice(0, 6).map(it => `${escapeHtml(it.matchedMember.name)} ← ${escapeHtml(it.name)}`).join(' • ')}${renamedItems.length > 6 ? ' ...' : ''}</div>` : ''}
+        ${newItems.length ? `<div style="font-size:12px; color:#065f46; margin-bottom:6px;"><strong>✨ الأسماء الجديدة:</strong> ${newItems.slice(0, 10).map(it => escapeHtml(it.name)).join('، ')}${newItems.length > 10 ? ` (+${newItems.length - 10})` : ''}</div>` : ''}
+        ${leftoverMembers.length ? `
+          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:8px; margin-bottom:8px; font-size:12px; color:#92400e;">
+            <div><strong>👤 عضوات موجودات في الجروب لكن غير مذكورات في الكشف الجديد (${leftoverMembers.length}):</strong> ${leftoverMembers.slice(0, 10).map(m => escapeHtml(m.name)).join('، ')}${leftoverMembers.length > 10 ? ` (+${leftoverMembers.length - 10})` : ''}</div>
+            <label style="display:flex; align-items:center; gap:6px; margin-top:6px; font-weight:700; cursor:pointer; color:#991b1b;">
+              <input type="checkbox" id="bulk-sync-delete-leftover" style="width:16px; height:16px;" />
+              <span>حذف العضوات غير المذكورات نهائياً (وإلا سيبقين بدون رقم كشف مع حفظ سجلهن)</span>
+            </label>
+          </div>
+        ` : ''}
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="applyRosterSync()">✅ تأكيد وتحديث الكشف الآن</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="cancelRosterSyncPreview()">إلغاء</button>
+        </div>
+      `;
+      box.classList.remove('hidden');
+    }
+    function applyRosterSync() {
+      if (!pendingRosterSync) return;
+      const { parsedGroups, autoPair, leftoverMembers } = pendingRosterSync;
+      const deleteLeftoverEl = document.getElementById('bulk-sync-delete-leftover');
+      const deleteLeftover = Boolean(deleteLeftoverEl && deleteLeftoverEl.checked);
+      if (deleteLeftover && leftoverMembers.length && !confirm(`سيتم حذف ${leftoverMembers.length} عضوة غير مذكورة في الكشف الجديد نهائياً. هل أنتِ متأكدة؟`)) return;
+      const orderedGroupMembers = [], upsertMembers = [], newPartnerships = [];
+      let addedCount = 0;
+      const sortedGroups = [...parsedGroups].sort((a, b) => (a.number ?? 999999) - (b.number ?? 999999));
+      sortedGroups.forEach(pg => {
+        if (!pg.items.length) return;
+        const ids = pg.items.map(it => {
+          if (it.matchedMember) {
+            const m = it.matchedMember;
+            let changed = false;
+            if (m.name !== it.name) { m.name = it.name; changed = true; }
+            if (it.recitationOnly && !m.recitationOnly) { m.recitationOnly = true; changed = true; }
+            if (changed) upsertMembers.push(m);
+            orderedGroupMembers.push(m);
+            return m.id;
+          } else {
+            const m = { id: uid('m'), groupId: currentGroupId, name: it.name, recitationOnly: it.recitationOnly };
+            upsertMembers.push(m);
+            orderedGroupMembers.push(m);
+            addedCount++;
+            return m.id;
+          }
+        });
+        if (autoPair && pg.number !== null && ids.length >= 1) {
+          newPartnerships.push({ id: uid('p'), groupId: currentGroupId, number: pg.number, memberIds: ids });
+        }
+      });
+      const delIds = deleteLeftover ? leftoverMembers.map(m => m.id) : [];
+      if (!deleteLeftover) orderedGroupMembers.push(...leftoverMembers);
+      const otherMembers = db.members.filter(m => m.groupId !== currentGroupId);
+      db.members = [...otherMembers, ...orderedGroupMembers];
+      const oldPartnershipIds = getGroupPartnerships().map(p => p.id);
+      db.partnerships = [...db.partnerships.filter(p => p.groupId !== currentGroupId), ...newPartnerships];
+      cloudExec(async () => {
+        if (upsertMembers.length || delIds.length) {
+          const mPatch = {};
+          upsertMembers.forEach(m => mPatch[m.id] = m);
+          delIds.forEach(id => mPatch[id] = null);
+          await cloudRequest('/members', 'PATCH', mPatch);
+        }
+        if (oldPartnershipIds.length || newPartnerships.length) {
+          const pPatch = {};
+          oldPartnershipIds.forEach(id => pPatch[id] = null);
+          newPartnerships.forEach(p => pPatch[p.id] = p);
+          await cloudRequest('/partnerships', 'PATCH', pPatch);
+        }
+      });
+      const area = document.getElementById('bulk-members-input'); if (area) area.value = '';
+      cancelRosterSyncPreview();
+      editingMemberId = null; assigningSoloMemberId = null; editingPartnerNumId = null; addingPartnerToPId = null;
+      renderAll();
+      showToast(`✅ تم تحديث وترتيب الكشف (${newPartnerships.length} رقم) وإضافة ${addedCount} عضوة جديدة!`);
+    }
+    function addBulkMembers() {
+      const area = document.getElementById('bulk-members-input'), autoPair = document.getElementById('bulk-auto-pair').checked;
+      const rawText = area.value; if (!rawText.trim()) return showToast('الصق الأسماء أولاً');
+      const nextSeq = getGroupPartnerships().reduce((max, p) => Math.max(max, Number(p.number) || 0), 0) + 1;
+      const parsedGroups = parseBulkRosterGroups(rawText, autoPair, nextSeq);
       const newM = [], newP = [];
       parsedGroups.forEach(pg => {
         if (!pg.items.length) return;
         const ids = pg.items.map(it => { const m = { id: uid('m'), groupId: currentGroupId, name: it.name, recitationOnly: it.recitationOnly }; newM.push(m); return m.id; });
         if (autoPair && pg.number !== null && ids.length >= 1) {
-          if (ids.length <= 3) newP.push({ id: uid('p'), groupId: currentGroupId, number: pg.number, memberIds: ids });
-          else for (let i = 0; i < ids.length; i += 2) { const sl = ids.slice(i, i + 2); if (sl.length >= 1) newP.push({ id: uid('p'), groupId: currentGroupId, number: pg.number + Math.floor(i / 2), memberIds: sl }); }
+          newP.push({ id: uid('p'), groupId: currentGroupId, number: pg.number, memberIds: ids });
         }
       });
       if (!newM.length) return showToast('لم يتم العثور على أسماء صالحة');
-      db.members.push(...newM); db.partnerships.push(...newP); cloudSaveBulkMembersAndPartners(newM, newP); area.value = ''; renderAll();
+      db.members.push(...newM); db.partnerships.push(...newP); cloudSaveBulkMembersAndPartners(newM, newP); area.value = ''; cancelRosterSyncPreview(); renderAll();
       showToast(newP.length ? `✅ تمت إضافة ${newM.length} عضو وتكوين ${newP.length} مجموعة رفقاء بأرقامها!` : `✅ تمت إضافة ${newM.length} عضو بنجاح`);
     }
 
@@ -2376,10 +2590,15 @@
       updateSearchClearBtn('search-manage');
       const group = getCurrentGroup(), allMembers = getGroupMembers(), partnerships = getGroupPartnerships();
       document.getElementById('manage-count').textContent = allMembers.length;
-      const pNumMap = {}; partnerships.forEach((p, idx) => { const n = p.number || (idx + 1), c = (p.memberIds || []).length; p.memberIds.forEach(id => pNumMap[id] = { n, c }); });
+      const pNumMap = {}; partnerships.forEach((p, idx) => { const n = p.number || (idx + 1), c = (p.memberIds || []).length; p.memberIds.forEach((id, mIdx) => pNumMap[id] = { n, c, mIdx }); });
+      const orderedAllMembers = [...allMembers].sort((a, b) => {
+        const pa = pNumMap[a.id], pb = pNumMap[b.id];
+        if (pa && pb) return (pa.n - pb.n) || (pa.mIdx - pb.mIdx);
+        if (pa) return -1; if (pb) return 1; return 0;
+      });
       document.getElementById('reset-date-note').textContent = group && group.absenceStartDate ? `يتم حساب الغياب المتتابع بدءاً من: ${group.absenceStartDate}` : 'يتم حساب الغياب المتتابع (يتصفر تلقائياً عند الحضور).';
       const list = document.getElementById('manage-members-list'), searchEl = document.getElementById('search-manage'), q = searchEl ? searchEl.value.trim().toLowerCase() : '';
-      const members = q ? allMembers.filter(m => m.name.toLowerCase().includes(q)) : allMembers;
+      const members = q ? orderedAllMembers.filter(m => m.name.toLowerCase().includes(q)) : orderedAllMembers;
       if (!allMembers.length) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة للبحث "${escapeHtml(q)}".</div>`; return; }
       list.innerHTML = members.map((m, i) => {
