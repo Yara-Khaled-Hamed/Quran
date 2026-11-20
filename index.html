@@ -424,10 +424,14 @@
             <button class="btn btn-outline btn-sm" onclick="clearDayType('recitation')">🗑️ مسح اليوم</button>
           </div>
           <div id="partner-builder" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
-            <p style="font-size:13px; font-weight:700; color:var(--primary);">حدد 2 أو 3 أفراد للربط معاً (المحدد حالياً: <span id="selected-count">0</span> / 3):</p>
+            <p style="font-size:13px; font-weight:700; color:var(--primary);">حددي 1 (فردي برقم كشف) أو 2 أو 3 أفراد (المحدد حالياً: <span id="selected-count">0</span> / 3):</p>
             <div id="unpaired-grid" class="select-grid"></div>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;">
+              <label style="font-size:12.5px; font-weight:700; color:var(--primary);">رقم الكشف:</label>
+              <input type="number" min="1" id="partner-builder-num" class="input" style="width:92px; padding:6px 10px; font-size:14px;" />
+            </div>
             <div style="display:flex; gap:8px; margin-top:10px;">
-              <button class="btn btn-primary btn-sm" onclick="createPartnership()">حفظ الرفقاء</button>
+              <button class="btn btn-primary btn-sm" onclick="createPartnership()">💾 حفظ الرقم / الرفقاء</button>
               <button class="btn btn-outline btn-sm" onclick="togglePartnerBuilder(false)">إلغاء</button>
             </div>
           </div>
@@ -609,6 +613,10 @@
     let quickSelectedGroupId = null;
     let editingGroupId = null;
     let editingPartnerNumId = null;
+    let assigningSoloMemberId = null;
+    let addingPartnerToPId = null;
+    let addingPartnerSelectedIds = [];
+    let addingPartnerSearchQuery = '';
     let editingMemberId = null;
     let currentWeeklyMessage = '';
     let deferredPrompt = null;
@@ -928,7 +936,7 @@
       try { localStorage.setItem(GUIDE_STORAGE_KEY, '1'); } catch (e) {}
     }
     function openGroupScreen(groupId) {
-      currentGroupId = groupId; editingMemberId = null; listeningFilter = 'all'; recitationFilter = 'all';
+      currentGroupId = groupId; editingMemberId = null; assigningSoloMemberId = null; editingPartnerNumId = null; addingPartnerToPId = null; addingPartnerSelectedIds = []; addingPartnerSearchQuery = ''; listeningFilter = 'all'; recitationFilter = 'all';
       if (session) saveSession({ ...session, groupId });
       document.getElementById('login-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
       document.getElementById('date-picker').value = currentDate;
@@ -1116,6 +1124,7 @@
       document.getElementById('header-supervisor-name').textContent = supLabel;
       document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
       updateSwitchGroupBtn(); renderStats(); renderListening(); renderRecitation(); renderManage(); previewListeningBatch(); previewRecitationUnified();
+      const pb = document.getElementById('partner-builder'); if (pb && !pb.classList.contains('hidden')) renderUnpairedGrid();
     }
 
     function renderStats() {
@@ -1143,7 +1152,7 @@
       if (filter === 'unmarked') return !st;
       return true;
     }
-    function renderFilterChips(containerId, members, dayMap, currentFilter, onChangeFnName) {
+    function renderFilterChips(containerId, members, dayMap, currentFilter, onChangeFnName, extraChips = []) {
       const wrap = document.getElementById(containerId); if (!wrap) return;
       let absentC = 0, presentC = 0, unmarkedC = 0;
       members.forEach(m => { const st = dayMap[m.id]; if (st === 'absent') absentC++; else if (st === 'present') presentC++; else if (!st) unmarkedC++; });
@@ -1151,7 +1160,8 @@
         { key: 'all', label: `الكل (${members.length})`, cls: 'active' },
         { key: 'absent', label: `❌ الغائبين (${absentC})`, cls: 'active-absent' },
         { key: 'unmarked', label: `⏳ لم يُسجل (${unmarkedC})`, cls: 'active-unmarked' },
-        { key: 'present', label: `✅ الحاضرين (${presentC})`, cls: 'active-present' }
+        { key: 'present', label: `✅ الحاضرين (${presentC})`, cls: 'active-present' },
+        ...extraChips
       ];
       wrap.innerHTML = chips.map(c => `<button type="button" class="filter-chip ${currentFilter === c.key ? c.cls : ''}" onclick="${onChangeFnName}('${c.key}')">${c.label}</button>`).join('');
     }
@@ -2043,54 +2053,176 @@
       showToast(mode === 'present' && markRestAbsent ? `✅ تم تسجيل ${markedCount} حاضر و ${restAbsentCount} غياب` : (mode === 'present' ? `✅ تم تسجيل ${markedCount} حاضر من الصور` : `❌ تم تسجيل ${markedCount} غياب من الصور`));
     }
 
+    function getNextPartnershipNumber() {
+      return getGroupPartnerships().reduce((max, p) => Math.max(max, Number(p.number) || 0), 0) + 1;
+    }
     function togglePartnerBuilder(forceState) {
       const box = document.getElementById('partner-builder'), show = forceState !== undefined ? forceState : box.classList.contains('hidden');
-      box.classList.toggle('hidden', !show); if (show) { selectedForPartner = []; renderUnpairedGrid(); }
+      box.classList.toggle('hidden', !show);
+      if (show) {
+        selectedForPartner = [];
+        const numInp = document.getElementById('partner-builder-num');
+        if (numInp) numInp.value = getNextPartnershipNumber();
+        renderUnpairedGrid();
+      }
     }
-    function getPairedMemberIds() { const ids = new Set(); getGroupPartnerships().forEach(p => p.memberIds.forEach(id => ids.add(id))); return ids; }
+    function getValidGroupPartnershipMap() {
+      const validIds = new Set(getGroupMembers().map(m => m.id));
+      const numberedIds = new Set(), multiPairedIds = new Set(), soloNumByMemberId = {};
+      getGroupPartnerships().forEach((p, idx) => {
+        const valid = (p.memberIds || []).filter(id => validIds.has(id));
+        valid.forEach(id => numberedIds.add(id));
+        if (valid.length >= 2) valid.forEach(id => multiPairedIds.add(id));
+        else if (valid.length === 1) soloNumByMemberId[valid[0]] = p.number || (idx + 1);
+      });
+      return { numberedIds, multiPairedIds, soloNumByMemberId };
+    }
+    function getPairedMemberIds() { return getValidGroupPartnershipMap().multiPairedIds; }
+    function getNumberedMemberIds() { return getValidGroupPartnershipMap().numberedIds; }
     function renderUnpairedGrid() {
-      const grid = document.getElementById('unpaired-grid'), paired = getPairedMemberIds(), unpaired = getGroupMembers().filter(m => !paired.has(m.id));
+      const grid = document.getElementById('unpaired-grid');
+      const { multiPairedIds, soloNumByMemberId } = getValidGroupPartnershipMap();
+      const noPartnerMembers = getGroupMembers().filter(m => !multiPairedIds.has(m.id)).sort((a, b) => compareArabic(a.name, b.name));
+      const validSet = new Set(noPartnerMembers.map(m => m.id));
+      selectedForPartner = selectedForPartner.filter(id => validSet.has(id));
       document.getElementById('selected-count').textContent = selectedForPartner.length;
-      if (unpaired.length < 2) { grid.innerHTML = `<p style="grid-column:1/-1; color:var(--muted); font-size:13px;">تحتاج على الأقل إلى عضوين غير مرتبطين (المتاح: ${unpaired.length})</p>`; return; }
-      grid.innerHTML = unpaired.map(m => { const isSel = selectedForPartner.includes(m.id); return `<div class="select-item ${isSel ? 'selected' : ''}" onclick="toggleSelectPartnerMember('${m.id}')"><span>${isSel ? '☑️' : '⬜'}</span><span>${escapeHtml(m.name)}</span></div>`; }).join('');
+      if (!noPartnerMembers.length) { grid.innerHTML = `<p style="grid-column:1/-1; color:var(--muted); font-size:13px;">جميع الأعضاء لديهم رفقاء بالفعل.</p>`; return; }
+      grid.innerHTML = noPartnerMembers.map(m => {
+        const isSel = selectedForPartner.includes(m.id), soloNum = soloNumByMemberId[m.id];
+        const numTag = soloNum ? `<span class="partner-type-pill" style="font-size:11px; padding:1px 6px; margin-right:auto;">كشف #${soloNum}</span>` : '';
+        return `<div class="select-item ${isSel ? 'selected' : ''}" onclick="toggleSelectPartnerMember('${m.id}')"><span>${isSel ? '☑️' : '⬜'}</span><span>${escapeHtml(m.name)}</span>${numTag}</div>`;
+      }).join('');
     }
     function toggleSelectPartnerMember(mId) {
       const idx = selectedForPartner.indexOf(mId);
-      if (idx > -1) selectedForPartner.splice(idx, 1); else { if (selectedForPartner.length >= 3) return showToast('الحد الأقصى للرفقاء هو 3 أفراد'); selectedForPartner.push(mId); }
+      if (idx > -1) selectedForPartner.splice(idx, 1); else { if (selectedForPartner.length >= 3) return showToast('الحد الأقصى هو 3 أفراد'); selectedForPartner.push(mId); }
       renderUnpairedGrid();
     }
     function createPartnership() {
-      if (selectedForPartner.length < 2 || selectedForPartner.length > 3) return showToast('اختر 2 أو 3 أفراد معاً');
-      const maxNum = getGroupPartnerships().reduce((max, p) => Math.max(max, Number(p.number) || 0), 0);
-      const newP = { id: uid('p'), groupId: currentGroupId, number: maxNum + 1, memberIds: [...selectedForPartner] };
-      db.partnerships.push(newP); cloudSavePartnership(newP); togglePartnerBuilder(false); renderRecitation(); showToast(`تم ربط رفقاء رقم ${maxNum + 1} بنجاح`);
+      if (selectedForPartner.length < 1 || selectedForPartner.length > 3) return showToast('حددي عضواً واحداً (فردي) أو 2 إلى 3 رفقاء');
+      const oldSoloEntries = getGroupPartnerships().filter(p => (p.memberIds || []).length <= 1 && p.memberIds.some(id => selectedForPartner.includes(id)));
+      const oldSoloIds = new Set(oldSoloEntries.map(p => p.id));
+      const numInp = document.getElementById('partner-builder-num');
+      const val = numInp && numInp.value.trim() ? parseInt(toEnglishDigits(numInp.value), 10) : getNextPartnershipNumber();
+      if (!val || val < 1) return showToast('أدخل رقم كشف صحيح');
+      if (getGroupPartnerships().some(p => !oldSoloIds.has(p.id) && Number(p.number) === val)) return showToast(`رقم ${val} مستخدم بالفعل في الكشف، اختاري رقماً آخر`);
+      if (oldSoloIds.size > 0) {
+        db.partnerships = db.partnerships.filter(p => !oldSoloIds.has(p.id));
+        oldSoloIds.forEach(pId => cloudDeletePartnership(pId));
+      }
+      const newP = { id: uid('p'), groupId: currentGroupId, number: val, memberIds: [...selectedForPartner] };
+      db.partnerships.push(newP); cloudSavePartnership(newP); togglePartnerBuilder(false); renderAll();
+      showToast(selectedForPartner.length === 1 ? `✅ تم إعطاء رقم كشف #${val} بنجاح` : `✅ تم ربط رفقاء رقم ${val} بنجاح`);
+    }
+    function startAssignSoloNumber(mId) {
+      assigningSoloMemberId = mId; renderRecitation();
+      const inp = document.getElementById(`solo-num-input-${mId}`);
+      if (inp) { inp.focus(); inp.select(); }
+    }
+    function saveSoloNumber(mId) {
+      const inp = document.getElementById(`solo-num-input-${mId}`);
+      const val = inp ? parseInt(toEnglishDigits(inp.value), 10) : getNextPartnershipNumber();
+      if (!val || val < 1) return showToast('أدخل رقم كشف صحيح');
+      if (getGroupPartnerships().some(p => Number(p.number) === val)) return showToast(`رقم ${val} مستخدم بالفعل في الكشف، اختاري رقماً آخر`);
+      if (getNumberedMemberIds().has(mId)) { assigningSoloMemberId = null; renderRecitation(); return; }
+      const newP = { id: uid('p'), groupId: currentGroupId, number: val, memberIds: [mId] };
+      db.partnerships.push(newP); cloudSavePartnership(newP); assigningSoloMemberId = null; renderAll();
+      showToast(`✅ تم إعطاء رقم كشف #${val} بنجاح`);
     }
     function savePartnerNumber(pId) {
       const val = parseInt(toEnglishDigits(document.getElementById(`partner-num-input-${pId}`).value), 10);
       if (!val || val < 1) return showToast('أدخل رقماً صحيحاً');
+      if (getGroupPartnerships().some(x => x.id !== pId && Number(x.number) === val)) return showToast(`رقم ${val} مستخدم بالفعل في الكشف، اختاري رقماً آخر`);
       const p = db.partnerships.find(x => x.id === pId); if (p) { p.number = val; cloudSavePartnership(p); }
-      editingPartnerNumId = null; renderRecitation(); showToast('تم تعديل رقم الرفقاء');
+      editingPartnerNumId = null; renderAll(); showToast('تم تعديل رقم الكشف');
     }
     function dissolvePartnership(pId) {
-      if (!confirm('هل تريد فك ارتباط هؤلاء الرفقاء؟')) return;
-      db.partnerships = db.partnerships.filter(p => p.id !== pId); cloudDeletePartnership(pId); renderRecitation(); showToast('تم فك الارتباط');
+      const p = db.partnerships.find(x => x.id === pId);
+      const msg = p && p.memberIds.length === 1 ? 'هل تريد إزالة رقم الكشف عن هذا العضو؟' : 'هل تريد فك ارتباط هؤلاء الرفقاء؟';
+      if (!confirm(msg)) return;
+      if (addingPartnerToPId === pId) cancelAddPartnerToCard(false);
+      db.partnerships = db.partnerships.filter(p => p.id !== pId); cloudDeletePartnership(pId); renderAll(); showToast(p && p.memberIds.length === 1 ? 'تمت إزالة الرقم' : 'تم فك الارتباط');
     }
 
-    function renderRecitationMemberRow(m, day) {
+    function getInlinePartnerCandidatesHtml(p, query) {
+      const { multiPairedIds, soloNumByMemberId } = getValidGroupPartnershipMap();
+      const q = (query || '').trim().toLowerCase();
+      const candidates = getGroupMembers()
+        .filter(m => !multiPairedIds.has(m.id) && !(p.memberIds || []).includes(m.id) && (!q || m.name.toLowerCase().includes(q)))
+        .sort((a, b) => compareArabic(a.name, b.name));
+      if (!candidates.length) {
+        return `<p style="grid-column:1/-1; color:var(--muted); font-size:12.5px; margin:4px 0;">${q ? 'لا توجد نتائج مطابقة للبحث.' : 'لا توجد عضوات بدون رفقاء حالياً لإضافتهن.'}</p>`;
+      }
+      return candidates.map(m => {
+        const isSel = addingPartnerSelectedIds.includes(m.id), soloNum = soloNumByMemberId[m.id];
+        const numTag = soloNum ? `<span class="partner-type-pill" style="font-size:11px; padding:1px 6px; margin-right:auto;">كشف #${soloNum}</span>` : '';
+        return `<div class="select-item ${isSel ? 'selected' : ''}" onclick="toggleInlinePartnerSelect('${p.id}', '${m.id}')"><span>${isSel ? '☑️' : '⬜'}</span><span>${escapeHtml(m.name)}</span>${numTag}</div>`;
+      }).join('');
+    }
+    function toggleAddPartnerToCard(pId) {
+      if (addingPartnerToPId === pId) { cancelAddPartnerToCard(); return; }
+      editingPartnerNumId = null; addingPartnerToPId = pId; addingPartnerSelectedIds = []; addingPartnerSearchQuery = '';
+      renderRecitation();
+    }
+    function cancelAddPartnerToCard(shouldRender = true) {
+      addingPartnerToPId = null; addingPartnerSelectedIds = []; addingPartnerSearchQuery = '';
+      if (shouldRender) renderRecitation();
+    }
+    function filterInlinePartnerCandidates(pId, val) {
+      addingPartnerSearchQuery = val;
+      const p = db.partnerships.find(x => x.id === pId);
+      const grid = document.getElementById(`inline-add-partner-grid-${pId}`);
+      if (p && grid) grid.innerHTML = getInlinePartnerCandidatesHtml(p, val);
+    }
+    function toggleInlinePartnerSelect(pId, mId) {
+      const p = db.partnerships.find(x => x.id === pId); if (!p) return;
+      const maxAdd = Math.max(1, 3 - (p.memberIds || []).length);
+      const idx = addingPartnerSelectedIds.indexOf(mId);
+      if (idx > -1) addingPartnerSelectedIds.splice(idx, 1);
+      else {
+        if (addingPartnerSelectedIds.length >= maxAdd) return showToast(`الحد الأقصى لهذه المجموعة هو 3 أفراد`);
+        addingPartnerSelectedIds.push(mId);
+      }
+      const grid = document.getElementById(`inline-add-partner-grid-${pId}`);
+      if (grid) grid.innerHTML = getInlinePartnerCandidatesHtml(p, addingPartnerSearchQuery);
+      const btn = document.getElementById(`inline-add-partner-save-${pId}`);
+      if (btn) btn.textContent = `💾 حفظ الإضافة (${addingPartnerSelectedIds.length})`;
+    }
+    function saveAddPartnerToCard(pId) {
+      const p = db.partnerships.find(x => x.id === pId); if (!p) return;
+      if (!addingPartnerSelectedIds.length) return showToast('اختاري عضوة واحدة على الأقل لإضافتها كرفيقة');
+      const oldSoloEntries = getGroupPartnerships().filter(x => x.id !== pId && (x.memberIds || []).length <= 1 && x.memberIds.some(id => addingPartnerSelectedIds.includes(id)));
+      const oldSoloIds = new Set(oldSoloEntries.map(x => x.id));
+      if (oldSoloIds.size > 0) {
+        db.partnerships = db.partnerships.filter(x => !oldSoloIds.has(x.id));
+        oldSoloIds.forEach(oldId => cloudDeletePartnership(oldId));
+      }
+      p.memberIds = Array.from(new Set([...(p.memberIds || []), ...addingPartnerSelectedIds])).slice(0, 3);
+      cloudSavePartnership(p);
+      cancelAddPartnerToCard(false);
+      renderAll();
+      showToast(`✅ تمت إضافة الرفيقة لرقم ${p.number || ''} بنجاح`);
+    }
+
+    function renderRecitationMemberRow(m, day, extraHtml = '') {
       const st = day.recitation[m.id] || '', absCount = getAbsenceCount(m.id, 'recitation');
       const absTag = absCount > 0 ? `<div class="absence-tag">غياب التسميع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</div>` : '';
       const badge = m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : '';
-      return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div><span style="font-weight:700;">${escapeHtml(m.name)}</span> ${badge}${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button></div></div>`;
+      return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><span style="font-weight:700;">${escapeHtml(m.name)}</span> ${badge}${extraHtml}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button></div></div>`;
     }
 
     function renderRecitation() {
       updateSearchClearBtn('search-recitation');
       const container = document.getElementById('recitation-list'), members = getGroupMembers();
       const memberMap = Object.fromEntries(members.map(m => [m.id, m])), partnerships = getGroupPartnerships(), day = ensureDayRecord();
+      const { numberedIds, multiPairedIds } = getValidGroupPartnershipMap();
+      const noPartnerCount = members.filter(m => !multiPairedIds.has(m.id)).length;
+      if (recitationFilter === 'solo' && noPartnerCount === 0) recitationFilter = 'all';
       const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
       const rStatusEl = document.getElementById('recitation-status-line');
       if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل اليوم: ${rRecorded} من ${members.length} • المتبقي: ${rRemaining}` : '';
-      renderFilterChips('recitation-filters', members, day.recitation, recitationFilter, 'setRecitationFilter');
+      const extraRecitChips = noPartnerCount > 0 ? [{ key: 'solo', label: `👤 بدون رفيقة (${noPartnerCount})`, cls: 'active' }] : [];
+      renderFilterChips('recitation-filters', members, day.recitation, recitationFilter, 'setRecitationFilter', extraRecitChips);
       const rawQ = document.getElementById('search-recitation').value.trim(), normQ = toEnglishDigits(rawQ).replace(/^#/, '').replace(/^رقم\s*/, '').trim().toLowerCase(), isNumSearch = /^\d+$/.test(normQ);
       let visiblePartnerships = partnerships.map((p, idx) => ({ p, pNum: p.number || (idx + 1) }));
       if (normQ) {
@@ -2100,19 +2232,41 @@
       let html = '', renderedPartnerCards = 0;
       visiblePartnerships.forEach(({ p, pNum }) => {
         const allValid = p.memberIds.map(id => memberMap[id]).filter(Boolean); if (!allValid.length) return;
+        const isSolo = allValid.length === 1;
+        if (recitationFilter === 'solo' && !isSolo) return;
         let shownMembers = allValid.filter(m => matchesStatusFilter(day.recitation[m.id], recitationFilter));
         if (recitationFilter === 'all' && normQ && !isNumSearch) shownMembers = allValid;
         if (!shownMembers.length) return;
         renderedPartnerCards++;
-        const allPresent = allValid.every(m => day.recitation[m.id] === 'present'), typeLabel = allValid.length === 3 ? 'ثلاثي (3 رفقاء)' : 'ثنائي (رفيقان)', isEd = editingPartnerNumId === p.id;
-        html += `<div class="partner-card ${allPresent ? 'all-done' : ''}"><div class="partner-header"><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${isEd ? `<input type="number" min="1" id="partner-num-input-${p.id}" class="input" style="width:72px; padding:4px 8px; font-size:13px;" value="${pNum}" /><button class="btn btn-primary btn-xs" onclick="savePartnerNumber('${p.id}')">حفظ</button><button class="btn btn-outline btn-xs" onclick="editingPartnerNumId=null; renderRecitation();">إلغاء</button>` : `<span class="partner-num-pill">🔢 رفقاء رقم ${pNum}</span><button class="btn btn-outline btn-xs" onclick="editingPartnerNumId='${p.id}'; renderRecitation();">✏️ رقم</button><span class="partner-type-pill">${typeLabel}</span>`}</div><div style="display:flex; gap:6px;"><button class="btn btn-sm ${allPresent ? 'btn-primary' : 'btn-soft'}" onclick="toggleWholePartnership('${p.id}', ${!allPresent})">${allPresent ? '✅ تم التسميع للكل' : 'تسميع للكل'}</button><button class="btn btn-danger btn-sm" onclick="dissolvePartnership('${p.id}')">فك</button></div></div><div class="partner-members-list">${shownMembers.map(m => renderRecitationMemberRow(m, day)).join('')}</div></div>`;
+        const allPresent = allValid.every(m => day.recitation[m.id] === 'present');
+        const isEd = editingPartnerNumId === p.id;
+        const isAddingPartner = isSolo && addingPartnerToPId === p.id;
+        const numPillText = isSolo ? `🔢 رقم ${pNum}` : `🔢 رفقاء رقم ${pNum}`;
+        const soloOrTypeControl = isSolo
+          ? `<button class="btn ${isAddingPartner ? 'btn-primary' : 'btn-soft'} btn-xs" onclick="toggleAddPartnerToCard('${p.id}')">➕ إضافة رفيقة</button>`
+          : `<span class="partner-type-pill">${allValid.length === 3 ? 'ثلاثي (3 رفقاء)' : 'ثنائي (رفيقان)'}</span>`;
+        const headerActions = isSolo
+          ? `<button class="btn btn-danger btn-xs" onclick="dissolvePartnership('${p.id}')">إزالة الرقم</button>`
+          : `<button class="btn btn-sm ${allPresent ? 'btn-primary' : 'btn-soft'}" onclick="toggleWholePartnership('${p.id}', ${!allPresent})">${allPresent ? '✅ تم التسميع للكل' : 'تسميع للكل'}</button><button class="btn btn-danger btn-sm" onclick="dissolvePartnership('${p.id}')">فك</button>`;
+        const inlineAddBox = isAddingPartner
+          ? `<div style="background:var(--primary-soft); border:1.5px solid #a7f3d0; border-radius:10px; padding:10px; margin-bottom:10px;"><div style="font-size:12.5px; font-weight:700; color:var(--primary); margin-bottom:6px;">اختاري رفيقة (أو رفيقتين) لإضافتها إلى رقم ${pNum}:</div><input type="text" class="input" style="padding:7px 10px; font-size:13px; margin-bottom:6px;" placeholder="🔍 ابحث بالاسم..." value="${escapeHtml(addingPartnerSearchQuery)}" oninput="filterInlinePartnerCandidates('${p.id}', this.value)" /><div id="inline-add-partner-grid-${p.id}" class="select-grid" style="max-height:175px; margin-top:0;">${getInlinePartnerCandidatesHtml(p, addingPartnerSearchQuery)}</div><div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;"><button id="inline-add-partner-save-${p.id}" class="btn btn-primary btn-xs" onclick="saveAddPartnerToCard('${p.id}')">💾 حفظ الإضافة (${addingPartnerSelectedIds.length})</button><button class="btn btn-outline btn-xs" onclick="cancelAddPartnerToCard()">إلغاء</button></div></div>`
+          : '';
+        html += `<div class="partner-card ${allPresent ? 'all-done' : ''}"><div class="partner-header"><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${isEd ? `<input type="number" min="1" id="partner-num-input-${p.id}" class="input" style="width:72px; padding:4px 8px; font-size:13px;" value="${pNum}" onkeypress="if(event.key==='Enter') savePartnerNumber('${p.id}')" /><button class="btn btn-primary btn-xs" onclick="savePartnerNumber('${p.id}')">حفظ</button><button class="btn btn-outline btn-xs" onclick="editingPartnerNumId=null; renderRecitation();">إلغاء</button>` : `<span class="partner-num-pill">${numPillText}</span><button class="btn btn-outline btn-xs" onclick="addingPartnerToPId=null; editingPartnerNumId='${p.id}'; renderRecitation();">✏️ رقم</button>${soloOrTypeControl}`}</div><div style="display:flex; gap:6px;">${headerActions}</div></div>${inlineAddBox}<div class="partner-members-list">${shownMembers.map(m => renderRecitationMemberRow(m, day)).join('')}</div></div>`;
       });
-      const paired = getPairedMemberIds();
-      let unpaired = members.filter(m => !paired.has(m.id) && matchesStatusFilter(day.recitation[m.id], recitationFilter));
+      const nextNum = getNextPartnershipNumber();
+      let unpaired = members.filter(m => !numberedIds.has(m.id) && matchesStatusFilter(day.recitation[m.id], recitationFilter));
       if (normQ) unpaired = isNumSearch ? [] : unpaired.filter(m => m.name.toLowerCase().includes(normQ));
-      if (unpaired.length) html += `<div class="card" style="background:#fffbeb; border-color:#fde68a;"><strong style="font-size:14px; color:#92400e;">أعضاء غير مرتبطين برفقاء حالياً (${unpaired.length}):</strong><div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">${unpaired.map(m => renderRecitationMemberRow(m, day)).join('')}</div></div>`;
+      if (unpaired.length) {
+        const unpairedRows = unpaired.map(m => {
+          const soloControl = assigningSoloMemberId === m.id
+            ? `<span style="display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap;"><input type="number" min="1" id="solo-num-input-${m.id}" class="input" style="width:72px; padding:4px 8px; font-size:13px;" value="${nextNum}" onkeypress="if(event.key==='Enter') saveSoloNumber('${m.id}')" /><button class="btn btn-primary btn-xs" onclick="saveSoloNumber('${m.id}')">حفظ</button><button class="btn btn-outline btn-xs" onclick="assigningSoloMemberId=null; renderRecitation();">إلغاء</button></span>`
+            : `<button class="btn btn-soft btn-xs" onclick="startAssignSoloNumber('${m.id}')">🔢 إعطاء رقم كشف</button>`;
+          return renderRecitationMemberRow(m, day, soloControl);
+        }).join('');
+        html += `<div class="card" style="background:#fffbeb; border-color:#fde68a;"><strong style="font-size:14px; color:#92400e;">أعضاء بدون رقم كشف حالياً (${unpaired.length}):</strong><div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">${unpairedRows}</div></div>`;
+      }
       if (!members.length) html = `<div class="card empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`;
-      else if (!renderedPartnerCards && !unpaired.length) html = `<div class="card empty-state">${recitationFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في التسميع اليوم!' : (normQ && isNumSearch ? `لا توجد مجموعة رفقاء برقم "${escapeHtml(rawQ)}".` : 'لا توجد نتائج مطابقة للبحث أو التصفية الحالية.')}</div>`;
+      else if (!renderedPartnerCards && !unpaired.length) html = `<div class="card empty-state">${recitationFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في التسميع اليوم!' : (normQ && isNumSearch ? `لا توجد مجموعة أو عضوة برقم "${escapeHtml(rawQ)}".` : 'لا توجد نتائج مطابقة للبحث أو التصفية الحالية.')}</div>`;
       container.innerHTML = html;
     }
 
@@ -2167,9 +2321,9 @@
       parsedGroups.forEach(pg => {
         if (!pg.items.length) return;
         const ids = pg.items.map(it => { const m = { id: uid('m'), groupId: currentGroupId, name: it.name, recitationOnly: it.recitationOnly }; newM.push(m); return m.id; });
-        if (autoPair && pg.number !== null && ids.length >= 2) {
+        if (autoPair && pg.number !== null && ids.length >= 1) {
           if (ids.length <= 3) newP.push({ id: uid('p'), groupId: currentGroupId, number: pg.number, memberIds: ids });
-          else for (let i = 0; i < ids.length; i += 2) { const sl = ids.slice(i, i + 2); if (sl.length >= 2) newP.push({ id: uid('p'), groupId: currentGroupId, number: pg.number + Math.floor(i / 2), memberIds: sl }); }
+          else for (let i = 0; i < ids.length; i += 2) { const sl = ids.slice(i, i + 2); if (sl.length >= 1) newP.push({ id: uid('p'), groupId: currentGroupId, number: pg.number + Math.floor(i / 2), memberIds: sl }); }
         }
       });
       if (!newM.length) return showToast('لم يتم العثور على أسماء صالحة');
@@ -2197,8 +2351,8 @@
       const m = db.members.find(x => x.id === mId); if (!m || !confirm(`هل تريد حذف "${m.name}" من الجروب نهائياً؟`)) return;
       db.members = db.members.filter(x => x.id !== mId);
       const updP = [], delP = [];
-      db.partnerships.forEach(p => { if (p.memberIds.includes(mId)) { p.memberIds = p.memberIds.filter(id => id !== mId); if (p.memberIds.length >= 2) updP.push(p); else delP.push(p.id); } });
-      db.partnerships = db.partnerships.filter(p => p.memberIds.length >= 2);
+      db.partnerships.forEach(p => { if (p.memberIds.includes(mId)) { p.memberIds = p.memberIds.filter(id => id !== mId); if (p.memberIds.length >= 1) updP.push(p); else delP.push(p.id); } });
+      db.partnerships = db.partnerships.filter(p => p.memberIds.length >= 1);
       cloudDeleteMember(mId, updP, delP); renderAll(); showToast('تم حذف العضو');
     }
     function deleteAllGroupMembers() {
@@ -2222,18 +2376,18 @@
       updateSearchClearBtn('search-manage');
       const group = getCurrentGroup(), allMembers = getGroupMembers(), partnerships = getGroupPartnerships();
       document.getElementById('manage-count').textContent = allMembers.length;
-      const pNumMap = {}; partnerships.forEach((p, idx) => { const n = p.number || (idx + 1); p.memberIds.forEach(id => pNumMap[id] = n); });
+      const pNumMap = {}; partnerships.forEach((p, idx) => { const n = p.number || (idx + 1), c = (p.memberIds || []).length; p.memberIds.forEach(id => pNumMap[id] = { n, c }); });
       document.getElementById('reset-date-note').textContent = group && group.absenceStartDate ? `يتم حساب الغياب المتتابع بدءاً من: ${group.absenceStartDate}` : 'يتم حساب الغياب المتتابع (يتصفر تلقائياً عند الحضور).';
       const list = document.getElementById('manage-members-list'), searchEl = document.getElementById('search-manage'), q = searchEl ? searchEl.value.trim().toLowerCase() : '';
       const members = q ? allMembers.filter(m => m.name.toLowerCase().includes(q)) : allMembers;
       if (!allMembers.length) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة للبحث "${escapeHtml(q)}".</div>`; return; }
       list.innerHTML = members.map((m, i) => {
-        const lAbs = getAbsenceCount(m.id, 'listening'), rAbs = getAbsenceCount(m.id, 'recitation'), pNum = pNumMap[m.id];
+        const lAbs = getAbsenceCount(m.id, 'listening'), rAbs = getAbsenceCount(m.id, 'recitation'), pInfo = pNumMap[m.id];
         if (editingMemberId === m.id) {
           return `<div style="padding:10px; border-radius:12px; background:var(--primary-soft); border:1.5px solid #6ee7b7; margin-bottom:8px;"><div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;"><input type="text" id="edit-member-name-${m.id}" class="input" style="padding:8px 10px; font-size:14px; flex:1; min-width:170px;" value="${escapeHtml(m.name)}" onkeypress="if(event.key==='Enter') saveMemberEdit('${m.id}')" /><button class="btn btn-primary btn-sm" onclick="saveMemberEdit('${m.id}')">💾 حفظ</button><button class="btn btn-outline btn-sm" onclick="editingMemberId=null; renderManage();">إلغاء</button></div></div>`;
         }
-        return `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid var(--border); flex-wrap:wrap;"><div><div style="font-weight:700;">${i + 1}. ${escapeHtml(m.name)} ${pNum ? `<span class="partner-type-pill" style="font-size:11px; padding:1px 7px;">رفقاء #${pNum}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div><div style="font-size:12px; color:var(--muted);">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'} ${lAbs > 2 ? '⚠️ إنذار' : ''} •`} تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'} ${rAbs > 2 ? '⚠️ إنذار' : ''}</div></div><div style="display:flex; gap:5px; flex-wrap:wrap;"><button class="btn btn-soft btn-xs" onclick="startEditMember('${m.id}')">✏️ تعديل</button><button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? '🎧 تفعيل الاستماع' : '📖 تسميع فقط'}</button><button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">🗑️ حذف</button></div></div>`;
+        return `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid var(--border); flex-wrap:wrap;"><div><div style="font-weight:700;">${i + 1}. ${escapeHtml(m.name)} ${pInfo ? `<span class="partner-type-pill" style="font-size:11px; padding:1px 7px;">${pInfo.c === 1 ? 'رقم كشف #' + pInfo.n : 'رفقاء #' + pInfo.n}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div><div style="font-size:12px; color:var(--muted);">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'} ${lAbs > 2 ? '⚠️ إنذار' : ''} •`} تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'} ${rAbs > 2 ? '⚠️ إنذار' : ''}</div></div><div style="display:flex; gap:5px; flex-wrap:wrap;"><button class="btn btn-soft btn-xs" onclick="startEditMember('${m.id}')">✏️ تعديل</button><button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? '🎧 تفعيل الاستماع' : '📖 تسميع فقط'}</button><button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">🗑️ حذف</button></div></div>`;
       }).join('');
     }
 
