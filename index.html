@@ -687,6 +687,25 @@
       const norm = s => String(s || '').trim().replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي');
       return norm(a).localeCompare(norm(b), 'ar');
     }
+    let __nameMeasureCtx = null;
+    function getVisualNameWidth(s) {
+      const clean = String(s || '').replace(/[\u064B-\u065F\u0670\u0640]/g, '').trim().replace(/\s+/g, ' ');
+      try {
+        if (!__nameMeasureCtx && typeof document !== 'undefined') {
+          const c = document.createElement('canvas');
+          __nameMeasureCtx = c.getContext('2d');
+          if (__nameMeasureCtx) __nameMeasureCtx.font = '15px system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Arial, sans-serif';
+        }
+        if (__nameMeasureCtx) return __nameMeasureCtx.measureText(clean).width;
+      } catch (e) {}
+      return clean.length;
+    }
+    function compareNameLengthAsc(a, b) {
+      const cleanLen = s => String(s || '').replace(/[\u064B-\u065F\u0670\u0640]/g, '').trim().replace(/\s+/g, ' ').length;
+      const wa = getVisualNameWidth(a), wb = getVisualNameWidth(b);
+      if (Math.abs(wa - wb) >= 0.5) return wa - wb;
+      return (cleanLen(a) - cleanLen(b)) || compareArabic(a, b);
+    }
 
     const COMPOUND_PREFIXES = new Set(['عبد', 'ابو', 'ام', 'ال', 'بن', 'بنت', 'ذي']);
     function extractFirstTwoArabicNames(rawName, allowSplitExtra = false) {
@@ -1028,7 +1047,7 @@
       }
       const stars = members.filter(m => !m.recitationOnly && activeListeningDays.every(d => db.attendance[d]?.listening?.[m.id] === 'present') && activeRecitationDays.every(d => db.attendance[d]?.recitation?.[m.id] === 'present'));
       summaryEl.textContent = `أيام الاستماع: ${activeListeningDays.length} • أيام التسميع: ${activeRecitationDays.length} • المثابرات: ${stars.length} من ${members.length}`;
-      currentWeeklyMessage = !stars.length ? '🤍 مثابرات الإسبوع 🤍\n\nلا يوجد أعضاء ملتزمون في الاستماع والتسميع معاً طوال هذا الأسبوع.' : `🤍 مثابرات الإسبوع 🤍\n\n${stars.sort((a, b) => compareArabic(a.name, b.name)).map(m => `🌻 الجميلة / ${m.name} 👑`).join('\n\n')}`;
+      currentWeeklyMessage = !stars.length ? '🤍 مثابرات الإسبوع 🤍\n\nلا يوجد أعضاء ملتزمون في الاستماع والتسميع معاً طوال هذا الأسبوع.' : `🤍 مثابرات الإسبوع 🤍\n\n${stars.sort((a, b) => compareNameLengthAsc(a.name, b.name)).map(m => `🌻 الجميلة / ${m.name} 👑`).join('\n\n')}`;
       outputEl.textContent = currentWeeklyMessage;
     }
     function copyWeeklyStarsMessage() { if (!currentWeeklyMessage) return showToast('لا توجد رسالة للنسخ'); copyTextSilently(currentWeeklyMessage, '✅ تم نسخ رسالة مثابرات الإسبوع بنجاح!'); }
@@ -2222,7 +2241,7 @@
       const members = type === 'listening' ? getListeningMembers() : getGroupMembers(), day = ensureDayRecord();
       const title = type === 'listening' ? `🌹غياب الإستماع ليوم ${getArabicWeekday(currentDate)}🌹` : `🌹غياب التسميع ليوم ${getArabicWeekday(currentDate)}🌹`;
       const absentList = members.filter(m => day[type][m.id] === 'absent').map(m => ({ name: m.name, count: getAbsenceCount(m.id, type, currentDate) }))
-        .sort((a, b) => type === 'listening' ? (a.count - b.count) || compareArabic(a.name, b.name) : (a.count - b.count));
+        .sort((a, b) => (a.count - b.count) || compareNameLengthAsc(a.name, b.name));
       if (!absentList.length) return `${title}\n\n✨ ما شاء الله، لا يوجد غياب اليوم!`;
       return `${title}\n\n${absentList.map(it => `🥀${it.name} ${'🔴'.repeat(Math.max(1, it.count))}${it.count > 2 ? ' إنذار بالحذف' : ''}`).join('\n')}`;
     }
