@@ -147,6 +147,15 @@
     .filter-chip.active-absent { background: var(--danger); border-color: var(--danger); color: #fff; }
     .filter-chip.active-present { background: #059669; border-color: #059669; color: #fff; }
     .filter-chip.active-unmarked { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-select-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .filter-select-label { font-size: 13px; font-weight: 800; color: var(--primary); white-space: nowrap; }
+    .filter-select { flex: 1; min-width: 190px; min-height: 42px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: #fff; font-size: 13.5px; font-weight: 700; color: var(--text); cursor: pointer; font-variant-numeric: tabular-nums; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+    .filter-select:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12); }
+    .filter-select.filter-active { border-color: var(--primary-light); background: var(--primary-soft); color: var(--primary); }
+    .filter-select.filter-absent { border-color: #fca5a5; background: var(--danger-soft); color: var(--danger); }
+    .filter-select.filter-excused { border-color: #fcd34d; background: #fffbeb; color: #b45309; }
+    .filter-select.filter-unmarked { border-color: #fcd34d; background: #fffbeb; color: #b45309; }
+    .filter-select.filter-present { border-color: #6ee7b7; background: #f0fdf4; color: #059669; }
     .member-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 15px; border: 1.5px solid var(--border); background: #fff; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
     .status-present { border-color: #6ee7b7 !important; background: #f0fdf4 !important; }
     .status-absent { border-color: #fca5a5 !important; background: #fef2f2 !important; }
@@ -480,7 +489,7 @@
             <input type="text" id="search-listening" class="input" style="padding:9px 12px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
             <button type="button" class="search-clear-btn" data-target="search-listening" title="مسح البحث" onclick="clearSearchInput('search-listening', renderListening)">✕</button>
           </div>
-          <div id="listening-filters" class="filter-chips"></div>
+          <div id="listening-filters" class="filter-select-wrap"></div>
           <div class="bulk-actions-row">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
@@ -516,7 +525,7 @@
             <input type="text" id="search-recitation" class="input" style="padding:9px 12px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
             <button type="button" class="search-clear-btn" data-target="search-recitation" title="مسح البحث" onclick="clearSearchInput('search-recitation', renderRecitation)">✕</button>
           </div>
-          <div id="recitation-filters" class="filter-chips"></div>
+          <div id="recitation-filters" class="filter-select-wrap"></div>
           <div class="bulk-actions-row">
             <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
             <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
@@ -1749,22 +1758,37 @@
     function matchesStatusFilter(st, filter) {
       if (filter === 'all') return true;
       if (filter === 'absent') return st === 'absent';
+      if (filter === 'excused') return st === 'excused';
       if (filter === 'present') return st === 'present';
       if (filter === 'unmarked') return !st;
       return true;
     }
-    function renderFilterChips(containerId, members, dayMap, currentFilter, onChangeFnName, extraChips = []) {
+    function renderFilterDropdown(containerId, members, dayMap, currentFilter, onChangeFnName, extraOptions = []) {
       const wrap = document.getElementById(containerId); if (!wrap) return;
-      let absentC = 0, presentC = 0, unmarkedC = 0;
-      members.forEach(m => { const st = dayMap[m.id]; if (st === 'absent') absentC++; else if (st === 'present') presentC++; else if (!st) unmarkedC++; });
-      const chips = [
-        { key: 'all', label: `الكل (${members.length})`, cls: 'active' },
-        { key: 'absent', label: `❌ الغائبين (${absentC})`, cls: 'active-absent' },
-        { key: 'unmarked', label: `⏳ لم يُسجل (${unmarkedC})`, cls: 'active-unmarked' },
-        { key: 'present', label: `✅ الحاضرين (${presentC})`, cls: 'active-present' },
-        ...extraChips
+      let absentC = 0, excusedC = 0, presentC = 0, unmarkedC = 0;
+      members.forEach(m => {
+        const st = dayMap[m.id];
+        if (st === 'absent') absentC++;
+        else if (st === 'excused') excusedC++;
+        else if (st === 'present') presentC++;
+        else if (!st) unmarkedC++;
+      });
+      const options = [
+        { key: 'all', label: `الكل (${members.length})`, cls: '' },
+        { key: 'absent', label: `❌ الغائبين (${absentC})`, cls: 'filter-absent' },
+        { key: 'excused', label: `🟡 بعذر (${excusedC})`, cls: 'filter-excused' },
+        { key: 'unmarked', label: `⏳ لم يُسجل (${unmarkedC})`, cls: 'filter-unmarked' },
+        { key: 'present', label: `✅ الحاضرين (${presentC})`, cls: 'filter-present' },
+        ...extraOptions
       ];
-      wrap.innerHTML = chips.map(c => `<button type="button" class="filter-chip ${currentFilter === c.key ? c.cls : ''}" onclick="${onChangeFnName}('${c.key}')">${c.label}</button>`).join('');
+      const activeOpt = options.find(o => o.key === currentFilter) || options[0];
+      const selectId = `${containerId}-select`;
+      const resetBtn = activeOpt.key !== 'all'
+        ? `<button type="button" class="btn btn-outline btn-xs" onclick="${onChangeFnName}('all')">عرض الكل</button>`
+        : '';
+      wrap.innerHTML = `<label for="${selectId}" class="filter-select-label">تصفية القائمة:</label><select id="${selectId}" class="filter-select ${activeOpt.cls}" onchange="${onChangeFnName}(this.value)">${options.map(o => `<option value="${o.key}"${activeOpt.key === o.key ? ' selected' : ''}>${o.label}</option>`).join('')}</select>${resetBtn}`;
+      const sel = document.getElementById(selectId);
+      if (sel) sel.value = activeOpt.key;
     }
     function setListeningFilter(f) { listeningFilter = f; renderListening(); }
     function setRecitationFilter(f) { recitationFilter = f; renderRecitation(); }
@@ -1788,7 +1812,7 @@
       const lRecorded = allListen.filter(m => Boolean(day.listening[m.id])).length, lRemaining = Math.max(0, allListen.length - lRecorded);
       const lStatusEl = document.getElementById('listening-status-line');
       if (lStatusEl) lStatusEl.textContent = allListen.length ? `المُسجَّل اليوم: ${lRecorded} من ${allListen.length} • المتبقي: ${lRemaining}` : '';
-      renderFilterChips('listening-filters', allListen, day.listening, listeningFilter, 'setListeningFilter');
+      renderFilterDropdown('listening-filters', allListen, day.listening, listeningFilter, 'setListeningFilter');
       const members = allListen.filter(m => arabicIncludes(m.name, q) && matchesStatusFilter(day.listening[m.id], listeningFilter)).sort((a, b) => compareArabic(a.name, b.name));
       if (!allListen.length) { list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="card empty-state">${listeningFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في الاستماع اليوم!' : 'لا يوجد أعضاء مطابقون للتصفية الحالية.'}</div>`; return; }
@@ -3168,8 +3192,8 @@
       const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
       const rStatusEl = document.getElementById('recitation-status-line');
       if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل اليوم: ${rRecorded} من ${members.length} • المتبقي: ${rRemaining}` : '';
-      const extraRecitChips = noPartnerCount > 0 ? [{ key: 'solo', label: `👤 بدون رفيقة (${noPartnerCount})`, cls: 'active' }] : [];
-      renderFilterChips('recitation-filters', members, day.recitation, recitationFilter, 'setRecitationFilter', extraRecitChips);
+      const extraRecitOptions = noPartnerCount > 0 ? [{ key: 'solo', label: `👤 بدون رفيقة (${noPartnerCount})`, cls: 'filter-active' }] : [];
+      renderFilterDropdown('recitation-filters', members, day.recitation, recitationFilter, 'setRecitationFilter', extraRecitOptions);
       const rawQ = document.getElementById('search-recitation').value.trim(), normQ = toEnglishDigits(rawQ).replace(/^#/, '').replace(/^رقم\s*/, '').trim().toLowerCase(), isNumSearch = /^\d+$/.test(normQ);
       let visiblePartnerships = partnerships.map((p, idx) => ({ p, pNum: p.number || (idx + 1) }));
       if (normQ) {
@@ -3554,8 +3578,17 @@
       const title = type === 'listening' ? `🌹غياب الإستماع ليوم ${getArabicWeekday(currentDate)}🌹` : `🌹غياب التسميع ليوم ${getArabicWeekday(currentDate)}🌹`;
       const absentList = members.filter(m => day[type][m.id] === 'absent').map(m => ({ name: m.name, count: getAbsenceCount(m.id, type, currentDate) }))
         .sort((a, b) => (a.count - b.count) || compareNameLengthAsc(a.name, b.name));
-      if (!absentList.length) return `${title}\n\n✨ ما شاء الله، لا يوجد غياب اليوم!`;
-      return `${title}\n\n${absentList.map(it => `🥀${it.name} ${'🔴'.repeat(Math.max(1, it.count))}${it.count > 2 ? ' إنذار بالحذف' : ''}`).join('\n')}`;
+      const excusedList = members.filter(m => day[type][m.id] === 'excused').map(m => ({ name: m.name }))
+        .sort((a, b) => compareNameLengthAsc(a.name, b.name));
+      if (!absentList.length && !excusedList.length) return `${title}\n\n✨ ما شاء الله، لا يوجد غياب اليوم!`;
+      const blocks = [];
+      if (absentList.length) {
+        blocks.push(absentList.map(it => `🥀${it.name} ${'🔴'.repeat(Math.max(1, it.count))}${it.count > 2 ? ' إنذار بالحذف' : ''}`).join('\n'));
+      }
+      if (excusedList.length) {
+        blocks.push(excusedList.map(it => `🥀${it.name} ⭕بعذر`).join('\n'));
+      }
+      return `${title}\n\n${blocks.join('\n\n')}`;
     }
     function copyAbsenceMessage(mode) { copyTextSilently(buildAbsenceSection(mode), '✅ تم نسخ رسالة الغياب بنجاح!'); }
 
