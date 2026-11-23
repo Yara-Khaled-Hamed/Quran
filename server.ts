@@ -185,6 +185,31 @@ function normalizeParsedSchedule(parsed: ParsedSchedule): ParsedSchedule {
   };
 }
 
+const ATTENDANCE_OCR_PROMPT = `أنت مساعد خبير في قراءة أسماء الأعضاء/الطالبات من صور لقطات شاشة الواتساب (سواء استطلاعات الرأي، أو رسائل غياب الاستماع/التسميع، أو قوائم المجموعات).
+استخرج جميع أسماء الأشخاص الظاهرة في الصورة بدقة تامة من الأعلى إلى الأسفل بدون تجاهل أي اسم!
+
+قواعد الاستخراج الإلزامية:
+1. استخرج كل اسم يظهر في القائمة سواء كان اسماً مركباً (مثل: نسمة محمد) أو اسماً من كلمة واحدة قصيرة (مثل: نسمة، ندى، هبة، منى، سارة، آية).
+2. إذا ظهر رقم هاتف ومعه اسم بعد علامة ~ (مثل: +20 100... ~ نسمة)، استخرج الاسم فقط ("نسمة").
+3. تجاهل تماماً:
+   - عناوين الرسائل والاستطلاعات مثل: "تفاصيل الاستطلاع"، "استطلاع الرأي"، "المصوتون"، "غياب الإستماع ليوم..."، "غياب التسميع ليوم..."، "مثابرات الإسبوع"، "خيارات"، "أصوات".
+   - الإيموجي والرموز مثل: 🥀، 🌹، 🔴، ✅، ❌، 👑، 🌻، 🍃.
+   - كلمات التنبيه مثل: "إنذار بالحذف"، "تسميع فقط".
+   - التواريخ والأوقات مثل: "أمس"، "اليوم"، "٨:١٥ م"، "منذ ٥ دقائق".
+4. حافظ على كتابة الاسم كما هو بدون اختصار أو حذف أي اسم في أعلى أو أسفل الصورة.`;
+
+const ATTENDANCE_OCR_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    names: {
+      type: Type.ARRAY,
+      description: 'قائمة جميع أسماء الأشخاص المستخرجة من الصورة بالترتيب',
+      items: { type: Type.STRING },
+    },
+  },
+  required: ['names'],
+};
+
 const SCHEDULE_PROMPT = `أنت مساعد خبير في قراءة جداول حفظ ومراجعة القرآن الكريم العربية بدقة تامة (سواء كانت مصممة بالإكسل أو مكتوبة بخط اليد).
 اقرأ صورة الجدول المرفقة بالكامل صفاً بصف من الأعلى إلى الأسفل، وفي كل صف اقرأ كل عمود من اليمين إلى اليسار (اتجاه عربي RTL) بدون إهمال أي عمود!
 
@@ -269,6 +294,87 @@ const SCHEDULE_RESPONSE_SCHEMA = {
 async function startServer() {
   const app = express();
   app.use(express.json({ limit: '15mb' }));
+
+  app.post('/api/parse-attendance-image', async (req: Request, res: Response) => {
+    try {
+      const { imageBase64, mimeType } = (req.body || {}) as {
+        imageBase64?: string;
+        mimeType?: string;
+      };
+      if (!imageBase64 || typeof imageBase64 !== 'string') {
+        res.status(400).json({ error: 'يرجى إرسال صورة الأسماء أولاً' });
+        return;
+      }
+
+      const ai = getGeminiClient();
+      if (!ai) {
+        res.status(503).json({
+          error: 'GEMINI_API_KEY غير مضبوط',
+          fallback: true,
+        });
+        return;
+      }
+
+      const cleanBase64 = imageBase64.replace(/^data:[^;]+;base64,/, '').trim();
+      const safeMime = typeof mimeType === 'string' && mimeType.startsWith('image/')
+        ? mimeType
+        : 'image/png';
+
+      const modelsToTry = ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'];
+      let lastErr: unknown = null;
+      for (let attempt = 0; attempt < modelsToTry.length; attempt++) {
+        const modelName = modelsToTry[attempt];
+        try {
+          const response = await withTimeout(
+            ai.models.generateContent({
+              model: modelName,
+              contents: {
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: safeMime,
+                      data: cleanBase64,
+                    },
+                  },
+                  { text: ATTENDANCE_OCR_PROMPT },
+                ],
+              },
+              config: {
+                responseMimeType: 'application/json',
+                responseSchema: ATTENDANCE_OCR_SCHEMA,
+                ...(modelName === 'gemini-4-hydrogen'
+                  ? { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } }
+                  : {}),
+              },
+            }),
+            20000,
+            modelName
+          );
+
+          const rawJson = (response.text ?? '{}').trim();
+          const parsed = JSON.parse(rawJson) as { names?: unknown };
+          const names = Array.isArray(parsed?.names)
+            ? parsed.names.map((n) => String(n || '').trim()).filter(Boolean)
+            : [];
+          res.json({ names, modelUsed: modelName });
+          return;
+        } catch (err) {
+          lastErr = err;
+          if (attempt < modelsToTry.length - 1) {
+            await new Promise((r) => setTimeout(r, 250));
+          }
+        }
+      }
+
+      const rawErrMsg = lastErr instanceof Error ? lastErr.message : String(lastErr || '');
+      console.error('parse-attendance-image error:', lastErr);
+      res.status(503).json({ error: rawErrMsg || 'تعذر قراءة الصورة ذكياً', fallback: true });
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : 'حدث خطأ غير متوقع';
+      console.error('parse-attendance-image unexpected error:', err);
+      res.status(500).json({ error: errMsg, fallback: true });
+    }
+  });
 
   app.post('/api/parse-schedule', async (req: Request, res: Response) => {
     try {
