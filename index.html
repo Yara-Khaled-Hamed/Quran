@@ -93,10 +93,18 @@
     .dash-seg-btn { min-height: 36px; padding: 6px 12px; border: none; border-radius: 9px; background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all 0.16s var(--ease); white-space: nowrap; }
     .dash-seg-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
     .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
-    .dash-kpi-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 13px 14px; }
-    .dash-kpi-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    .dash-kpi-card { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 13px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: var(--shadow-sm); }
+    .dash-kpi-label { font-size: 12px; font-weight: 800; color: var(--muted); }
     .dash-kpi-val { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.25; }
-    .dash-kpi-sub { font-size: 11.5px; color: var(--muted); font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .dash-kpi-sub { font-size: 11px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.35; }
+    .dash-ring-wrap { position: relative; width: 76px; height: 76px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dash-ring-wrap svg { display: block; }
+    .dash-ring-val { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16.5px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .dash-ring-row { display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex-wrap: wrap; }
+    .dash-delta-pill { display: inline-flex; align-items: center; gap: 2px; padding: 2px 7px; border-radius: 99px; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .dash-delta-pill.up { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .dash-delta-pill.down { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .dash-delta-pill.flat { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
     .dash-split-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; align-items: stretch; }
     .dash-split-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; }
     .dash-spotlight-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.06); cursor: pointer; }
@@ -145,6 +153,8 @@
     .status-excused { border-color: #fcd34d !important; background: #fffbeb !important; }
     .member-info { display: flex; flex-direction: column; gap: 2px; }
     .member-name { font-weight: 800; font-size: 15.5px; }
+    .member-name-link { cursor: pointer; transition: color 0.15s; text-decoration: underline dotted rgba(6,95,70,0.35); text-underline-offset: 4px; display: inline-block; }
+    .member-name-link:hover, .member-name-link:active { color: var(--primary); }
     .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; }
     .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 99px; margin-right: 4px; }
     .status-pills { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -192,6 +202,8 @@
     .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 190px; overflow-y: auto; }
     .name-match-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-soft); border: 1px solid #6ee7b7; color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; margin: 2px; }
     .name-match-chip.absent-chip { background: var(--danger-soft); border-color: #fca5a5; color: var(--danger); }
+    .name-match-chip.excused-chip { background: #fffbeb; border-color: #fcd34d; color: #b45309; }
+    .paste-hint-banner { background: #f0fdf4; border: 1px dashed #6ee7b7; color: var(--primary); font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 10px; text-align: center; margin-bottom: 8px; }
     .name-chip-remove { background: transparent; border: none; color: inherit; font-weight: 800; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 2px; opacity: 0.75; }
     .name-chip-remove:hover { opacity: 1; }
     .bulk-actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -447,8 +459,8 @@
               <strong style="font-size:14px; color:var(--primary);">📝 تسجيل مجموعة أسماء في الاستماع دفعة واحدة</strong>
               <button class="btn btn-outline btn-xs" onclick="toggleListeningBatch(false)">إغلاق</button>
             </div>
-            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي الأسماء (كل اسم في سطر، أو بينهم فاصلة <code>،</code> — حتى لو منسوخة من الواتساب بالإيموجي مثل <code>🥀</code>).</p>
-            <textarea id="listening-batch-input" dir="rtl" class="input" rows="4" style="padding:10px 12px; font-size:14px;" placeholder="مثال:&#10;سلسبيل محمد&#10;مريم كرم، أسماء أبو حسين&#10;🥀 سحر الأفندي" oninput="previewListeningBatch()"></textarea>
+            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي الأسماء (كل اسم في سطر، أو بينهم فاصلة <code>،</code>). إذا كُتبت كلمة <code>عذر</code> أو <code>بعذر</code> بجانب الاسم يُسجل <strong>غياب بعذر</strong> عند تسجيل الغياب.</p>
+            <textarea id="listening-batch-input" dir="rtl" class="input" rows="4" style="padding:10px 12px; font-size:14px;" placeholder="مثال:&#10;سلسبيل محمد&#10;مريم كرم عذر، أسماء أبو حسين&#10;🥀 سحر الأفندي (بعذر)" oninput="previewListeningBatch()"></textarea>
             <div id="listening-batch-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:9px; cursor:pointer;">
               <input type="checkbox" id="listening-batch-auto-present" style="width:17px; height:17px;" />
@@ -485,8 +497,8 @@
 
           <div id="recitation-unified-box" class="quick-num-box">
             <div style="font-weight:800; font-size:14px; color:var(--primary); margin-bottom:4px;">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>) لتسجيلهم دفعة واحدة.</p>
-            <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>). كتابة <code>عذر</code> بجانب الاسم أو الرقم تسجله <strong>بعذر</strong> عند الغياب.</p>
+            <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام عذر، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer;">
               <input type="checkbox" id="recit-unified-auto-rest" checked style="width:17px; height:17px;" />
@@ -895,10 +907,11 @@
       </p>
 
       <div id="sched-import-image-panel">
-        <label class="btn btn-primary btn-block btn-sm" style="cursor:pointer; margin-bottom:10px;">
+        <label class="btn btn-primary btn-block btn-sm" style="cursor:pointer; margin-bottom:8px;">
           🖼️ اختيار صورة الجدول
           <input type="file" id="sched-import-file" accept="image/*" class="hidden" onchange="onSchedImportFileSelected(this)" />
         </label>
+        <div class="paste-hint-banner">📋 أو خذي لقطة شاشة واضغطي لصق مباشرة (Ctrl+V) لتنفيذ الجدول فوراً</div>
         <div id="sched-import-preview-wrap" class="hidden" style="margin-bottom:10px; text-align:center; background:#f8faf9; padding:8px; border-radius:12px; border:1px solid var(--border);">
           <img id="sched-import-preview-img" src="" alt="معاينة صورة الجدول" style="max-width:100%; max-height:240px; border-radius:8px; object-fit:contain;" />
         </div>
@@ -978,6 +991,7 @@
         <label class="btn btn-primary btn-sm" style="flex:1; cursor:pointer;">🖼️ اختيار صور (صورة أو أكثر)<input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" /></label>
         <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles(true)">🗑️ مسح الصور</button>
       </div>
+      <div class="paste-hint-banner">📋 يمكنكِ لصق لقطة الشاشة مباشرة هنا (Ctrl+V) لقراءتها فوراً دون حفظها</div>
       <label style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px;"><input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" /><span>فرض الوضع الليلي (عكس الألوان يدوياً)</span></label>
       <div id="ocr-files-meta" class="hidden" style="font-size:12.5px; font-weight:700; color:var(--primary); margin-top:4px;"></div>
       <div id="ocr-thumbs-wrap" class="ocr-thumbs-wrap hidden"></div>
@@ -1030,6 +1044,11 @@
           <p id="member-detail-sub" style="font-size:12px; color:var(--muted); font-weight:600;"></p>
         </div>
         <button class="btn btn-outline btn-sm" onclick="closeMemberDetailModal()">✕</button>
+      </div>
+      <div id="member-detail-scope-bar" class="dash-segmented" style="margin-bottom:10px;">
+        <button type="button" id="member-scope-btn-all" class="dash-seg-btn active" onclick="setMemberDetailScope('all')">🕰️ منذ البداية</button>
+        <button type="button" id="member-scope-btn-month" class="dash-seg-btn" onclick="setMemberDetailScope('month')">📅 خلال الشهر</button>
+        <button type="button" id="member-scope-btn-custom" class="dash-seg-btn hidden" onclick="setMemberDetailScope('custom')">📆 فترة الداشبورد</button>
       </div>
       <div id="member-detail-stats" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:12px;"></div>
       <div id="member-detail-history" style="max-height:52vh; overflow-y:auto; border:1px solid var(--border); border-radius:12px; padding:8px 10px;"></div>
@@ -1100,8 +1119,12 @@
     let dashMonthValue = getTodayStr().slice(0, 7);
     let dashTierFilter = 'all';
     let dashLastData = null;
+    let memberDetailCurrentId = null;
+    let memberDetailScopeMode = 'all';
     let recitationMatchedMemberIds = [];
+    let recitationExcusedIds = new Set();
     let listeningBatchMatchedIds = [];
+    let listeningBatchExcusedIds = new Set();
     let listeningBatchExcludedIds = new Set();
     let selectedForPartner = [];
     let pendingSupervisorName = '';
@@ -1773,7 +1796,7 @@
       list.innerHTML = members.map(m => {
         const st = day.listening[m.id] || '', absCount = getAbsenceCount(m.id, 'listening');
         const absTag = absCount > 0 ? `<span class="absence-tag">غياب الاستماع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</span>` : '';
-        return `<div class="member-row ${st ? 'status-' + st : ''}"><div class="member-info"><div class="member-name">🎧 ${escapeHtml(m.name)}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✅ حاضر</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">❌ غائب</button></div></div>`;
+        return `<div class="member-row ${st ? 'status-' + st : ''}"><div class="member-info"><div class="member-name member-name-link" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">🎧 ${escapeHtml(m.name)}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✅ حاضر</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">❌ غائب</button></div></div>`;
       }).join('');
     }
     function setListening(memberId, status) {
@@ -1803,10 +1826,39 @@
       listeningBatchExcludedIds.clear();
       previewListeningBatch();
     }
+    function extractExcuseMarker(rawSegment) {
+      let s = String(rawSegment || '');
+      let excused = false;
+      const checkWords = ['بعذر', 'بالعذر', 'عذر شرعي', 'عذر', 'معذورة', 'معذوره', 'معذور', 'اعذار'];
+      const cleaned = s
+        .replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳🎧📖#()\[\]{}]/g, ' ')
+        .replace(/[-–—ـ:]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!cleaned) return { text: '', excused: false };
+      const words = cleaned.split(/\s+/);
+      const kept = [];
+      for (let i = 0; i < words.length; i++) {
+        const nw = normalizeArabicText(words[i]);
+        const nextNw = i + 1 < words.length ? normalizeArabicText(words[i + 1]) : '';
+        if (nw === 'عذر' && nextNw === 'شرعي') {
+          excused = true;
+          i++;
+          continue;
+        }
+        if (checkWords.some(w => normalizeArabicText(w) === nw)) {
+          excused = true;
+          continue;
+        }
+        kept.push(words[i]);
+      }
+      return { text: kept.join(' ').trim(), excused };
+    }
+
     function parseListeningBatchNames(rawText) {
       const raw = toEnglishDigits(String(rawText || '')).replace(/(?:^|\n)\s*[^\n]*(?:غياب\s+(?:ال[اإ]ستماع|التسميع)|مثابرات\s+ا?ل[اإ]سبوع|لا يوجد غياب)[^\n]*/g, '');
       const segments = raw.split(/[\r\n،,;؛\/]+/);
-      const nameTokens = [];
+      const items = [];
       segments.forEach(seg => {
         let s = seg
           .replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳🎧📖#]/g, ' ')
@@ -1816,9 +1868,15 @@
           .replace(/^[\s\-–—.*ـ:()]+|[\s\-–—.*ـ:()]+$/g, '')
           .replace(/\s+/g, ' ')
           .trim();
-        if (s) nameTokens.push(s);
+        if (!s) return;
+        const { text, excused } = extractExcuseMarker(s);
+        if (!text && excused) {
+          if (items.length) items[items.length - 1].excused = true;
+          return;
+        }
+        if (text) items.push({ name: text, excused });
       });
-      return nameTokens;
+      return items;
     }
     function removeListeningBatchMatch(memberId) {
       listeningBatchExcludedIds.add(memberId);
@@ -1826,12 +1884,15 @@
     }
     function resolveAmbiguousListeningName(rawEntry, chosenName) {
       const ta = document.getElementById('listening-batch-input'); if (!ta) return;
-      const tokens = parseListeningBatchNames(ta.value);
+      const items = parseListeningBatchNames(ta.value);
       const normRaw = normalizeArabicText(rawEntry);
       let replaced = false;
-      const updated = tokens.map(tok => {
-        if (!replaced && normalizeArabicText(tok) === normRaw) { replaced = true; return chosenName; }
-        return tok;
+      const updated = items.map(it => {
+        if (!replaced && normalizeArabicText(it.name) === normRaw) {
+          replaced = true;
+          return it.excused ? `${chosenName} عذر` : chosenName;
+        }
+        return it.excused ? `${it.name} عذر` : it.name;
       });
       if (!replaced) updated.push(chosenName);
       ta.value = updated.join('\n');
@@ -1843,16 +1904,21 @@
       const raw = inputEl.value;
       if (!raw.trim()) {
         listeningBatchMatchedIds = [];
+        listeningBatchExcusedIds = new Set();
         listeningBatchExcludedIds.clear();
         box.classList.add('hidden'); box.innerHTML = ''; return;
       }
-      const tokens = parseListeningBatchNames(raw), members = getListeningMembers();
-      const matched = [], matchedSet = new Set(), ambiguousList = [], unmatchedList = [];
-      tokens.forEach(token => {
-        const res = matchTypedNameToMember(token, members);
+      const items = parseListeningBatchNames(raw), members = getListeningMembers();
+      const matched = [], matchedSet = new Set(), excusedSet = new Set(), ambiguousList = [], unmatchedList = [];
+      items.forEach(item => {
+        const res = matchTypedNameToMember(item.name, members);
         if (res.status === 'matched') {
-          if (!listeningBatchExcludedIds.has(res.member.id) && !matchedSet.has(res.member.id)) {
-            matchedSet.add(res.member.id); matched.push(res.member);
+          if (!listeningBatchExcludedIds.has(res.member.id)) {
+            if (item.excused) excusedSet.add(res.member.id);
+            if (!matchedSet.has(res.member.id)) {
+              matchedSet.add(res.member.id);
+              matched.push(res.member);
+            }
           }
         } else if (res.status === 'ambiguous') {
           ambiguousList.push(res);
@@ -1861,10 +1927,14 @@
         }
       });
       listeningBatchMatchedIds = matched.map(m => m.id);
+      listeningBatchExcusedIds = excusedSet;
       let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">الأسماء المطابقة في الاستماع (${matched.length}):</div>`;
       if (matched.length) {
         html += `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:4px;">` +
-          matched.map(m => `<span class="name-match-chip">👤 ${escapeHtml(m.name)} <button type="button" class="name-chip-remove" title="إزالة" onclick="removeListeningBatchMatch('${m.id}')">×</button></span>`).join('') +
+          matched.map(m => {
+            const isExc = excusedSet.has(m.id);
+            return `<span class="name-match-chip ${isExc ? 'excused-chip' : ''}">${isExc ? '⏳' : '👤'} ${escapeHtml(m.name)}${isExc ? ' (بعذر)' : ''} <button type="button" class="name-chip-remove" title="إزالة" onclick="removeListeningBatchMatch('${m.id}')">×</button></span>`;
+          }).join('') +
           `</div>`;
       } else {
         html += `<div style="color:var(--muted);">لم تتم مطابقة أي اسم من قائمة الاستماع بعد.</div>`;
@@ -1882,7 +1952,14 @@
       const autoPresent = Boolean(document.getElementById('listening-batch-auto-present')?.checked);
       const members = getListeningMembers(), matchedSet = new Set(listeningBatchMatchedIds);
       const day = ensureDayRecord(), patch = {};
-      matchedSet.forEach(id => { day.listening[id] = status; patch[id] = status; });
+      let directCount = 0, excusedCount = 0;
+      matchedSet.forEach(id => {
+        const finalStatus = (status === 'absent' && listeningBatchExcusedIds.has(id)) ? 'excused' : status;
+        day.listening[id] = finalStatus;
+        patch[id] = finalStatus;
+        if (finalStatus === 'excused') excusedCount++;
+        else directCount++;
+      });
       let restCount = 0; const oppositeStatus = status === 'absent' ? 'present' : 'absent';
       if (autoPresent) {
         members.forEach(m => {
@@ -1892,19 +1969,42 @@
       cloudPatchAttendance(currentDate, 'listening', patch);
       clearListeningBatch(); renderAll();
       const statusLabel = status === 'absent' ? 'غائب' : 'حاضر', restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
-      showToast(autoPresent && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
+      const parts = [];
+      if (directCount > 0) parts.push(`${directCount} (${statusLabel})`);
+      if (excusedCount > 0) parts.push(`${excusedCount} (بعذر)`);
+      if (autoPresent && restCount > 0) parts.push(`${restCount} (${restLabel})`);
+      showToast(`✅ تم تسجيل ${parts.join(' و ')}`);
     }
 
     // ==================== تسجيل التسميع الموحد (أرقام + أسماء معاً) ====================
     function parseUnifiedRecitationInput(rawText) {
       const raw = toEnglishDigits(String(rawText || '')), segments = raw.split(/[\r\n،,;؛\/]+/);
       const numbers = [], nameTokens = [];
+      let lastKind = null;
       segments.forEach(seg => {
         let s = seg.replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳#]/g, ' ').replace(/إنذار\s+بالحذف/g, ' ').replace(/(?:^|\s)رقم\s*(?=\d)/g, ' ').trim();
         if (!s) return;
-        (s.match(/\d+/g) || []).forEach(dStr => { const n = parseInt(dStr, 10); if (n > 0 && !numbers.includes(n)) numbers.push(n); });
-        const namePart = s.replace(/\d+/g, ' ').replace(/^[\s\-–—.*ـ:()]+|[\s\-–—.*ـ:()]+$/g, '').replace(/\s+/g, ' ').trim();
-        if (namePart) nameTokens.push(namePart);
+        const { text: withoutExcuse, excused } = extractExcuseMarker(s);
+        if (!withoutExcuse && excused) {
+          if (lastKind === 'num' && numbers.length) numbers[numbers.length - 1].excused = true;
+          else if (lastKind === 'name' && nameTokens.length) nameTokens[nameTokens.length - 1].excused = true;
+          return;
+        }
+        const segNums = withoutExcuse.match(/\d+/g) || [];
+        segNums.forEach(dStr => {
+          const n = parseInt(dStr, 10);
+          if (n > 0) {
+            const existing = numbers.find(x => x.num === n);
+            if (existing) { if (excused) existing.excused = true; }
+            else numbers.push({ num: n, excused });
+            lastKind = 'num';
+          }
+        });
+        const namePart = withoutExcuse.replace(/\d+/g, ' ').replace(/^[\s\-–—.*ـ:()]+|[\s\-–—.*ـ:()]+$/g, '').replace(/\s+/g, ' ').trim();
+        if (namePart) {
+          nameTokens.push({ name: namePart, excused });
+          lastKind = 'name';
+        }
       });
       return { numbers, nameTokens };
     }
@@ -1943,26 +2043,43 @@
       const inputEl = document.getElementById('recitation-unified-input'), box = document.getElementById('recitation-unified-preview');
       if (!inputEl || !box) return;
       const raw = inputEl.value;
-      if (!raw.trim()) { recitationMatchedMemberIds = []; box.classList.add('hidden'); box.innerHTML = ''; return; }
+      if (!raw.trim()) { recitationMatchedMemberIds = []; recitationExcusedIds = new Set(); box.classList.add('hidden'); box.innerHTML = ''; return; }
       const { numbers, nameTokens } = parseUnifiedRecitationInput(raw), members = getGroupMembers(), memberMap = Object.fromEntries(members.map(m => [m.id, m]));
       const byNum = {}; getGroupPartnerships().forEach((p, idx) => { byNum[p.number || (idx + 1)] = p; });
-      const allMatchedSet = new Set(), foundNumberLines = [], missingNums = [];
-      numbers.forEach(n => {
+      const allMatchedSet = new Set(), excusedSet = new Set(), foundNumberLines = [], missingNums = [];
+      numbers.forEach(({ num: n, excused }) => {
         const p = byNum[n];
-        if (p) { const pM = p.memberIds.map(id => memberMap[id]).filter(Boolean); pM.forEach(m => allMatchedSet.add(m.id)); foundNumberLines.push(`<div>🔢 <strong>رقم ${n}:</strong> ${pM.map(m => escapeHtml(m.name)).join(' ، ')}</div>`); }
+        if (p) {
+          const pM = p.memberIds.map(id => memberMap[id]).filter(Boolean);
+          pM.forEach(m => {
+            allMatchedSet.add(m.id);
+            if (excused) excusedSet.add(m.id);
+          });
+          foundNumberLines.push(`<div>🔢 <strong>رقم ${n}${excused ? ' <span style="color:#b45309;">(بعذر)</span>' : ''}:</strong> ${pM.map(m => escapeHtml(m.name)).join(' ، ')}</div>`);
+        }
         else missingNums.push(String(n));
       });
       const matchedIndividual = [], individualSet = new Set(), ambiguousList = [], unmatchedList = [];
-      nameTokens.forEach(token => {
-        const res = matchTypedNameToMember(token, members);
-        if (res.status === 'matched') { allMatchedSet.add(res.member.id); if (!individualSet.has(res.member.id)) { individualSet.add(res.member.id); matchedIndividual.push(res.member); } }
+      nameTokens.forEach(item => {
+        const res = matchTypedNameToMember(item.name, members);
+        if (res.status === 'matched') {
+          allMatchedSet.add(res.member.id);
+          if (item.excused) excusedSet.add(res.member.id);
+          if (!individualSet.has(res.member.id)) { individualSet.add(res.member.id); matchedIndividual.push(res.member); }
+        }
         else if (res.status === 'ambiguous') ambiguousList.push(res);
         else if (res.status === 'unmatched') unmatchedList.push(res.entry);
       });
       recitationMatchedMemberIds = Array.from(allMatchedSet);
+      recitationExcusedIds = excusedSet;
       let html = `<div style="font-weight:800; color:var(--primary); margin-bottom:4px;">إجمالي الأعضاء المحددين (${recitationMatchedMemberIds.length}):</div>`;
       if (foundNumberLines.length) html += `<div style="margin-bottom:4px;">${foundNumberLines.join('')}</div>`;
-      if (matchedIndividual.length) html += `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:4px;">${matchedIndividual.map(m => `<span class="name-match-chip">👤 ${escapeHtml(m.name)}</span>`).join('')}</div>`;
+      if (matchedIndividual.length) {
+        html += `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:4px;">${matchedIndividual.map(m => {
+          const isExc = excusedSet.has(m.id);
+          return `<span class="name-match-chip ${isExc ? 'excused-chip' : ''}">${isExc ? '⏳' : '👤'} ${escapeHtml(m.name)}${isExc ? ' (بعذر)' : ''}</span>`;
+        }).join('')}</div>`;
+      }
       if (!recitationMatchedMemberIds.length) html += `<div style="color:var(--muted);">لم تتم مطابقة أي رقم رفقاء أو اسم عضو بعد.</div>`;
       if (missingNums.length) html += `<div style="color:var(--danger); font-weight:700; margin-top:4px;">⚠️ أرقام رفقاء غير موجودة: ${missingNums.join(' ، ')}</div>`;
       if (ambiguousList.length) html += ambiguousList.map(a => `<div style="color:#b45309; font-weight:700; margin-top:4px;">⚠️ "${escapeHtml(a.entry)}" يطابق أكثر من عضو (${a.names.map(escapeHtml).join('، ')}...) — اكتبي الاسم الثنائي</div>`).join('');
@@ -1974,13 +2091,24 @@
       if (!recitationMatchedMemberIds.length) return showToast('اكتبي أرقام رفقاء أو أسماء صحيحة موجودة بالجروب أولاً');
       const autoRest = document.getElementById('recit-unified-auto-rest').checked, members = getGroupMembers();
       const matchedSet = new Set(recitationMatchedMemberIds), day = ensureDayRecord(), patch = {};
-      matchedSet.forEach(id => { day.recitation[id] = status; patch[id] = status; });
+      let directCount = 0, excusedCount = 0;
+      matchedSet.forEach(id => {
+        const finalStatus = (status === 'absent' && recitationExcusedIds.has(id)) ? 'excused' : status;
+        day.recitation[id] = finalStatus;
+        patch[id] = finalStatus;
+        if (finalStatus === 'excused') excusedCount++;
+        else directCount++;
+      });
       let restCount = 0; const oppositeStatus = status === 'absent' ? 'present' : 'absent';
       if (autoRest) members.forEach(m => { if (!matchedSet.has(m.id) && !day.recitation[m.id]) { day.recitation[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++; } });
       cloudPatchAttendance(currentDate, 'recitation', patch);
       document.getElementById('recitation-unified-input').value = ''; previewRecitationUnified(); renderAll();
       const statusLabel = status === 'absent' ? 'غائب' : 'حاضر (سمّع)', restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
-      showToast(autoRest && restCount > 0 ? `✅ تم تسجيل ${matchedSet.size} (${statusLabel}) و ${restCount} (${restLabel})` : `✅ تم تسجيل ${matchedSet.size} عضو كـ "${statusLabel}"`);
+      const parts = [];
+      if (directCount > 0) parts.push(`${directCount} (${statusLabel})`);
+      if (excusedCount > 0) parts.push(`${excusedCount} (بعذر)`);
+      if (autoRest && restCount > 0) parts.push(`${restCount} (${restLabel})`);
+      showToast(`✅ تم تسجيل ${parts.join(' و ')}`);
     }
 
     // ==================== قراءة أسماء الاستماع من الصور (OCR عربي محسّن) ====================
@@ -2001,10 +2129,17 @@
       document.getElementById('ocr-progress-box').classList.add('hidden'); document.getElementById('ocr-result-box').classList.add('hidden');
       renderOcrThumbnails(); if (showMsg) showToast('تم مسح جميع الصور المختارة');
     }
+    function addOcrImageFiles(files) {
+      const valid = Array.from(files || []).filter(Boolean);
+      if (!valid.length) return;
+      valid.forEach(file => ocrFiles.push({ id: uid('img'), file, url: URL.createObjectURL(file), status: 'pending', lines: [] }));
+      renderOcrThumbnails();
+      processPendingOcrFiles();
+    }
     function onOcrFilesSelected(input) {
       const files = Array.from(input.files || []); if (!files.length) return;
-      files.forEach(file => ocrFiles.push({ id: uid('img'), file, url: URL.createObjectURL(file), status: 'pending', lines: [] }));
-      input.value = ''; renderOcrThumbnails(); processPendingOcrFiles();
+      input.value = '';
+      addOcrImageFiles(files);
     }
     function removeOcrFile(imgId) {
       if (ocrIsProcessing) return showToast('انتظري حتى تنتهي القراءة الجارية أولاً');
@@ -2908,7 +3043,7 @@
       const st = day.recitation[m.id] || '', absCount = getAbsenceCount(m.id, 'recitation');
       const absTag = absCount > 0 ? `<div class="absence-tag">غياب التسميع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</div>` : '';
       const badge = m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : '';
-      return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><span style="font-weight:700;">${escapeHtml(m.name)}</span> ${badge}${extraHtml}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button></div></div>`;
+      return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><span class="member-name-link" style="font-weight:700;" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">${escapeHtml(m.name)}</span> ${badge}${extraHtml}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button></div></div>`;
     }
 
     function renderRecitation() {
@@ -3380,8 +3515,7 @@
       };
     }
 
-    function computeDashboardStats() {
-      const scope = getDashboardDateScope();
+    function computeStatsForScope(scope) {
       const members = getGroupMembers();
       const partnerships = getGroupPartnerships();
       const pNumMap = {};
@@ -3498,6 +3632,32 @@
       };
     }
 
+    function computeDashboardStats() {
+      return computeStatsForScope(getDashboardDateScope());
+    }
+
+    function getPreviousMonthDelta(curYM, currentData) {
+      if (!/^\d{4}-\d{2}$/.test(curYM)) return null;
+      const [y, m] = curYM.split('-').map(Number);
+      const prevDateObj = new Date(y, m - 2, 1);
+      const prevYM = `${prevDateObj.getFullYear()}-${String(prevDateObj.getMonth() + 1).padStart(2, '0')}`;
+      const allGroupDates = getGroupAttendanceDates();
+      const prevDates = allGroupDates.filter(d => d.startsWith(prevYM));
+      if (!prevDates.length) return null;
+      const prevStats = computeStatsForScope({
+        mode: 'month',
+        label: `خلال شهر ${formatDashMonthLabel(prevYM)}`,
+        dates: prevDates,
+        endDate: prevDates[prevDates.length - 1]
+      });
+      return {
+        prevLabel: formatDashMonthLabel(prevYM),
+        overall: (currentData.avgOverall !== null && prevStats.avgOverall !== null) ? (currentData.avgOverall - prevStats.avgOverall) : null,
+        listen: (currentData.avgListen !== null && prevStats.avgListen !== null) ? (currentData.avgListen - prevStats.avgListen) : null,
+        recit: (currentData.avgRecit !== null && prevStats.avgRecit !== null) ? (currentData.avgRecit - prevStats.avgRecit) : null
+      };
+    }
+
     function setDashboardPeriod(mode) {
       dashPeriodMode = mode;
       ['all', 'month', 'custom'].forEach(m => {
@@ -3583,28 +3743,89 @@
       if (kpiEl) {
         const highCount = memberStats.filter(s => s.overallRate !== null && s.overallRate >= 90).length;
         const lowCount = memberStats.filter(s => s.overallRate !== null && s.overallRate < 70).length;
-        kpiEl.innerHTML = `
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-label">متوسط الالتزام العام</div>
-            <div class="dash-kpi-val ${getDashTierClass(avgOverall)}">${avgOverall !== null ? toEnglishDigits(avgOverall) + '%' : '—'}</div>
-            <div class="dash-kpi-sub">${toEnglishDigits(highCount)} عضوة ≥ 90% · ${toEnglishDigits(lowCount)} تحتاج متابعة</div>
-          </div>
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-label">التزام الاستماع</div>
-            <div class="dash-kpi-val" style="color:var(--primary);">${avgListen !== null ? toEnglishDigits(avgListen) + '%' : '—'}</div>
-            <div class="dash-kpi-sub">${toEnglishDigits(scope.dates.filter((_, idx) => dailySeries[idx].lRec > 0).length)} يوم مسجل للاستماع</div>
-          </div>
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-label">التزام التسميع</div>
-            <div class="dash-kpi-val" style="color:#b45309;">${avgRecit !== null ? toEnglishDigits(avgRecit) + '%' : '—'}</div>
-            <div class="dash-kpi-sub">${toEnglishDigits(scope.dates.filter((_, idx) => dailySeries[idx].rRec > 0).length)} يوم مسجل للتسميع</div>
-          </div>
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-label">أيام المتابعة / الأعضاء</div>
-            <div class="dash-kpi-val">${toEnglishDigits(scope.dates.length)} <span style="font-size:13px; color:var(--muted); font-weight:700;">يوم</span></div>
-            <div class="dash-kpi-sub">إجمالي الأعضاء: ${toEnglishDigits(totalMembers)} عضوة</div>
-          </div>
-        `;
+        const listenDaysCount = scope.dates.filter((_, idx) => dailySeries[idx].lRec > 0).length;
+        const recitDaysCount = scope.dates.filter((_, idx) => dailySeries[idx].rRec > 0).length;
+        const monthDelta = scope.mode === 'month' ? getPreviousMonthDelta(dashMonthValue, data) : null;
+
+        const renderDeltaBadge = (deltaVal) => {
+          if (deltaVal === null || deltaVal === undefined) return '';
+          const title = monthDelta?.prevLabel ? `مقارنة بشهر ${monthDelta.prevLabel}` : 'مقارنة بالشهر السابق';
+          if (deltaVal > 0) return `<span class="dash-delta-pill up" title="${escapeHtml(title)}">▲ +${toEnglishDigits(deltaVal)}%</span>`;
+          if (deltaVal < 0) return `<span class="dash-delta-pill down" title="${escapeHtml(title)}">▼ ${toEnglishDigits(deltaVal)}%</span>`;
+          return `<span class="dash-delta-pill flat" title="${escapeHtml(title)}">= 0%</span>`;
+        };
+
+        const renderRingCard = (label, rate, accent, track, bgGrad, borderCol, subHtml, deltaVal = null) => {
+          const pct = rate !== null ? Math.max(0, Math.min(100, rate)) : 0;
+          const r = 29;
+          const circ = 2 * Math.PI * r;
+          const offset = circ * (1 - pct / 100);
+          return `
+            <div class="dash-kpi-card" style="background:${bgGrad}; border-color:${borderCol};">
+              <div class="dash-kpi-label" style="color:${accent};">${label}</div>
+              <div class="dash-ring-row">
+                <div class="dash-ring-wrap">
+                  <svg viewBox="0 0 72 72" width="76" height="76" aria-hidden="true">
+                    <circle cx="36" cy="36" r="${r}" fill="none" stroke="${track}" stroke-width="7" />
+                    ${rate !== null ? `<circle cx="36" cy="36" r="${r}" fill="none" stroke="${accent}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 36 36)" />` : ''}
+                  </svg>
+                  <div class="dash-ring-val" style="color:${accent};">${rate !== null ? toEnglishDigits(rate) + '%' : '—'}</div>
+                </div>
+                ${renderDeltaBadge(deltaVal)}
+              </div>
+              <div class="dash-kpi-sub">${subHtml}${deltaVal !== null && deltaVal !== undefined ? ` <span style="color:var(--muted);">· عن الشهر السابق</span>` : ''}</div>
+            </div>
+          `;
+        };
+
+        kpiEl.innerHTML =
+          renderRingCard(
+            'متوسط الالتزام العام',
+            avgOverall,
+            '#059669',
+            '#d1fae5',
+            'linear-gradient(155deg, #ecfdf5 0%, #ffffff 78%)',
+            '#a7f3d0',
+            `<span style="color:#059669;">${toEnglishDigits(highCount)} ≥ 90%</span> · <span style="color:#dc2626;">${toEnglishDigits(lowCount)} متابعة</span>`,
+            monthDelta ? monthDelta.overall : null
+          ) +
+          renderRingCard(
+            'التزام الاستماع',
+            avgListen,
+            '#0284c7',
+            '#bae6fd',
+            'linear-gradient(155deg, #f0f9ff 0%, #ffffff 78%)',
+            '#bae6fd',
+            `${toEnglishDigits(listenDaysCount)} يوم للاستماع`,
+            monthDelta ? monthDelta.listen : null
+          ) +
+          renderRingCard(
+            'التزام التسميع',
+            avgRecit,
+            '#d97706',
+            '#fde68a',
+            'linear-gradient(155deg, #fffbeb 0%, #ffffff 78%)',
+            '#fde68a',
+            `${toEnglishDigits(recitDaysCount)} يوم للتسميع`,
+            monthDelta ? monthDelta.recit : null
+          ) +
+          `
+            <div class="dash-kpi-card" style="background:linear-gradient(155deg, #f5f3ff 0%, #ffffff 78%); border-color:#ddd6fe; justify-content:space-between;">
+              <div class="dash-kpi-label" style="color:#6d28d9;">أيام المتابعة / الأعضاء</div>
+              <div style="display:flex; align-items:center; justify-content:center; gap:14px; width:100%; padding:8px 0;">
+                <div>
+                  <div class="dash-kpi-val" style="color:#6d28d9; font-size:22px;">${toEnglishDigits(scope.dates.length)}</div>
+                  <div style="font-size:11px; color:var(--muted); font-weight:700;">يوم</div>
+                </div>
+                <div style="width:1px; height:34px; background:#ddd6fe;"></div>
+                <div>
+                  <div class="dash-kpi-val" style="color:#4338ca; font-size:22px;">${toEnglishDigits(totalMembers)}</div>
+                  <div style="font-size:11px; color:var(--muted); font-weight:700;">عضوة</div>
+                </div>
+              </div>
+              <div class="dash-kpi-sub">إجمالي المسجلين في الجروب: ${toEnglishDigits(totalMembers)}</div>
+            </div>
+          `;
       }
 
       const splitEl = document.getElementById('dash-split-grid');
@@ -3774,8 +3995,51 @@
       `;
     }
 
-    function openMemberDetailModal(memberId) {
-      const data = dashLastData || computeDashboardStats();
+    function getMemberModalScope(mode) {
+      const allGroupDates = getGroupAttendanceDates();
+      if (mode === 'month') {
+        const curYM = /^\d{4}-\d{2}$/.test(dashMonthValue) ? dashMonthValue : getTodayStr().slice(0, 7);
+        const dates = allGroupDates.filter(d => d.startsWith(curYM));
+        return {
+          mode: 'month',
+          label: `خلال شهر ${formatDashMonthLabel(curYM)}`,
+          dates,
+          endDate: dates.length ? dates[dates.length - 1] : `${curYM}-31`
+        };
+      }
+      if (mode === 'custom' && dashPeriodMode === 'custom') {
+        return getDashboardDateScope();
+      }
+      const firstDate = allGroupDates.length ? allGroupDates[0] : '';
+      const lastDate = allGroupDates.length ? allGroupDates[allGroupDates.length - 1] : currentDate;
+      return {
+        mode: 'all',
+        label: allGroupDates.length ? `منذ البداية (${formatDashDateWithDay(firstDate)} ← ${formatDashDateWithDay(lastDate)})` : 'منذ البداية (لا توجد تسجيلات بعد)',
+        dates: allGroupDates,
+        endDate: lastDate
+      };
+    }
+
+    function setMemberDetailScope(mode) {
+      if (!memberDetailCurrentId) return;
+      openMemberDetailModal(memberDetailCurrentId, mode);
+    }
+
+    function openMemberDetailModal(memberId, forcedScopeMode = null) {
+      memberDetailCurrentId = memberId;
+      if (forcedScopeMode) {
+        memberDetailScopeMode = forcedScopeMode;
+      } else {
+        memberDetailScopeMode = currentTab === 'dashboard' ? dashPeriodMode : 'all';
+      }
+      ['all', 'month', 'custom'].forEach(m => {
+        const btn = document.getElementById('member-scope-btn-' + m);
+        if (!btn) return;
+        if (m === 'custom') btn.classList.toggle('hidden', dashPeriodMode !== 'custom');
+        btn.classList.toggle('active', memberDetailScopeMode === m);
+      });
+
+      const data = computeStatsForScope(getMemberModalScope(memberDetailScopeMode));
       const s = data.memberStats.find(x => x.member.id === memberId);
       if (!s) return;
       document.getElementById('member-detail-title').textContent = s.member.name;
@@ -5215,6 +5479,7 @@
     // ==================== تنفيذ / استيراد جدول من صورة أو نص ====================
     let schedImportFile = null;
     let schedImportMode = 'gemini';
+    let schedImportInFlight = false;
 
     function updateSchedImportActionState() {
       const btn = document.getElementById('sched-import-run-btn');
@@ -5224,7 +5489,7 @@
         btn.disabled = !txt;
         btn.textContent = '✨ تنفيذ الجدول من النص الآن';
       } else {
-        btn.disabled = !schedImportFile;
+        btn.disabled = !schedImportFile || schedImportInFlight;
         btn.textContent = '✨ قراءة وتنفيذ الجدول الآن';
       }
     }
@@ -5247,7 +5512,7 @@
       } else {
         imgPanel?.classList.remove('hidden');
         txtPanel?.classList.add('hidden');
-        if (descEl) descEl.textContent = 'اختاري صورة جدول شهري (إكسل أو مكتوب بخط اليد)، وسيتم قراءته وتنفيذه مباشرة في الجدول لتعديله وحفظه وتحميله.';
+        if (descEl) descEl.textContent = 'اختاري صورة جدول شهري (أو الصقيها بـ Ctrl+V)، وسيتم قراءته وتنفيذه مباشرة في الجدول لتعديله وحفظه وتحميله.';
       }
       updateSchedImportActionState();
     }
@@ -5272,8 +5537,7 @@
     function closeSchedImportModal() {
       document.getElementById('sched-import-modal').classList.remove('open');
     }
-    function onSchedImportFileSelected(input) {
-      const file = input?.files?.[0];
+    function loadSchedImportFile(file, autoRun = false) {
       if (!file) return;
       schedImportFile = file;
       const reader = new FileReader();
@@ -5286,6 +5550,12 @@
       const st = document.getElementById('sched-import-status');
       if (st) st.classList.add('hidden');
       updateSchedImportActionState();
+      if (autoRun && !schedImportInFlight) runSchedImageImport();
+    }
+    function onSchedImportFileSelected(input) {
+      const file = input?.files?.[0];
+      if (!file) return;
+      loadSchedImportFile(file, false);
     }
     function prepareScheduleImageForUpload(file) {
       return new Promise((resolve, reject) => {
@@ -5693,6 +5963,8 @@
       }
 
       if (!schedImportFile) return showToast('اختاري صورة الجدول أولاً');
+      if (schedImportInFlight) return;
+      schedImportInFlight = true;
       if (btn) btn.disabled = true;
 
       try {
@@ -5711,9 +5983,49 @@
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'تعذر قراءة صورة الجدول';
         setStatus(`❌ ${msg}`, true);
+      } finally {
+        schedImportInFlight = false;
         updateSchedImportActionState();
       }
     }
+
+    function extractPastedImagesFromClipboard(clipboardData) {
+      const out = [];
+      if (!clipboardData) return out;
+      if (clipboardData.items && clipboardData.items.length) {
+        for (const item of clipboardData.items) {
+          if (item.kind === 'file' && item.type && item.type.startsWith('image/')) {
+            const f = item.getAsFile();
+            if (f) out.push(f);
+          }
+        }
+      }
+      if (!out.length && clipboardData.files && clipboardData.files.length) {
+        for (const f of clipboardData.files) {
+          if (f && f.type && f.type.startsWith('image/')) out.push(f);
+        }
+      }
+      return out;
+    }
+
+    document.addEventListener('paste', (e) => {
+      const pastedImages = extractPastedImagesFromClipboard(e.clipboardData);
+      if (!pastedImages.length) return;
+      const ocrOpen = document.getElementById('ocr-modal')?.classList.contains('open');
+      const schedOpen = document.getElementById('sched-import-modal')?.classList.contains('open');
+      if (ocrOpen) {
+        e.preventDefault();
+        addOcrImageFiles(pastedImages);
+        showToast(pastedImages.length > 1 ? `📋 تم لصق ${pastedImages.length} صور وجاري قراءتها...` : '📋 تم لصق الصورة وجاري قراءتها...');
+        return;
+      }
+      if (schedOpen) {
+        e.preventDefault();
+        if (schedImportMode !== 'gemini') setSchedImportMode('gemini');
+        loadSchedImportFile(pastedImages[0], true);
+        showToast('📋 تم لصق صورة الجدول وجاري قراءتها...');
+      }
+    });
 
     (async function initApp() {
       if (session && session.role === 'head') {
