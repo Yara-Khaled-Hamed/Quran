@@ -917,7 +917,7 @@
           </label>
           <button type="button" class="btn btn-soft btn-sm" style="flex:1; min-width:140px;" onclick="pasteImageFromClipboard('sched')">📋 لصق من الحافظة</button>
         </div>
-        <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الجدول من الهاتف" data-placeholder="📱 من الهاتف: اضغطي هنا ثم اختاري «لصق» أو صورة من حافظة الكيبورد (أو Ctrl+V من الكمبيوتر)" oninput="handleMobilePasteBoxInput(this, 'sched')"></div>
+        <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الجدول" data-placeholder="💻 للكمبيوتر: Ctrl+V هنا | 📱 للهاتف: انسخي الصورة واضغطي زر «لصق من الحافظة» بالأعلى (أو ضغطة مطولة ← لصق)" oninput="handleMobilePasteBoxInput(this, 'sched')"></div>
         <div id="sched-import-preview-wrap" class="hidden" style="margin-bottom:10px; text-align:center; background:#f8faf9; padding:8px; border-radius:12px; border:1px solid var(--border);">
           <img id="sched-import-preview-img" src="" alt="معاينة صورة الجدول" style="max-width:100%; max-height:240px; border-radius:8px; object-fit:contain;" />
         </div>
@@ -998,7 +998,7 @@
         <button type="button" class="btn btn-soft btn-sm" style="flex:1; min-width:130px;" onclick="pasteImageFromClipboard('ocr')">📋 لصق من الحافظة</button>
         <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles(true)">🗑️ مسح الصور</button>
       </div>
-      <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الغياب من الهاتف" data-placeholder="📱 من الهاتف: اضغطي هنا ثم اختاري «لصق» أو صورة من حافظة الكيبورد (أو Ctrl+V من الكمبيوتر)" oninput="handleMobilePasteBoxInput(this, 'ocr')"></div>
+      <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الغياب" data-placeholder="💻 للكمبيوتر: Ctrl+V هنا | 📱 للهاتف: انسخي الصورة واضغطي زر «لصق من الحافظة» بالأعلى (أو ضغطة مطولة ← لصق)" oninput="handleMobilePasteBoxInput(this, 'ocr')"></div>
       <label style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px;"><input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" /><span>فرض الوضع الليلي (عكس الألوان يدوياً)</span></label>
       <div id="ocr-files-meta" class="hidden" style="font-size:12.5px; font-weight:700; color:var(--primary); margin-top:4px;"></div>
       <div id="ocr-thumbs-wrap" class="ocr-thumbs-wrap hidden"></div>
@@ -6029,7 +6029,7 @@
 
     async function pasteImageFromClipboard(target) {
       if (!navigator.clipboard || typeof navigator.clipboard.read !== 'function') {
-        showToast('اضغطي داخل المربع الأخضر بالأسفل ثم اختاري الصورة من حافظة الكيبورد أو «لصق»');
+        showToast('متصفح الهاتف لا يدعم لصق الصور مباشرة — استخدمي زر «اختيار صور» لاختيار أحدث لقطة شاشة');
         return;
       }
       try {
@@ -6044,12 +6044,12 @@
           }
         }
         if (!files.length) {
-          showToast('الحافظة لا تحتوي على صورة منسوخة الآن — انسخي الصورة أولاً أو استخدمي حافظة الكيبورد داخل المربع');
+          showToast('لا توجد صورة منسوخة في الحافظة — اضغطي «نسخ» على الصورة أولاً أو استخدمي زر «اختيار صور»');
           return;
         }
         handlePastedImagesForTarget(files, target);
       } catch (err) {
-        showToast('اضغطي داخل المربع الأخضر بالأسفل ثم اختاري الصورة من حافظة الكيبورد أو «لصق»');
+        showToast('تعذر قراءة الحافظة (أو تم رفض الإذن) — استخدمي زر «اختيار صور» لفتح أحدث صورة مباشرة');
       }
     }
 
