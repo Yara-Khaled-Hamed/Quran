@@ -104,7 +104,6 @@
     .dash-spotlight-row:hover { background: #f9fafb; }
     .dash-progress-track { height: 7px; background: #e5e7eb; border-radius: 99px; overflow: hidden; width: 100%; }
     .dash-progress-fill { height: 100%; border-radius: 99px; transition: width 0.35s var(--ease); }
-    .dash-chart-scroll { overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
     .dash-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: #fff; -webkit-overflow-scrolling: touch; }
     .dash-table { width: 100%; border-collapse: collapse; min-width: 610px; font-size: 13.5px; }
     .dash-table th { background: #f8faf9; color: var(--primary); font-weight: 800; font-size: 12.5px; padding: 10px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
@@ -562,17 +561,6 @@
         </div>
 
         <div id="dash-kpi-grid" class="dash-kpi-grid"></div>
-
-        <div id="dash-chart-card" class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-            <h4 style="font-size:15px; font-weight:800; color:var(--text);">نسبة الحضور عبر الأيام</h4>
-            <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:700; color:var(--muted);">
-              <span><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#059669; margin-left:4px;"></span>الاستماع</span>
-              <span><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#d97706; margin-left:4px;"></span>التسميع</span>
-            </div>
-          </div>
-          <div id="dash-chart-body"></div>
-        </div>
 
         <div id="dash-split-grid" class="dash-split-grid"></div>
 
@@ -3617,38 +3605,6 @@
             <div class="dash-kpi-sub">إجمالي الأعضاء: ${toEnglishDigits(totalMembers)} عضوة</div>
           </div>
         `;
-      }
-
-      const chartBody = document.getElementById('dash-chart-body');
-      if (chartBody) {
-        if (!dailySeries.length) {
-          chartBody.innerHTML = `<div class="empty-state" style="padding:20px 10px;">لا توجد بيانات حضور مسجلة في هذه الفترة لعرض الرسم البياني.</div>`;
-        } else {
-          const shown = dailySeries.slice(-31);
-          chartBody.innerHTML = `
-            <div class="dash-chart-scroll">
-              <div style="display:flex; align-items:flex-end; gap:10px; min-width:${Math.max(320, shown.length * 48)}px; height:172px; padding:18px 8px 6px; border-bottom:1px solid var(--border); position:relative; background:linear-gradient(to top, rgba(6,95,70,0.03) 0%, transparent 100%);">
-                ${shown.map(pt => {
-                  const lH = pt.lPct !== null ? Math.max(4, Math.round((pt.lPct / 100) * 104)) : 0;
-                  const rH = pt.rPct !== null ? Math.max(4, Math.round((pt.rPct / 100) * 104)) : 0;
-                  const dayName = getArabicWeekday(pt.date);
-                  const shortD = toEnglishDigits(pt.date.slice(5).replace('-', '/'));
-                  const titleTxt = `${dayName} ${toEnglishDigits(pt.date)} — الاستماع: ${pt.lPct !== null ? pt.lPct + '%' : '—'} | التسميع: ${pt.rPct !== null ? pt.rPct + '%' : '—'}`;
-                  return `
-                    <div title="${escapeHtml(titleTxt)}" style="flex:1 0 40px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px; height:100%;">
-                      <div style="display:flex; align-items:flex-end; gap:3px; height:106px;">
-                        <div style="width:10px; border-radius:4px 4px 0 0; background:${pt.lPct !== null ? '#059669' : '#e5e7eb'}; height:${pt.lPct !== null ? lH : 4}px; transition:height 0.3s;"></div>
-                        <div style="width:10px; border-radius:4px 4px 0 0; background:${pt.rPct !== null ? '#d97706' : '#e5e7eb'}; height:${pt.rPct !== null ? rH : 4}px; transition:height 0.3s;"></div>
-                      </div>
-                      <span style="font-size:10px; color:var(--primary); font-weight:800; white-space:nowrap; line-height:1.1;">${escapeHtml(dayName)}</span>
-                      <span style="font-size:10px; color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.1;">${shortD}</span>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          `;
-        }
       }
 
       const splitEl = document.getElementById('dash-split-grid');
