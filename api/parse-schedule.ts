@@ -1,4 +1,5 @@
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -18,17 +19,17 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   });
 }
 
-interface VercelReq {
-  method?: string;
-  body?: {
-    imageBase64?: string;
-    mimeType?: string;
-  };
-}
-
-interface VercelRes {
-  status: (code: number) => VercelRes;
-  json: (data: unknown) => void;
+function getGeminiClient() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  return new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      },
+    },
+  });
 }
 
 const HIJRI_MONTHS_AR = [
@@ -257,97 +258,149 @@ const SCHEDULE_RESPONSE_SCHEMA = {
   ],
 };
 
-export default async function handler(req: VercelReq, res: VercelRes) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
+type ApiReq = IncomingMessage & { method?: string; body?: unknown };
+type ApiRes = ServerResponse & {
+  status?: (code: number) => ApiRes;
+  json?: (data: unknown) => void;
+};
 
-  const { imageBase64, mimeType } = req.body || {};
-  if (!imageBase64 || typeof imageBase64 !== 'string') {
-    res.status(400).json({ error: 'يرجى إرسال صورة الجدول أولاً' });
-    return;
-  }
-
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    res.status(503).json({
-      error: 'مفتاح GEMINI_API_KEY غير مضبوط على الخادم لقراءة صورة الجدول',
-    });
-    return;
-  }
-
-  const ai = new GoogleGenAI({
-    apiKey,
-    httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-  });
-  const cleanBase64 = imageBase64.replace(/^data:[^;]+;base64,/, '').trim();
-  const safeMime =
-    typeof mimeType === 'string' && mimeType.startsWith('image/')
-      ? mimeType
-      : 'image/png';
-
-  const modelsToTry = ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'];
-  let lastErr: unknown = null;
-  for (let attempt = 0; attempt < modelsToTry.length; attempt++) {
-    const modelName = modelsToTry[attempt];
-    try {
-      const response = await withTimeout(
-        ai.models.generateContent({
-          model: modelName,
-          contents: {
-            parts: [
-              { inlineData: { mimeType: safeMime, data: cleanBase64 } },
-              { text: SCHEDULE_PROMPT },
-            ],
-          },
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: SCHEDULE_RESPONSE_SCHEMA,
-            ...(modelName === 'gemini-4-hydrogen'
-              ? { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } }
-              : {}),
-          },
-        }),
-        25000,
-        modelName
-      );
-
-      const parsed = JSON.parse((response.text ?? '{}').trim()) as ParsedSchedule;
-      if (!parsed || !Array.isArray(parsed.rows) || !parsed.rows.length) {
-        res.status(422).json({
-          error: 'لم يتم التعرف على صفوف واضحة في صورة الجدول، تأكدي من وضوح الصورة',
-        });
-        return;
-      }
-      res.status(200).json({ schedule: normalizeParsedSchedule(parsed), modelUsed: modelName });
+function sendJson(res: ApiRes, statusCode: number, payload: unknown) {
+  if (typeof res.status === 'function' && typeof res.json === 'function') {
+    const target = res.status(statusCode);
+    if (target && typeof target.json === 'function') {
+      target.json(payload);
       return;
-    } catch (err) {
-      lastErr = err;
-      if (attempt < modelsToTry.length - 1) {
-        await new Promise((r) => setTimeout(r, 300));
-      }
     }
   }
+  res.statusCode = statusCode;
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.end(JSON.stringify(payload));
+}
 
-  const rawErrMsg = lastErr instanceof Error ? lastErr.message : String(lastErr || '');
-  if (/503|UNAVAILABLE|high demand|overloaded/i.test(rawErrMsg)) {
-    res.status(503).json({
-      error: 'خادم الذكاء الاصطناعي يشهد ضغطاً مؤقتاً حالياً (503). يرجى المحاولة بعد قليل أو استخدام خيار «لصق نص / إكسل».',
-    });
+async function readJsonBody(req: ApiReq): Promise<Record<string, unknown>> {
+  if (req.body && typeof req.body === 'object') {
+    return req.body as Record<string, unknown>;
+  }
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body) as Record<string, unknown>;
+    } catch {
+      return {};
+    }
+  }
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  const raw = Buffer.concat(chunks).toString('utf8').trim();
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+export default async function handler(req: ApiReq, res: ApiRes) {
+  if (req.method && req.method !== 'POST') {
+    sendJson(res, 405, { error: 'Method Not Allowed' });
     return;
   }
-  if (/429|RESOURCE_EXHAUSTED|quota/i.test(rawErrMsg)) {
-    res.status(429).json({
-      error: 'تم تجاوز الحد المسموح مؤقتاً لطلبات القراءة الذكية (429). يرجى المحاولة بعد قليل أو استخدام خيار «لصق نص / إكسل».',
-    });
-    return;
+
+  try {
+    const body = await readJsonBody(req);
+    const imageBase64 = typeof body.imageBase64 === 'string' ? body.imageBase64 : '';
+    const mimeType = typeof body.mimeType === 'string' ? body.mimeType : '';
+
+    if (!imageBase64) {
+      sendJson(res, 400, { error: 'يرجى إرسال صورة الجدول أولاً' });
+      return;
+    }
+
+    const ai = getGeminiClient();
+    if (!ai) {
+      sendJson(res, 503, {
+        error: 'مفتاح GEMINI_API_KEY غير مضبوط على الخادم لقراءة صورة الجدول',
+      });
+      return;
+    }
+
+    const cleanBase64 = imageBase64.replace(/^data:[^;]+;base64,/, '').trim();
+    const safeMime = mimeType.startsWith('image/') ? mimeType : 'image/png';
+
+    const modelsToTry = ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'];
+    let lastErr: unknown = null;
+    for (let attempt = 0; attempt < modelsToTry.length; attempt++) {
+      const modelName = modelsToTry[attempt];
+      try {
+        const response = await withTimeout(
+          ai.models.generateContent({
+            model: modelName,
+            contents: {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: safeMime,
+                    data: cleanBase64,
+                  },
+                },
+                { text: SCHEDULE_PROMPT },
+              ],
+            },
+            config: {
+              responseMimeType: 'application/json',
+              responseSchema: SCHEDULE_RESPONSE_SCHEMA,
+              ...(modelName === 'gemini-4-hydrogen'
+                ? { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } }
+                : {}),
+            },
+          }),
+          25000,
+          modelName
+        );
+
+        const rawJson = (response.text ?? '{}').trim();
+        const parsed = JSON.parse(rawJson) as ParsedSchedule;
+        if (!parsed || !Array.isArray(parsed.rows) || !parsed.rows.length) {
+          sendJson(res, 422, {
+            error: 'لم يتم التعرف على صفوف واضحة في صورة الجدول، تأكدي من وضوح الصورة',
+          });
+          return;
+        }
+        sendJson(res, 200, { schedule: normalizeParsedSchedule(parsed), modelUsed: modelName });
+        return;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < modelsToTry.length - 1) {
+          await new Promise((r) => setTimeout(r, 300));
+        }
+      }
+    }
+
+    const rawErrMsg = lastErr instanceof Error ? lastErr.message : String(lastErr || '');
+    console.error('parse-schedule error:', lastErr);
+    if (/503|UNAVAILABLE|high demand|overloaded/i.test(rawErrMsg)) {
+      sendJson(res, 503, {
+        error: 'خادم الذكاء الاصطناعي يشهد ضغطاً مؤقتاً حالياً (503). يرجى المحاولة بعد قليل أو استخدام خيار «لصق نص / إكسل».',
+      });
+      return;
+    }
+    if (/429|RESOURCE_EXHAUSTED|quota/i.test(rawErrMsg)) {
+      sendJson(res, 429, {
+        error: 'تم تجاوز الحد المسموح مؤقتاً لطلبات القراءة الذكية (429). يرجى المحاولة بعد قليل أو استخدام خيار «لصق نص / إكسل».',
+      });
+      return;
+    }
+    if (/403|PERMISSION_DENIED|API_KEY_INVALID/i.test(rawErrMsg)) {
+      sendJson(res, 403, {
+        error: 'مفتاح GEMINI_API_KEY غير صالح أو غير مفعّل. يمكنك استخدام خيار «لصق نص / إكسل».',
+      });
+      return;
+    }
+    sendJson(res, 500, { error: rawErrMsg || 'تعذر تحليل صورة الجدول' });
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : 'حدث خطأ غير متوقع';
+    console.error('parse-schedule unexpected error:', err);
+    sendJson(res, 500, { error: errMsg });
   }
-  if (/403|PERMISSION_DENIED|API_KEY_INVALID/i.test(rawErrMsg)) {
-    res.status(403).json({
-      error: 'مفتاح GEMINI_API_KEY غير صالح أو غير مفعّل. يمكنك استخدام خيار «لصق نص / إكسل».',
-    });
-    return;
-  }
-  res.status(500).json({ error: rawErrMsg || 'تعذر تحليل صورة الجدول' });
 }
