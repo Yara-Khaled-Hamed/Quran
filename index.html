@@ -24,92 +24,76 @@
       --accent: #d97706; --accent-soft: #fef3c7; --bg: #f3f7f5;
       --card: #ffffff; --text: #111827; --muted: #6b7280; --border: #e5e7eb;
       --danger: #dc2626; --danger-soft: #fef2f2;
-      --shadow: 0 4px 18px rgba(6, 95, 70, 0.06);
-      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.04);
+      --shadow: 0 6px 22px rgba(6, 95, 70, 0.07);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
       --radius: 18px;
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.55; overflow-x: hidden; padding-bottom: max(84px, calc(64px + env(safe-area-inset-bottom))); }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; overflow-x: hidden; padding-bottom: max(90px, calc(72px + env(safe-area-inset-bottom))); }
     button, input, select, textarea { font-family: inherit; outline: none; }
-    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--primary-light); outline-offset: 2px; }
-    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes modalPop { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .container { max-width: 940px; margin: 0 auto; padding: 14px; }
-    .card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.04); margin-bottom: 14px; }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes modalPop { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .container { max-width: 880px; margin: 0 auto; padding: 14px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid rgba(6, 95, 70, 0.08); margin-bottom: 14px; transition: box-shadow 0.2s var(--ease); }
     h1, h2, h3 { text-wrap: balance; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 42px; padding: 9px 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-size: 13.5px; white-space: nowrap; transition: transform 0.14s var(--ease), background-color 0.18s, opacity 0.18s; }
-    .btn:active { transform: scale(0.97); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 10px 16px; border-radius: 13px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; transition: transform 0.14s var(--ease), background-color 0.2s, box-shadow 0.2s, opacity 0.2s; }
+    .btn:active { transform: scale(0.96); }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: #047857; }
+    .btn-primary { background: linear-gradient(135deg, #065f46, #047857); color: #fff; box-shadow: 0 4px 12px rgba(6,95,70,0.2); }
     .btn-soft { background: var(--primary-soft); color: var(--primary); border: 1px solid #a7f3d0; }
-    .btn-gold { background: var(--accent); color: #fff; }
-    .btn-gold:hover { background: #b45309; }
+    .btn-gold { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 4px 12px rgba(217,119,6,0.22); }
     .btn-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
-    .btn-danger-solid { background: var(--danger); color: #fff; }
-    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text); }
-    .btn-outline:hover { background: #f9fafb; }
-    .btn-sm { min-height: 38px; padding: 7px 12px; font-size: 13px; border-radius: 10px; }
-    .btn-xs { min-height: 32px; padding: 4px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-danger-solid { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; box-shadow: 0 4px 12px rgba(220,38,38,0.2); }
+    .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-sm { min-height: 40px; padding: 8px 12px; font-size: 13px; border-radius: 11px; }
+    .btn-xs { min-height: 34px; padding: 5px 10px; font-size: 12px; border-radius: 9px; }
     .btn-block { width: 100%; }
-    .input { width: 100%; padding: 10px 13px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 15px; background: #fff; transition: border-color 0.18s, box-shadow 0.18s; }
-    .input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
+    .input { width: 100%; padding: 11px 14px; border-radius: 13px; border: 1.5px solid var(--border); font-size: 15px; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
+    .input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12); }
     .pw-wrap { position: relative; display: flex; align-items: center; }
     .pw-toggle { position: absolute; left: 10px; background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px; }
-    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(150deg, #ecfdf5 0%, #f3f7f5 55%, #fffbeb 100%); }
-    .login-box { width: 100%; max-width: 440px; background: #fff; border-radius: 24px; padding: 26px 22px; border: 1px solid rgba(6,95,70,0.08); box-shadow: 0 18px 45px rgba(6, 78, 59, 0.1); animation: fadeSlideUp 0.28s var(--ease); }
-    .logo-badge { width: 64px; height: 64px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-    .quick-chips { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; max-height: 210px; overflow-y: auto; padding: 2px; -webkit-overflow-scrolling: touch; }
-    .quick-group-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 12px; background: #f9fafb; border: 1px solid var(--border); }
-    .quick-group-title { font-size: 12.5px; font-weight: 800; color: var(--primary); margin-left: 4px; }
-    .chip { padding: 6px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.14s; }
-    .chip:hover, .chip:active { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); }
-    .chip-head { background: var(--accent-soft); border-color: #fcd34d; color: #92400e; align-self: flex-start; padding: 6px 12px; font-size: 12.5px; }
-    .app-header { background: linear-gradient(135deg, #064e3b, #047857); color: #fff; padding: 13px 16px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; box-shadow: 0 6px 20px rgba(6,95,70,0.18); }
-    .header-top { max-width: 940px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .header-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .header-title { min-width: 0; }
-    .header-title h1 { font-size: 17.5px; font-weight: 800; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .header-title p { font-size: 12.5px; opacity: 0.88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-    .header-btn { min-height: 36px; background: rgba(255,255,255,0.16); color: #fff; border: 1px solid rgba(255,255,255,0.22); padding: 6px 11px; border-radius: 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
-    .header-btn:hover { background: rgba(255,255,255,0.24); }
-    .header-btn:active { transform: scale(0.96); }
-    .date-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .date-pill-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex: 1; min-width: 0; min-height: 38px; padding: 6px 12px; border-radius: 11px; background: #f3f8f6; border: 1px solid #d1e7dd; color: var(--primary); font-weight: 800; font-size: 14px; cursor: pointer; transition: background-color 0.15s; }
-    .date-pill-trigger:hover { background: #ecfdf5; }
-    .date-pill-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .date-native-overlay { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; border: none; font-size: 16px; }
-    .date-nav-btn { min-width: 38px; min-height: 38px; padding: 0 10px; border-radius: 11px; border: 1px solid var(--border); background: #fff; color: var(--text); font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .date-nav-btn:active { transform: scale(0.95); background: #f3f4f6; }
-    .daily-progress-strip { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
-    .daily-prog-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .daily-prog-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
-    .daily-prog-num { color: var(--primary); font-weight: 800; font-variant-numeric: tabular-nums; }
-    .daily-prog-item.amber .daily-prog-num { color: #b45309; }
-    .daily-total-meta { font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .stat-mini-bar { height: 5px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
-    .stat-mini-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.35s var(--ease); border-radius: 99px; }
-    .daily-prog-item.amber .stat-mini-fill { background: var(--accent); }
-    .stat-box { background: #f8faf9; border: 1px solid var(--border); border-radius: 13px; padding: 10px 8px; text-align: center; }
-    .stat-box.amber { background: #fffbeb; border-color: #fde68a; }
-    .stat-box.gray { background: #f9fafb; border-color: #e5e7eb; }
-    .stat-num { font-size: 18px; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(160deg, #064e3b 0%, #059669 44%, #f3f7f5 44%); }
+    .login-box { width: 100%; max-width: 470px; background: #fff; border-radius: 24px; padding: 28px 22px; box-shadow: 0 22px 50px rgba(6, 78, 59, 0.16); animation: fadeSlideUp 0.35s var(--ease); }
+    .logo-badge { width: 76px; height: 76px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+    .quick-chips { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; max-height: 230px; overflow-y: auto; padding: 2px; -webkit-overflow-scrolling: touch; }
+    .quick-group-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 11px; border-radius: 13px; background: #f8faf9; border: 1px solid var(--border); }
+    .quick-group-title { font-size: 13px; font-weight: 800; color: var(--primary); margin-left: 4px; }
+    .chip { padding: 6px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.15s; }
+    .chip:hover, .chip:active { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); transform: translateY(-1px); }
+    .chip-head { background: var(--accent-soft); border-color: #fcd34d; color: #92400e; align-self: flex-start; padding: 7px 14px; font-size: 13px; }
+    .app-header { background: linear-gradient(135deg, #064e3b, #047857); color: #fff; padding: 16px 16px 22px; border-bottom-left-radius: 26px; border-bottom-right-radius: 26px; box-shadow: 0 8px 24px rgba(6,95,70,0.2); }
+    .header-top { max-width: 880px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .header-brand { display: flex; align-items: center; gap: 10px; }
+    .header-title h1 { font-size: 19px; font-weight: 800; line-height: 1.3; }
+    .header-title p { font-size: 13px; opacity: 0.92; }
+    .header-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .header-btn { background: rgba(255,255,255,0.16); backdrop-filter: blur(6px); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 7px 11px; border-radius: 11px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .header-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.26); }
+    .date-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .date-controls { display: flex; align-items: center; gap: 6px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    .stat-box { background: var(--primary-soft); border-radius: 14px; padding: 10px 8px; text-align: center; border: 1px solid #d1fae5; }
+    .stat-box.amber { background: var(--accent-soft); border-color: #fde68a; }
+    .stat-box.gray { background: #f3f4f6; border-color: #e5e7eb; }
+    .stat-num { font-size: 19px; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
     .stat-box.amber .stat-num { color: #b45309; }
-    .stat-box.gray .stat-num { color: var(--text); }
-    .stat-label { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-top: 2px; line-height: 1.3; }
-    .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; background: #e5e7eb; padding: 4px; border-radius: 14px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 50; }
-    .tab-btn { min-height: 40px; padding: 8px 4px; border: none; border-radius: 10px; background: transparent; font-weight: 800; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.18s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
-    .tab-panel { animation: fadeSlideUp 0.18s var(--ease); }
+    .stat-box.gray .stat-num { color: #374151; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .stat-mini-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .stat-mini-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.4s var(--ease); border-radius: 99px; }
+    .stat-box.amber .stat-mini-fill { background: var(--accent); }
+    .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; background: #e5e7eb; padding: 5px; border-radius: 16px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .tab-btn { min-height: 42px; padding: 9px 4px; border: none; border-radius: 12px; background: transparent; font-weight: 800; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.2s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+    .tab-panel { animation: fadeSlideUp 0.22s var(--ease); }
     /* ==================== داشبورد الالتزام ==================== */
     .dash-segmented { display: inline-flex; gap: 4px; background: #f3f4f6; padding: 4px; border-radius: 12px; border: 1px solid var(--border); flex-wrap: wrap; }
     .dash-seg-btn { min-height: 36px; padding: 6px 12px; border: none; border-radius: 9px; background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all 0.16s var(--ease); white-space: nowrap; }
     .dash-seg-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
-    .dash-kpi-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: var(--shadow-sm); }
+    .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .dash-kpi-card { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 13px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: var(--shadow-sm); }
     .dash-kpi-label { font-size: 12px; font-weight: 800; color: var(--muted); }
     .dash-kpi-val { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.25; }
     .dash-kpi-sub { font-size: 11px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.35; }
@@ -121,14 +105,14 @@
     .dash-delta-pill.up { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .dash-delta-pill.down { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
     .dash-delta-pill.flat { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
-    .dash-split-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; align-items: stretch; }
-    .dash-split-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; }
-    .dash-spotlight-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 4px; border-bottom: 1px solid rgba(0,0,0,0.06); cursor: pointer; }
+    .dash-split-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; align-items: stretch; }
+    .dash-split-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; }
+    .dash-spotlight-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.06); cursor: pointer; }
     .dash-spotlight-row:last-child { border-bottom: none; }
     .dash-spotlight-row:hover { background: #f9fafb; }
     .dash-progress-track { height: 7px; background: #e5e7eb; border-radius: 99px; overflow: hidden; width: 100%; }
     .dash-progress-fill { height: 100%; border-radius: 99px; transition: width 0.35s var(--ease); }
-    .dash-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: #fff; -webkit-overflow-scrolling: touch; }
+    .dash-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: #fff; -webkit-overflow-scrolling: touch; }
     .dash-table { width: 100%; border-collapse: collapse; min-width: 610px; font-size: 13.5px; }
     .dash-table th { background: #f8faf9; color: var(--primary); font-weight: 800; font-size: 12.5px; padding: 10px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
     .dash-table td { padding: 10px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: middle; font-variant-numeric: tabular-nums; }
@@ -140,14 +124,13 @@
     .dash-tier-low { color: #dc2626; font-weight: 800; }
     .dash-history-row { display: grid; grid-template-columns: 165px 1fr 1fr; gap: 8px; align-items: center; padding: 8px 6px; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 13px; font-variant-numeric: tabular-nums; }
     .dash-history-row:last-child { border-bottom: none; }
-    .guide-card { background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+    .guide-card { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
     .guide-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
-    .guide-step { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: #374151; line-height: 1.5; }
-    .guide-num { flex-shrink: 0; width: 22px; height: 22px; border-radius: 99px; background: #d97706; color: #fff; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
-    .action-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
-    .batch-absent-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; margin-bottom: 10px; animation: fadeSlideUp 0.16s var(--ease); }
-    .quick-util-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-    .quick-util-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .guide-step { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: #374151; line-height: 1.55; }
+    .guide-num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 99px; background: #d97706; color: #fff; font-weight: 800; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+    .step-label { font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .action-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+    .batch-absent-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 13px; margin-bottom: 12px; animation: fadeSlideUp 0.18s var(--ease); }
     .search-wrap { position: relative; display: flex; align-items: center; margin-bottom: 8px; }
     .search-wrap .input { padding-left: 38px; margin-bottom: 0 !important; }
     .search-clear-btn { position: absolute; left: 8px; width: 28px; height: 28px; border-radius: 99px; border: none; background: #e5e7eb; color: #374151; font-size: 13px; font-weight: 800; cursor: pointer; display: none; align-items: center; justify-content: center; line-height: 1; transition: background-color 0.15s; }
@@ -156,43 +139,42 @@
     .ambig-row { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 7px 9px; margin-top: 6px; }
     .ambig-pick-btn { background: #fff; border: 1px solid #f59e0b; color: #92400e; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; cursor: pointer; margin: 3px 2px 0; }
     .ambig-pick-btn:hover, .ambig-pick-btn:active { background: #fef3c7; }
-    .status-summary-line { font-size: 12.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
-    .section-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+    .status-summary-line { font-size: 12.5px; font-weight: 700; color: var(--muted); text-align: center; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-    .filter-chip { min-height: 34px; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; font-variant-numeric: tabular-nums; }
+    .filter-chip { min-height: 36px; padding: 6px 12px; border-radius: 99px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; font-variant-numeric: tabular-nums; }
     .filter-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
     .filter-chip.active-absent { background: var(--danger); border-color: var(--danger); color: #fff; }
     .filter-chip.active-present { background: #059669; border-color: #059669; color: #fff; }
     .filter-chip.active-unmarked { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .member-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 15px; border: 1.5px solid var(--border); background: #fff; margin-bottom: 8px; box-shadow: var(--shadow-sm); transition: background-color 0.14s, border-color 0.14s; }
-    .status-present { background: #f0fdf4 !important; border-color: #86efac !important; }
-    .status-absent { background: #fef2f2 !important; border-color: #fecaca !important; }
-    .status-excused { background: #fffbeb !important; border-color: #fde68a !important; }
-    .member-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .member-name { font-weight: 700; font-size: 15px; color: var(--text); }
-    .member-name-link { cursor: pointer; transition: color 0.15s; text-decoration: underline dotted rgba(6,95,70,0.32); text-underline-offset: 4px; display: inline-block; }
+    .member-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 15px; border: 1.5px solid var(--border); background: #fff; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+    .status-present { border-color: #6ee7b7 !important; background: #f0fdf4 !important; }
+    .status-absent { border-color: #fca5a5 !important; background: #fef2f2 !important; }
+    .status-excused { border-color: #fcd34d !important; background: #fffbeb !important; }
+    .member-info { display: flex; flex-direction: column; gap: 2px; }
+    .member-name { font-weight: 800; font-size: 15.5px; }
+    .member-name-link { cursor: pointer; transition: color 0.15s; text-decoration: underline dotted rgba(6,95,70,0.35); text-underline-offset: 4px; display: inline-block; }
     .member-name-link:hover, .member-name-link:active { color: var(--primary); }
-    .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; font-variant-numeric: tabular-nums; }
-    .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-right: 4px; }
-    .status-pills { display: flex; gap: 5px; flex-shrink: 0; }
-    .pill { min-height: 38px; padding: 6px 12px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: #374151; white-space: nowrap; transition: all 0.14s; }
-    .pill:hover { border-color: #d1d5db; }
-    .pill:active { transform: scale(0.96); }
+    .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; }
+    .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 99px; margin-right: 4px; }
+    .status-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill { min-height: 44px; padding: 8px 12px; border-radius: 11px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--muted); }
+    .pill:active { transform: scale(0.95); }
     .pill.active-present { background: #059669; border-color: #059669; color: #fff; }
     .pill.active-absent { background: #dc2626; border-color: #dc2626; color: #fff; }
     .pill.active-excused { background: #d97706; border-color: #d97706; color: #fff; }
-    .partner-card { border: 1.5px solid var(--border); border-radius: 16px; background: #fff; padding: 12px 13px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
-    .partner-card.all-done { border-color: #86efac; background: #f8fffb; }
-    .partner-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
-    .partner-num-pill { background: var(--primary); color: #fff; font-size: 12.5px; font-weight: 800; padding: 4px 11px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
-    .partner-type-pill { background: var(--accent-soft); color: #92400e; font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 99px; }
-    .partner-members-list { display: flex; flex-direction: column; gap: 7px; }
-    .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--border); background: #fff; }
+    .partner-card { border: 1.5px solid var(--border); border-radius: 16px; padding: 14px; background: #fff; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+    .partner-card.all-done { border-color: #6ee7b7; background: #f0fdf4; }
+    .partner-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
+    .partner-num-pill { background: var(--primary); color: #fff; padding: 4px 11px; border-radius: 99px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+    .partner-type-pill { background: var(--primary-soft); color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+    .partner-members-list { display: flex; flex-direction: column; gap: 8px; }
+    .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(255,255,255,0.92); padding: 9px 12px; border-radius: 12px; border: 1.5px solid var(--border); }
     .select-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; margin: 10px 0; }
     .select-item { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 11px; border: 1.5px solid var(--border); cursor: pointer; background: #fff; font-size: 14px; font-weight: 600; }
     .select-item.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
     .group-manage-card { border: 1.5px solid var(--border); border-radius: 15px; padding: 14px; margin-bottom: 10px; background: #fff; box-shadow: var(--shadow-sm); }
-    .sup-badge { display: inline-flex; align-items: center; gap: 4px; background: #f3f4f6; padding: 2px 8px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+    .sup-badge { display: inline-flex; align-items: center; gap: 4px; background: #f3f4f6; border: 1px solid var(--border); padding: 3px 9px; border-radius: 99px; font-size: 12.5px; font-weight: 600; }
     .sup-edit-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
     .stars-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; white-space: pre-wrap; font-size: 14.5px; line-height: 1.65; max-height: 300px; overflow-y: auto; margin: 12px 0; }
     .modal-backdrop { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.55); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; padding: 14px; z-index: 1000; }
@@ -229,21 +211,21 @@
     .scroll-top-btn.show { display: flex; }
     @media (max-width: 560px) {
       .container { padding: 10px; }
-      .card { padding: 12px 13px; border-radius: 15px; margin-bottom: 10px; }
-      .app-header { padding: 11px 12px; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
-      .header-title h1 { font-size: 15.5px; }
-      .header-btn { min-height: 36px; padding: 6px 9px; font-size: 12px; }
-      .date-bar { flex-wrap: nowrap; gap: 6px; }
-      .date-pill-trigger { font-size: 13px; padding: 5px 10px; min-height: 38px; }
+      .card { padding: 13px; border-radius: 16px; margin-bottom: 12px; }
+      .app-header { padding: 12px 12px 18px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; }
+      .header-title h1 { font-size: 17px; }
+      .header-btn { min-height: 36px; padding: 6px 10px; font-size: 12px; }
+      .date-controls { width: 100%; }
+      .date-controls #date-picker { flex: 1; min-width: 0; text-align: center; }
       .input, textarea.input { font-size: 16px !important; }
-      .action-row-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-      .action-row-3 .btn { padding: 8px 8px; font-size: 12.5px; }
-      .action-row-3 .btn-span-mobile { grid-column: 1 / -1; }
-      .member-row, .partner-member-item { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 12px; }
-      .status-pills { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .pill { text-align: center; padding: 8px 4px; font-size: 12px; }
+      .action-grid-2 { grid-template-columns: 1fr; }
+      .bulk-actions-row { display: grid; grid-template-columns: repeat(2, 1fr); }
+      .bulk-actions-row .btn-span-full { grid-column: 1 / -1; }
+      .member-row, .partner-member-item { flex-direction: column; align-items: stretch; }
+      .status-pills { justify-content: space-between; }
+      .pill { flex: 1; text-align: center; padding: 9px 6px; }
       .tabs { top: 4px; gap: 3px; padding: 4px; }
-      .tab-btn { font-size: 12px; padding: 8px 2px; min-height: 38px; }
+      .tab-btn { font-size: 11.5px; padding: 8px 2px; min-height: 40px; }
       .dash-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .dash-split-grid { grid-template-columns: 1fr; }
       .dash-history-row { grid-template-columns: 125px 1fr 1fr; font-size: 12px; }
@@ -304,47 +286,49 @@
   <div id="login-screen" class="login-wrap">
     <div class="login-box">
       <div class="logo-badge">
-        <svg viewBox="0 0 128 128" width="64" height="64">
+        <svg viewBox="0 0 128 128" width="76" height="76">
           <rect width="128" height="128" rx="28" fill="#065f46"/>
           <rect x="8" y="8" width="112" height="112" rx="22" fill="none" stroke="#fbbf24" stroke-width="3" opacity="0.65"/>
           <path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/>
           <path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/>
+          <path d="M34 52 H54 M34 62 H54 M34 72 H50 M74 52 H94 M74 62 H94 M78 72 H94" stroke="#065f46" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
           <circle cx="64" cy="24" r="5" fill="#fbbf24"/>
         </svg>
       </div>
-      <h2 style="text-align:center; color:var(--primary); font-size:21px; font-weight:800; margin-bottom:2px;">تعاهدوا القرءان</h2>
-      <p style="text-align:center; color:var(--muted); font-size:13.5px; margin-bottom:18px;">متابعة حضور الاستماع والتسميع</p>
+      <h2 style="text-align:center; color:var(--primary); font-size:23px; font-weight:800; margin-bottom:4px;">جروبات تعاهدوا القرءان</h2>
+      <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:18px;">متابعة حضور الاستماع والتسميع لحفظة كتاب الله</p>
       <div id="login-step-1">
-        <label style="display:block; font-weight:700; font-size:13.5px; margin-bottom:5px;">الجروب أو المشرف</label>
-        <input type="text" id="supervisor-input" class="input" placeholder="اكتبي اسم الجروب أو اختاريه بالأسفل..." oninput="quickSelectedGroupId=null" onkeypress="if(event.key==='Enter') document.getElementById('password-input').focus()" />
-        <label style="display:block; font-weight:700; font-size:13.5px; margin:10px 0 5px;">كلمة المرور</label>
+        <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم الجروب (أو المشرف الرئيسي)</label>
+        <input type="text" id="supervisor-input" class="input" placeholder="اكتبي اسم الجروب أو اختاريه من الأسفل..." oninput="quickSelectedGroupId=null" onkeypress="if(event.key==='Enter') document.getElementById('password-input').focus()" />
+        <label style="display:block; font-weight:700; font-size:14px; margin:10px 0 6px;">كلمة المرور (الباسورد)</label>
         <div class="pw-wrap">
-          <input type="password" id="password-input" class="input" style="padding-left:40px;" placeholder="أدخلي كلمة المرور..." onkeypress="if(event.key==='Enter') handleLogin()" />
+          <input type="password" id="password-input" class="input" style="padding-left:40px;" placeholder="أدخلي كلمة مرور الجروب (أرقام عربي أو إنجليزي)..." onkeypress="if(event.key==='Enter') handleLogin()" />
           <button type="button" class="pw-toggle" onclick="togglePwVisibility('password-input', this)">👁️</button>
         </div>
-        <button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="handleLogin()">دخول</button>
+        <button class="btn btn-primary btn-block" style="margin-top:14px; padding:12px;" onclick="handleLogin()">دخول</button>
         <div id="existing-supervisors-wrap" style="margin-top:16px;">
-          <p style="font-size:12.5px; color:var(--muted); font-weight:700;">اختاري الجروب:</p>
+          <p style="font-size:13px; color:var(--primary); font-weight:700;">الجروبات المسجلة (اضغطي لاختيار الجروب):</p>
           <div id="quick-supervisors" class="quick-chips"></div>
         </div>
       </div>
       <div id="login-step-2" class="hidden">
-        <div style="background:var(--primary-soft); padding:11px; border-radius:12px; margin-bottom:12px; font-size:13.5px;">إنشاء جروب جديد باسم «<strong id="new-sup-display"></strong>»:</div>
-        <label style="display:block; font-weight:700; font-size:13.5px; margin-bottom:5px;">اسم المشرف / المشرفة</label>
-        <input type="text" id="new-group-input" class="input" placeholder="مثال: أميرة، سارة..." onkeypress="if(event.key==='Enter') createNewSupervisorGroup()" />
+        <div style="background:var(--primary-soft); padding:12px; border-radius:12px; margin-bottom:14px; font-size:14px;">لم نجد جروباً باسم «<strong id="new-sup-display"></strong>» بعد — يمكنكِ إنشاؤه الآن:</div>
+        <label style="display:block; font-weight:700; font-size:14px; margin-bottom:6px;">اسم المشرف / المشرفة (يظهر أعلى صفحة الجروب)</label>
+        <input type="text" id="new-group-input" class="input" placeholder="مثال: أميرة، سارة، أحمد..." onkeypress="if(event.key==='Enter') createNewSupervisorGroup()" />
         <div style="display:flex; gap:8px; margin-top:12px;">
-          <button class="btn btn-primary" style="flex:1;" onclick="createNewSupervisorGroup()">إنشاء ودخول</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="createNewSupervisorGroup()">إنشاء الجروب والدخول</button>
           <button class="btn btn-outline" onclick="cancelNewSupervisor()">رجوع</button>
         </div>
       </div>
       <div id="login-step-pick-group" class="hidden">
-        <div style="background:var(--primary-soft); padding:11px; border-radius:12px; margin-bottom:12px; font-size:13.5px;">أهلاً <strong id="pick-sup-display"></strong>! اختاري الجروب:</div>
+        <div style="background:var(--primary-soft); padding:12px; border-radius:12px; margin-bottom:12px; font-size:14px;">أهلاً بك يا <strong id="pick-sup-display"></strong>! اختر الجروب الذي تريد فتحه:</div>
         <div id="login-pick-groups-list"></div>
         <button class="btn btn-outline btn-block btn-sm" style="margin-top:8px;" onclick="cancelPickGroup()">رجوع</button>
       </div>
-      <div style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--border); display:flex; flex-direction:column; gap:8px;">
-        <button class="btn btn-soft btn-block" onclick="openSchedulesScreen(null, 'login')">📅 الجداول الشهرية الهجرية</button>
-        <button class="btn btn-outline btn-block" onclick="openDownloadModal()">📲 تحميل التطبيق على الموبايل</button>
+      <hr style="border:none; border-top:1px solid var(--border); margin:18px 0 12px;" />
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn btn-gold btn-block btn-sm" onclick="openSchedulesScreen(null, 'login')">📅 صانع الجداول الشهرية</button>
+        <button class="btn btn-soft btn-block btn-sm" onclick="openDownloadModal()">📲 تثبيت التطبيق على الموبايل</button>
       </div>
     </div>
   </div>
@@ -353,20 +337,20 @@
     <header class="app-header">
       <div class="header-top">
         <div class="header-brand">
-          <svg viewBox="0 0 128 128" width="40" height="40" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
-          <div class="header-title"><h1>لوحة المشرف الرئيسي</h1><p id="head-name-display"></p></div>
+          <svg viewBox="0 0 128 128" width="42" height="42" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
+          <div class="header-title"><h1>👑 لوحة المشرف الرئيسي</h1><p>متابعة وإدارة جميع الجروبات (<span id="head-name-display"></span>)</p></div>
         </div>
         <div class="header-actions">
-          <button class="header-btn" onclick="openSchedulesScreen(null, 'head')">📅 الجداول</button>
-          <button class="header-btn" onclick="openDownloadModal()">📲 التطبيق</button>
+          <button class="header-btn" onclick="openSchedulesScreen(null, 'head')">📅 الجداول الشهرية</button>
           <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
+          <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
           <button class="header-btn" onclick="logout()">خروج</button>
         </div>
       </div>
     </header>
     <div class="container">
       <div class="card">
-        <h3 style="font-size:15.5px; margin-bottom:10px; color:var(--primary);">إضافة جروب جديد</h3>
+        <h3 style="font-size:16px; margin-bottom:10px; color:var(--primary);">➕ إضافة جروب ومشرف جديد</h3>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px;">
           <input type="text" id="head-add-gname" class="input" style="padding:9px 12px;" placeholder="اسم الجروب..." />
           <input type="text" id="head-add-sname" class="input" style="padding:9px 12px;" placeholder="اسم المشرف..." />
@@ -376,20 +360,20 @@
       </div>
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
-          <h3 style="font-size:15.5px;">كل الجروبات (<span id="head-groups-count">0</span>)</h3>
-          <span style="font-size:12px; color:var(--muted);">اليوم: <strong id="head-today-date"></strong></span>
+          <h3 style="font-size:16px;">📋 جميع الجروبات (<span id="head-groups-count">0</span>)</h3>
+          <span style="font-size:12px; color:var(--muted);">إحصائيات اليوم: <strong id="head-today-date"></strong></span>
         </div>
         <div id="head-groups-list"></div>
       </div>
       <div class="card">
         <details>
-          <summary style="cursor:pointer; font-weight:700; font-size:14px; color:var(--primary);">🔐 إعدادات كلمات المرور</summary>
+          <summary style="cursor:pointer; font-weight:700; font-size:14.5px; color:var(--primary);">🔐 تغيير اسم أو كلمات المرور (المشرف الرئيسي والجداول)</summary>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-top:12px;">
             <div><label style="font-size:12px; font-weight:700;">اسم الدخول للمشرف الرئيسي:</label><input type="text" id="head-edit-name" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
             <div><label style="font-size:12px; font-weight:700;">كلمة مرور المشرف الرئيسي:</label><input type="text" id="head-edit-pass" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
             <div><label style="font-size:12px; font-weight:700;">كلمة مرور جزئية الجداول:</label><input type="text" id="head-sched-pass" class="input" style="padding:8px 10px; margin-top:4px;" /></div>
           </div>
-          <button class="btn btn-soft btn-sm" style="margin-top:10px;" onclick="saveHeadCredentials()">حفظ البيانات</button>
+          <button class="btn btn-soft btn-sm" style="margin-top:10px;" onclick="saveHeadCredentials()">💾 حفظ كلمات المرور والبيانات</button>
         </details>
       </div>
     </div>
@@ -399,16 +383,16 @@
     <header class="app-header">
       <div class="header-top">
         <div class="header-brand">
-          <svg viewBox="0 0 128 128" width="40" height="40" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
+          <svg viewBox="0 0 128 128" width="42" height="42" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
           <div class="header-title"><h1 id="header-group-name">جروب تعاهدوا القرءان</h1><p>المشرف: <span id="header-supervisor-name"></span></p></div>
         </div>
         <div class="header-actions">
-          <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
           <button class="header-btn" onclick="openSchedulesScreen(currentGroupId, 'app')">📅 الجداول</button>
-          <button id="switch-group-btn" class="header-btn hidden" onclick="openSwitchGroupModal()">تبديل</button>
+          <button id="switch-group-btn" class="header-btn hidden" onclick="openSwitchGroupModal()">🔄 تبديل الجروب</button>
+          <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
           <button class="header-btn" onclick="toggleQuickGuide()">❓ شرح</button>
-          <button class="header-btn" onclick="openDownloadModal()">📲 التطبيق</button>
           <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
+          <button class="header-btn" onclick="openDownloadModal()">📲 تحميل</button>
           <button class="header-btn" onclick="logout()">خروج</button>
         </div>
       </div>
@@ -416,22 +400,38 @@
     <div class="container">
       <div id="quick-guide-card" class="guide-card hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-          <strong style="font-size:14.5px; color:#92400e;">💡 طريقة الاستخدام السريعة</strong>
-          <button class="btn btn-outline btn-xs" onclick="dismissQuickGuide()">فهمت، إخفاء ✕</button>
+          <strong style="font-size:15px; color:#92400e;">💡 طريقة الاستخدام في 3 خطوات بسيطة</strong>
+          <button class="btn btn-outline btn-xs" onclick="dismissQuickGuide()">فهمت، إخفاء 👍️</button>
         </div>
         <div class="guide-steps">
           <div class="guide-step">
             <span class="guide-num">1</span>
-            <div><strong>الاستماع:</strong> اضغطي أمام كل اسم أو استخدمي <strong>«استخراج من صورة»</strong> أو <strong>«كتابة / لصق أسماء»</strong> لتسجيل مجموعة دفعة واحدة.</div>
+            <div><strong>الاستماع:</strong> صوّري استطلاع الواتساب، أو اضغطي <strong>«كتابة/لصق أسماء غياب»</strong> لتسجيل مجموعة أسماء مرة واحدة، أو اضغطي أمام كل اسم.</div>
           </div>
           <div class="guide-step">
             <span class="guide-num">2</span>
-            <div><strong>التسميع:</strong> اضغطي <strong>«⚡ تسجيل الأسماء والأرقام»</strong> واكتبي أرقام الرفقاء (<code>1 3 5</code>) أو الأسماء دفعة واحدة، والباقي يتحسب تلقائياً.</div>
+            <div><strong>التسميع:</strong> اضغطي أمام كل رفيقة، أو استخدمي <strong>«تسجيل سريع»</strong> لكتابة أرقام الرفقاء (مثل <code>1 3 5</code>) أو الأسماء دفعة واحدة.</div>
           </div>
           <div class="guide-step">
             <span class="guide-num">3</span>
-            <div><strong>رسالة الغياب:</strong> اضغطي <strong>«🥀 نسخ رسالة الغياب»</strong> لإرسال قائمة الغياب بالإنذارات على الواتساب مباشرة.</div>
+            <div><strong>رسالة الواتساب:</strong> بعد الانتهاء اضغطي <strong>«نسخ رسالة الغياب»</strong> وأرسليها للجروب — والإنذارات 🔴 تُحسب تلقائياً.</div>
           </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="date-bar">
+          <div><span style="font-size:13px; color:var(--muted); font-weight:600;">تاريخ المتابعة:</span><div style="font-weight:800; font-size:15.5px;" id="date-readable"></div></div>
+          <div class="date-controls">
+            <button class="btn btn-outline btn-sm" onclick="changeDate(-1)">السابق</button>
+            <input type="date" id="date-picker" class="input" style="padding:6px 10px; width:auto; font-size:13px;" onchange="onDateChange()" />
+            <button class="btn btn-outline btn-sm" onclick="changeDate(1)">التالي</button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-num" id="stat-listening">0 / 0</div><div class="stat-label">حضور الاستماع</div><div class="stat-mini-bar"><div id="stat-listening-bar" class="stat-mini-fill"></div></div></div>
+          <div class="stat-box amber"><div class="stat-num" id="stat-recitation">0 / 0</div><div class="stat-label">حضور التسميع</div><div class="stat-mini-bar"><div id="stat-recitation-bar" class="stat-mini-fill"></div></div></div>
+          <div class="stat-box gray"><div class="stat-num" id="stat-total">0</div><div class="stat-label">إجمالي الأعضاء</div></div>
         </div>
       </div>
 
@@ -442,139 +442,113 @@
         <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء</button>
       </div>
 
-      <div id="daily-summary-card" class="card" style="padding:11px 13px;">
-        <div class="date-bar">
-          <button type="button" class="date-nav-btn" title="اليوم السابق" onclick="changeDate(-1)">▶</button>
-          <div class="date-pill-trigger" title="اضغطي لاختيار يوم آخر">
-            <span>📅</span>
-            <span class="date-pill-text" id="date-readable"></span>
-            <input type="date" id="date-picker" class="date-native-overlay" onchange="onDateChange()" />
-          </div>
-          <button type="button" class="date-nav-btn" title="اليوم التالي" onclick="changeDate(1)">◀</button>
-        </div>
-        <div class="daily-progress-strip">
-          <div class="daily-prog-item">
-            <div class="daily-prog-head"><span>الاستماع</span><span class="daily-prog-num" id="stat-listening">0 / 0</span></div>
-            <div class="stat-mini-bar"><div id="stat-listening-bar" class="stat-mini-fill"></div></div>
-          </div>
-          <div class="daily-prog-item amber">
-            <div class="daily-prog-head"><span>التسميع</span><span class="daily-prog-num" id="stat-recitation">0 / 0</span></div>
-            <div class="stat-mini-bar"><div id="stat-recitation-bar" class="stat-mini-fill"></div></div>
-          </div>
-          <div class="daily-total-meta">الأعضاء: <strong id="stat-total" style="color:var(--text);">0</strong></div>
-        </div>
-      </div>
-
       <div id="tab-listening" class="tab-panel">
-        <div class="card">
-          <div class="action-row-3">
-            <button class="btn btn-gold btn-sm" onclick="openOcrModal()">📸 استخراج من صورة</button>
-            <button id="listening-batch-toggle-btn" class="btn btn-soft btn-sm" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء</button>
-            <button class="btn btn-danger-solid btn-sm btn-span-mobile" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة الغياب</button>
+        <div class="card" style="padding:14px;">
+          <button class="btn btn-danger-solid btn-block" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة غياب الاستماع لليوم (مع عداد الإنذارات 🔴)</button>
+          <div id="listening-status-line" class="status-summary-line" style="margin-bottom:10px;"></div>
+
+          <div class="step-label"><span>تسجيل حضور أو غياب الاستماع</span></div>
+          <div class="action-grid-2">
+            <button class="btn btn-gold" onclick="openOcrModal()">📸 تسجيل من صور الواتساب</button>
+            <button id="listening-batch-toggle-btn" class="btn btn-soft" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء</button>
           </div>
 
           <div id="listening-batch-box" class="batch-absent-box hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
-              <strong style="font-size:13.5px; color:var(--primary);">📝 تسجيل أسماء الاستماع دفعة واحدة</strong>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+              <strong style="font-size:14px; color:var(--primary);">📝 تسجيل مجموعة أسماء في الاستماع دفعة واحدة</strong>
               <button class="btn btn-outline btn-xs" onclick="toggleListeningBatch(false)">إغلاق</button>
             </div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:7px; line-height:1.5;">اكتبي أو الصقي الأسماء بأي صيغة (كل اسم في سطر أو بفاصلة) — ولو مكتوب جنب الاسم كلمة <strong>عذر</strong> بيتسجل <strong>بعذر</strong> تلقائياً.</p>
-            <textarea id="listening-batch-input" dir="rtl" class="input" rows="3" style="padding:9px 11px; font-size:14px;" placeholder="مثال: سلسبيل محمد، مريم كرم عذر" oninput="previewListeningBatch()"></textarea>
+            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي الأسماء (كل اسم في سطر، أو بينهم فاصلة <code>،</code>). إذا كُتبت كلمة <code>عذر</code> أو <code>بعذر</code> بجانب الاسم يُسجل <strong>غياب بعذر</strong> تلقائياً.</p>
+            <textarea id="listening-batch-input" dir="rtl" class="input" rows="4" style="padding:10px 12px; font-size:14px;" placeholder="مثال:&#10;سلسبيل محمد&#10;مريم كرم عذر، أسماء أبو حسين&#10;🥀 سحر الأفندي (بعذر)" oninput="previewListeningBatch()"></textarea>
             <div id="listening-batch-preview" class="quick-num-preview hidden"></div>
-            <label style="display:flex; align-items:flex-start; gap:7px; font-size:12px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer; line-height:1.45;">
-              <input type="checkbox" id="listening-batch-auto-present" style="width:16px; height:16px; margin-top:2px; flex-shrink:0;" />
-              <span>تسجيل باقي الأعضاء غير المذكورين تلقائياً (باقي الأعضاء غياب عند تسجيل حاضر، أو باقي الأعضاء حاضر عند تسجيل غياب/بعذر)</span>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:9px; cursor:pointer;">
+              <input type="checkbox" id="listening-batch-auto-present" style="width:17px; height:17px;" />
+              <span>تسجيل باقي غير المسجلين بالعكس تلقائياً (مثلاً: الباقي غياب عند تسجيل الحضور)</span>
             </label>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(125px, 1fr)); gap:6px; margin-top:9px;">
-              <button class="btn btn-primary btn-sm" onclick="applyListeningBatch('present')">✅ تسجيل المكتوبين حاضر</button>
-              <button class="btn btn-gold btn-sm" onclick="applyListeningBatch('excused')">⏳ تسجيل المكتوبين بعذر</button>
-              <button class="btn btn-danger-solid btn-sm" onclick="applyListeningBatch('absent')">❌ تسجيل المكتوبين غياب</button>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <button class="btn btn-primary btn-block" onclick="applyListeningBatch('present')">✅ تسجيل المحددين حاضر مرة واحدة</button>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:130px;" onclick="applyListeningBatch('absent')">❌ تسجيل المحددين غياب</button>
+                <button class="btn btn-gold btn-sm" style="flex:1; min-width:130px;" onclick="applyListeningBatch('excused')">⏳ تسجيل المحددين بعذر</button>
+                <button class="btn btn-outline btn-sm" onclick="clearListeningBatch()">مسح</button>
+              </div>
             </div>
-            <button class="btn btn-outline btn-xs btn-block" style="margin-top:6px;" onclick="clearListeningBatch()">مسح الكلام المكتوب</button>
           </div>
 
+          <hr class="section-divider" />
           <div class="search-wrap">
-            <input type="text" id="search-listening" class="input" style="padding:9px 12px;" placeholder="🔍 ابحثي بالاسم..." oninput="renderListening()" />
+            <input type="text" id="search-listening" class="input" style="padding:9px 12px;" placeholder="🔍 ابحث عن اسم في الاستماع..." oninput="renderListening()" />
             <button type="button" class="search-clear-btn" data-target="search-listening" title="مسح البحث" onclick="clearSearchInput('search-listening', renderListening)">✕</button>
           </div>
-          <div class="quick-util-bar">
-            <div id="listening-status-line" class="status-summary-line"></div>
-            <div class="quick-util-actions">
-              <button class="btn btn-outline btn-xs" onclick="markAllListening('present')">✅ الكل حاضر</button>
-              <button class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
-              <button class="btn btn-outline btn-xs" onclick="clearDayType('listening')">🗑️ مسح اليوم</button>
-            </div>
-          </div>
           <div id="listening-filters" class="filter-chips"></div>
+          <div class="bulk-actions-row">
+            <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllListening('present')">✅ تحضير الكل</button>
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
+            <button class="btn btn-outline btn-sm btn-span-full" onclick="clearDayType('listening')">🗑️ مسح اليوم</button>
+          </div>
         </div>
         <div id="listening-list"></div>
       </div>
 
       <div id="tab-recitation" class="tab-panel hidden">
-        <div class="card">
-          <div class="action-row-3">
-            <button id="recitation-unified-toggle-btn" class="btn btn-primary btn-sm" onclick="toggleRecitationUnified()">⚡ تسجيل الأسماء والأرقام</button>
-            <button class="btn btn-soft btn-sm" onclick="togglePartnerBuilder()">➕ رفقاء جدد</button>
-            <button class="btn btn-danger-solid btn-sm btn-span-mobile" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع</button>
-          </div>
+        <div class="card" style="padding:14px;">
+          <button class="btn btn-danger-solid btn-block" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع لليوم (مع عداد الإنذارات 🔴)</button>
+          <div id="recitation-status-line" class="status-summary-line" style="margin-bottom:10px;"></div>
 
-          <div id="recitation-unified-box" class="quick-num-box hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px;">
-              <strong style="font-size:13.5px; color:var(--primary);">⚡ تسجيل أرقام الرفقاء والأسماء معاً</strong>
-              <button type="button" class="btn btn-outline btn-xs" onclick="toggleRecitationUnified(false)">إغلاق</button>
-            </div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:7px; line-height:1.5;">اكتبي أرقام الرفقاء (<code>1 3 5</code>) أو الأسماء في نفس الخانة، ولو مكتوب جنب الاسم أو الرقم كلمة <strong>عذر</strong> بيتسجل <strong>بعذر</strong> تلقائياً.</p>
-            <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 11px; font-size:14px;" placeholder="مثال: 1 3 5، ندى إمام عذر" oninput="previewRecitationUnified()"></textarea>
+          <div id="recitation-unified-box" class="quick-num-box">
+            <div style="font-weight:800; font-size:14px; color:var(--primary); margin-bottom:4px;">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</div>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>). كتابة <code>عذر</code> أو <code>بعذر</code> بجانب الاسم أو الرقم تسجله <strong>بعذر</strong> تلقائياً.</p>
+            <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام عذر، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
-            <label style="display:flex; align-items:flex-start; gap:7px; font-size:12px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer; line-height:1.45;">
-              <input type="checkbox" id="recit-unified-auto-rest" checked style="width:16px; height:16px; margin-top:2px; flex-shrink:0;" />
-              <span>تسجيل باقي الأعضاء تلقائياً (باقي الأعضاء غياب عند تسجيل حاضر، أو باقي الأعضاء حاضر عند تسجيل غياب/بعذر)</span>
+            <label style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer;">
+              <input type="checkbox" id="recit-unified-auto-rest" checked style="width:17px; height:17px;" />
+              <span>تسجيل باقي غير المسجلين بالعكس تلقائياً (مثلاً: الباقي حضور عند تسجيل الغياب)</span>
             </label>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(125px, 1fr)); gap:6px; margin-top:9px;">
-              <button class="btn btn-primary btn-sm" onclick="applyRecitationUnified('present')">✅ تسجيل المكتوبين حاضر (سمّع)</button>
-              <button class="btn btn-gold btn-sm" onclick="applyRecitationUnified('excused')">⏳ تسجيل المكتوبين بعذر</button>
-              <button class="btn btn-danger-solid btn-sm" onclick="applyRecitationUnified('absent')">❌ تسجيل المكتوبين غياب</button>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+              <button class="btn btn-primary btn-sm" style="flex:1; min-width:120px;" onclick="applyRecitationUnified('present')">✅ تسجيل حضور (سمّع)</button>
+              <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:120px;" onclick="applyRecitationUnified('absent')">❌ تسجيل غياب</button>
+              <button class="btn btn-gold btn-sm" style="flex:1; min-width:110px;" onclick="applyRecitationUnified('excused')">⏳ تسجيل بعذر</button>
             </div>
           </div>
 
-          <div id="partner-builder" class="hidden" style="margin-bottom:10px; padding:12px; background:#f8fafc; border:1px solid var(--border); border-radius:13px;">
-            <p style="font-size:13px; font-weight:700; color:var(--primary);">حددي 1 إلى 3 أعضاء (<span id="selected-count">0</span> / 3):</p>
+          <hr class="section-divider" />
+          <div class="search-wrap">
+            <input type="text" id="search-recitation" class="input" style="padding:9px 12px;" placeholder="🔍 ابحث برقم الرفقاء (مثال: 5) أو بالاسم..." oninput="renderRecitation()" />
+            <button type="button" class="search-clear-btn" data-target="search-recitation" title="مسح البحث" onclick="clearSearchInput('search-recitation', renderRecitation)">✕</button>
+          </div>
+          <div id="recitation-filters" class="filter-chips"></div>
+          <div class="bulk-actions-row">
+            <button class="btn btn-soft btn-sm" style="flex:1;" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
+            <button class="btn btn-primary btn-sm" onclick="togglePartnerBuilder()">➕ رفقاء جدد</button>
+            <button class="btn btn-outline btn-sm" onclick="clearDayType('recitation')">🗑️ مسح اليوم</button>
+          </div>
+          <div id="partner-builder" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+            <p style="font-size:13px; font-weight:700; color:var(--primary);">حددي 1 (فردي برقم كشف) أو 2 أو 3 أفراد (المحدد حالياً: <span id="selected-count">0</span> / 3):</p>
             <div id="unpaired-grid" class="select-grid"></div>
             <div style="display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;">
               <label style="font-size:12.5px; font-weight:700; color:var(--primary);">رقم الكشف:</label>
               <input type="number" min="1" id="partner-builder-num" class="input" style="width:92px; padding:6px 10px; font-size:14px;" />
             </div>
             <div style="display:flex; gap:8px; margin-top:10px;">
-              <button class="btn btn-primary btn-sm" onclick="createPartnership()">حفظ الرفقاء</button>
+              <button class="btn btn-primary btn-sm" onclick="createPartnership()">💾 حفظ الرقم / الرفقاء</button>
               <button class="btn btn-outline btn-sm" onclick="togglePartnerBuilder(false)">إلغاء</button>
             </div>
           </div>
-
-          <div class="search-wrap">
-            <input type="text" id="search-recitation" class="input" style="padding:9px 12px;" placeholder="🔍 ابحثي برقم الرفقاء أو بالاسم..." oninput="renderRecitation()" />
-            <button type="button" class="search-clear-btn" data-target="search-recitation" title="مسح البحث" onclick="clearSearchInput('search-recitation', renderRecitation)">✕</button>
-          </div>
-          <div class="quick-util-bar">
-            <div id="recitation-status-line" class="status-summary-line"></div>
-            <div class="quick-util-actions">
-              <button class="btn btn-outline btn-xs" onclick="markAllRecitation('present')">✅ الكل سمّع</button>
-              <button class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
-              <button class="btn btn-outline btn-xs" onclick="clearDayType('recitation')">🗑️ مسح اليوم</button>
-            </div>
-          </div>
-          <div id="recitation-filters" class="filter-chips"></div>
         </div>
         <div id="recitation-list"></div>
       </div>
 
       <div id="tab-dashboard" class="tab-panel hidden">
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
             <div>
-              <h3 style="font-size:16.5px; font-weight:800; color:var(--primary);">داشبورد الالتزام</h3>
-              <p id="dash-period-subtitle" style="font-size:12.5px; color:var(--muted); font-weight:600; margin-top:1px;"></p>
+              <h3 style="font-size:17px; font-weight:800; color:var(--primary);">📊 داشبورد متابعة الالتزام</h3>
+              <p id="dash-period-subtitle" style="font-size:12.5px; color:var(--muted); font-weight:600; margin-top:2px;"></p>
             </div>
-            <button type="button" class="btn btn-soft btn-sm" onclick="copyDashboardSummary()">📋 نسخ الملخص</button>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-soft btn-sm" onclick="copyDashboardSummary()">📋 نسخ ملخص الالتزام</button>
+            </div>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -585,9 +559,9 @@
             </div>
 
             <div id="dash-month-controls" class="hidden" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-              <button type="button" class="btn btn-outline btn-xs" onclick="shiftDashboardMonth(-1)">◀ السابق</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="shiftDashboardMonth(-1)">◀️ السابق</button>
               <input type="month" id="dash-month-input" class="input" style="width:auto; padding:6px 10px; font-size:13px;" onchange="onDashboardMonthChange()" />
-              <button type="button" class="btn btn-outline btn-xs" onclick="shiftDashboardMonth(1)">التالي ▶</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="shiftDashboardMonth(1)">التالي ▶️</button>
             </div>
 
             <div id="dash-custom-controls" class="hidden" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -605,13 +579,13 @@
 
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-            <h4 style="font-size:15px; font-weight:800; color:var(--text);">سجل الأعضاء (<span id="dash-table-count">0</span>)</h4>
-            <span style="font-size:12px; color:var(--muted);">اضغطي على الاسم للتفاصيل</span>
+            <h4 style="font-size:15.5px; font-weight:800; color:var(--text);">جدول التزام جميع الأعضاء (<span id="dash-table-count">0</span>)</h4>
+            <span style="font-size:12px; color:var(--muted); font-weight:600;">اضغطي على أي اسم لعرض سجل أيامه التفصيلي</span>
           </div>
 
           <div style="display:grid; grid-template-columns:1fr auto; gap:8px; margin-bottom:8px; align-items:center;">
             <div class="search-wrap" style="margin-bottom:0;">
-              <input type="text" id="dash-search" class="input" style="padding:8px 12px; font-size:14px;" placeholder="🔍 ابحثي بالاسم..." oninput="renderDashboardTableOnly()" />
+              <input type="text" id="dash-search" class="input" style="padding:8px 12px; font-size:14px;" placeholder="🔍 ابحث عن اسم في الداشبورد..." oninput="renderDashboardTableOnly()" />
               <button type="button" class="search-clear-btn" data-target="dash-search" title="مسح البحث" onclick="clearSearchInput('dash-search', renderDashboardTableOnly)">✕</button>
             </div>
             <select id="dash-sort-select" class="input" style="width:auto; padding:8px 10px; font-size:13px; font-weight:700;" onchange="renderDashboardTableOnly()">
@@ -623,45 +597,50 @@
             </select>
           </div>
 
-          <div id="dash-tier-filters" class="filter-chips" style="margin-bottom:10px;"></div>
+          <div id="dash-tier-filters" class="filter-chips"></div>
           <div id="dash-table-container"></div>
         </div>
       </div>
 
       <div id="tab-manage" class="tab-panel hidden">
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-            <h3 style="font-size:15.5px;">إضافة عضو جديد</h3>
-            <button class="btn btn-gold btn-sm" onclick="openWeeklyStarsModal()">👑 مثابرات الإسبوع</button>
+          <h3 style="font-size:16px; margin-bottom:10px;">🌹 رسائل الغياب ومثابرات الإسبوع</h3>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-danger" style="flex:1; min-width:170px;" onclick="copyAbsenceMessage('listening')">🥀 نسخ غياب الاستماع</button>
+              <button class="btn btn-danger" style="flex:1; min-width:170px;" onclick="copyAbsenceMessage('recitation')">🥀 نسخ غياب التسميع</button>
+            </div>
+            <button class="btn btn-gold btn-block" onclick="openWeeklyStarsModal()">🤍 مثابرات الإسبوع (الملتزمات بالتسميع والاستماع طوال الأسبوع) 👑</button>
           </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:16px; margin-bottom:10px;">➕ إضافة أعضاء جدد للجروب</h3>
           <div style="display:flex; gap:8px;">
-            <input type="text" id="new-member-name" class="input" placeholder="اكتبي اسم العضو الجديد..." onkeypress="if(event.key==='Enter') addSingleMember()" />
+            <input type="text" id="new-member-name" class="input" placeholder="اكتب اسم العضو الجديد..." onkeypress="if(event.key==='Enter') addSingleMember()" />
             <button class="btn btn-primary" onclick="addSingleMember()">إضافة</button>
           </div>
-          <details open style="margin-top:12px;">
-            <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--primary);">📋 تحديث أو إضافة الكشف دفعة واحدة</summary>
-            <p style="font-size:12px; color:var(--muted); margin-top:6px;">الصقي الكشف المرقّم لتحديث الترتيب والرفقاء دون فقدان سجل الحضور.</p>
+          <details style="margin-top:12px;" open>
+            <summary style="cursor:pointer; font-size:13.5px; font-weight:700; color:var(--primary);">📋 إضافة أو تحديث كشف الأسماء دفعة واحدة (وتنظيم الأرقام والرفقاء)</summary>
+            <p style="font-size:12px; color:var(--muted); margin-top:6px;">الصق الكشف المرقّم مباشرة (مثل <code>1 🌹الاسم / 🍃الاسم</code>) أو الأسماء سطرين سطرين، وسيتم ربط الرفقاء بأرقامهم تلقائياً. لتعديل الكشف وإعادة ترتيبه دون فقدان سجل الحضور والغياب، الصق الكشف المعدّل واضغط على <strong>«تحديث وترتيب الكشف الحالي»</strong>.</p>
             <div style="display:flex; justify-content:flex-end; margin-top:6px;">
               <button type="button" class="btn btn-outline btn-xs" onclick="copyCurrentRosterText()">📋 نسخ الكشف الحالي</button>
             </div>
-            <textarea id="bulk-members-input" class="input" rows="5" style="margin-top:6px; font-size:14px;" placeholder="الصقي الكشف هنا..."></textarea>
-            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; margin-top:8px; cursor:pointer;"><input type="checkbox" id="bulk-auto-pair" checked style="width:16px; height:16px;" /><span>تكوين الرفقاء تلقائياً بأرقامهم</span></label>
-            <button class="btn btn-primary btn-sm btn-block" style="margin-top:10px;" onclick="previewRosterSync()">تحديث وترتيب الكشف</button>
-            <div id="bulk-sync-preview" class="hidden" style="margin-top:10px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:12px;"></div>
+            <textarea id="bulk-members-input" class="input" rows="5" style="margin-top:6px; font-size:14px;" placeholder="الصق الكشف هنا..."></textarea>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; margin-top:8px; cursor:pointer;"><input type="checkbox" id="bulk-auto-pair" checked style="width:17px; height:17px;" /><span>تكوين الرفقاء تلقائياً بأرقامهم (ثنائي / ثلاثي)</span></label>
+            <button class="btn btn-primary btn-sm btn-block" style="margin-top:10px;" onclick="previewRosterSync()">🔄 تحديث وترتيب الكشف الحالي</button>
+            <div id="bulk-sync-preview" class="hidden" style="margin-top:10px; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px;"></div>
           </details>
         </div>
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-            <h3 style="font-size:15.5px;">أعضاء الجروب (<span id="manage-count">0</span>)</h3>
+            <h3 style="font-size:16px;">قائمة أعضاء الجروب (<span id="manage-count">0</span>)</h3>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button class="btn btn-danger btn-xs" onclick="copyAbsenceMessage('listening')">🥀 نسخ غياب الاستماع</button>
-              <button class="btn btn-danger btn-xs" onclick="copyAbsenceMessage('recitation')">🥀 نسخ غياب التسميع</button>
-              <button class="btn btn-outline btn-xs" onclick="resetAbsenceCounter()">تصفير العداد</button>
-              <button class="btn btn-danger btn-xs" onclick="deleteAllGroupMembers()">حذف الكل</button>
+              <button class="btn btn-outline btn-sm" onclick="resetAbsenceCounter()">🔄 تصفير العداد</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteAllGroupMembers()">🗑️ مسح جميع الأسماء</button>
             </div>
           </div>
           <div class="search-wrap">
-            <input type="text" id="search-manage" class="input" style="padding:8px 12px; font-size:14px;" placeholder="🔍 ابحثي لتعديل اسم أو حذفه..." oninput="renderManage()" />
+            <input type="text" id="search-manage" class="input" style="padding:8px 12px; font-size:14px;" placeholder="🔍 ابحث عن اسم لتعديله أو إدارته..." oninput="renderManage()" />
             <button type="button" class="search-clear-btn" data-target="search-manage" title="مسح البحث" onclick="clearSearchInput('search-manage', renderManage)">✕</button>
           </div>
           <p id="reset-date-note" style="font-size:12px; color:var(--muted); margin-bottom:8px;"></p>
@@ -997,7 +976,7 @@
   <div id="ocr-modal" class="modal-backdrop" onclick="if(event.target===this) closeOcrModal()">
     <div class="modal">
       <div class="modal-header">
-        <h3 style="color:var(--primary); font-size:17.5px;">📸 تسجيل الغياب والحضور من صورة</h3>
+        <h3 style="color:var(--primary); font-size:17.5px;">📸 قراءة أسماء الاستماع من الصور</h3>
         <button class="btn btn-outline btn-sm" onclick="closeOcrModal()">✕</button>
       </div>
       <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">قراءة ذكية لصور استطلاعات الواتساب (العربي والإنجليزي والوضع الليلي) مع قص الصور الشخصية والأيقونات الجانبية تلقائياً وتقطيع آمن بين السطور.</p>
@@ -1538,16 +1517,19 @@
 
     function initQuickGuideState() {
       const card = document.getElementById('quick-guide-card'); if (!card) return;
-      if (localStorage.getItem(GUIDE_STORAGE_KEY) === '1') card.classList.add('hidden');
-      else card.classList.remove('hidden');
+      let hidden = false;
+      try { hidden = localStorage.getItem(GUIDE_STORAGE_KEY) === '1'; } catch (e) {}
+      card.classList.toggle('hidden', hidden);
     }
     function toggleQuickGuide() {
       const card = document.getElementById('quick-guide-card'); if (!card) return;
-      card.classList.toggle('hidden');
+      const willShow = card.classList.contains('hidden');
+      card.classList.toggle('hidden', !willShow);
+      try { if (willShow) localStorage.removeItem(GUIDE_STORAGE_KEY); else localStorage.setItem(GUIDE_STORAGE_KEY, '1'); } catch (e) {}
     }
     function dismissQuickGuide() {
-      localStorage.setItem(GUIDE_STORAGE_KEY, '1');
       const card = document.getElementById('quick-guide-card'); if (card) card.classList.add('hidden');
+      try { localStorage.setItem(GUIDE_STORAGE_KEY, '1'); } catch (e) {}
     }
     function openGroupScreen(groupId) {
       currentGroupId = groupId; editingMemberId = null; assigningSoloMemberId = null; editingPartnerNumId = null; addingPartnerToPId = null; addingPartnerSelectedIds = []; addingPartnerSearchQuery = ''; pendingRosterSync = null; listeningFilter = 'all'; recitationFilter = 'all';
@@ -1556,7 +1538,7 @@
       document.getElementById('login-screen').classList.add('hidden'); document.getElementById('head-screen').classList.add('hidden'); document.getElementById('schedules-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
       document.getElementById('date-picker').value = currentDate;
       document.getElementById('back-to-head-btn').classList.toggle('hidden', !(session && session.role === 'head'));
-      initQuickGuideState(); updateSwitchGroupBtn(); switchTab(currentTab); renderAll();
+      initQuickGuideState(); updateSwitchGroupBtn(); renderAll();
     }
     function updateSwitchGroupBtn() {
       const btn = document.getElementById('switch-group-btn');
@@ -1733,9 +1715,9 @@
       const lRecorded = listenM.filter(m => Boolean(day.listening[m.id])).length, lRemaining = Math.max(0, listenM.length - lRecorded);
       const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
       const lStatusEl = document.getElementById('listening-status-line');
-      if (lStatusEl) lStatusEl.textContent = listenM.length ? `المُسجَّل: ${toEnglishDigits(lRecorded)}/${toEnglishDigits(listenM.length)} · المتبقي: ${toEnglishDigits(lRemaining)}` : '';
+      if (lStatusEl) lStatusEl.textContent = listenM.length ? `المُسجَّل اليوم: ${lRecorded} من ${listenM.length} • المتبقي: ${lRemaining}` : '';
       const rStatusEl = document.getElementById('recitation-status-line');
-      if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل: ${toEnglishDigits(rRecorded)}/${toEnglishDigits(members.length)} · المتبقي: ${toEnglishDigits(rRemaining)}` : '';
+      if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل اليوم: ${rRecorded} من ${members.length} • المتبقي: ${rRemaining}` : '';
       document.getElementById('header-supervisor-name').textContent = supLabel;
       document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
       updateSwitchGroupBtn(); renderStats(); renderListening(); renderRecitation(); renderManage(); previewListeningBatch(); previewRecitationUnified();
@@ -1777,9 +1759,9 @@
       members.forEach(m => { const st = dayMap[m.id]; if (st === 'absent') absentC++; else if (st === 'present') presentC++; else if (!st) unmarkedC++; });
       const chips = [
         { key: 'all', label: `الكل (${members.length})`, cls: 'active' },
-        { key: 'unmarked', label: `غير مسجل (${unmarkedC})`, cls: 'active-unmarked' },
-        { key: 'absent', label: `غائب (${absentC})`, cls: 'active-absent' },
-        { key: 'present', label: `حاضر (${presentC})`, cls: 'active-present' },
+        { key: 'absent', label: `❌ الغائبين (${absentC})`, cls: 'active-absent' },
+        { key: 'unmarked', label: `⏳ لم يُسجل (${unmarkedC})`, cls: 'active-unmarked' },
+        { key: 'present', label: `✅ الحاضرين (${presentC})`, cls: 'active-present' },
         ...extraChips
       ];
       wrap.innerHTML = chips.map(c => `<button type="button" class="filter-chip ${currentFilter === c.key ? c.cls : ''}" onclick="${onChangeFnName}('${c.key}')">${c.label}</button>`).join('');
@@ -1812,8 +1794,8 @@
       if (!members.length) { list.innerHTML = `<div class="card empty-state">${listeningFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في الاستماع اليوم!' : 'لا يوجد أعضاء مطابقون للتصفية الحالية.'}</div>`; return; }
       list.innerHTML = members.map(m => {
         const st = day.listening[m.id] || '', absCount = getAbsenceCount(m.id, 'listening');
-        const absTag = absCount > 0 ? `<span class="absence-tag">غياب متتالي: ${'🔴'.repeat(absCount)}${absCount > 2 ? ' · إنذار' : ''}</span>` : '';
-        return `<div class="member-row ${st ? 'status-' + st : ''}"><div class="member-info"><div class="member-name member-name-link" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">${escapeHtml(m.name)}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✓ حاضر</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">✕ غائب</button></div></div>`;
+        const absTag = absCount > 0 ? `<span class="absence-tag">غياب الاستماع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</span>` : '';
+        return `<div class="member-row ${st ? 'status-' + st : ''}"><div class="member-info"><div class="member-name member-name-link" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">🎧 ${escapeHtml(m.name)}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✅ حاضر</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">❌ غائب</button></div></div>`;
       }).join('');
     }
     function setListening(memberId, status) {
@@ -2106,13 +2088,6 @@
       box.innerHTML = html; box.classList.remove('hidden');
     }
 
-    function toggleRecitationUnified(forceState) {
-      const box = document.getElementById('recitation-unified-box'); if (!box) return;
-      const show = forceState !== undefined ? forceState : box.classList.contains('hidden');
-      box.classList.toggle('hidden', !show);
-      if (show) { const ta = document.getElementById('recitation-unified-input'); if (ta) ta.focus(); }
-    }
-
     function applyRecitationUnified(status) {
       previewRecitationUnified();
       if (!recitationMatchedMemberIds.length) return showToast('اكتبي أرقام رفقاء أو أسماء صحيحة موجودة بالجروب أولاً');
@@ -2129,7 +2104,7 @@
       let restCount = 0; const oppositeStatus = status === 'present' ? 'absent' : 'present';
       if (autoRest) members.forEach(m => { if (!matchedSet.has(m.id) && !day.recitation[m.id]) { day.recitation[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++; } });
       cloudPatchAttendance(currentDate, 'recitation', patch);
-      document.getElementById('recitation-unified-input').value = ''; previewRecitationUnified(); toggleRecitationUnified(false); renderAll();
+      document.getElementById('recitation-unified-input').value = ''; previewRecitationUnified(); renderAll();
       const statusLabel = status === 'absent' ? 'غائب' : (status === 'excused' ? 'بعذر' : 'حاضر (سمّع)');
       const restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
       const parts = [];
@@ -3178,9 +3153,9 @@
 
     function renderRecitationMemberRow(m, day, extraHtml = '') {
       const st = day.recitation[m.id] || '', absCount = getAbsenceCount(m.id, 'recitation');
-      const absTag = absCount > 0 ? `<div class="absence-tag">غياب متتالي: ${'🔴'.repeat(absCount)}${absCount > 2 ? ' · إنذار' : ''}</div>` : '';
+      const absTag = absCount > 0 ? `<div class="absence-tag">غياب التسميع المتتابع: ${'🔴'.repeat(absCount)} ${absCount > 2 ? '(إنذار بالحذف)' : ''}</div>` : '';
       const badge = m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : '';
-      return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div class="member-info"><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><span class="member-name member-name-link" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">${escapeHtml(m.name)}</span> ${badge}${extraHtml}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✓ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">✕ لم يسمّع</button></div></div>`;
+      return `<div class="partner-member-item ${st ? 'status-' + st : ''}"><div><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><span class="member-name-link" style="font-weight:700;" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">${escapeHtml(m.name)}</span> ${badge}${extraHtml}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setRecitationMember('${m.id}', 'present')">✅ سمّع</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setRecitationMember('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setRecitationMember('${m.id}', 'absent')">❌ لم يسمّع</button></div></div>`;
     }
 
     function renderRecitation() {
@@ -3193,7 +3168,7 @@
       const rRecorded = members.filter(m => Boolean(day.recitation[m.id])).length, rRemaining = Math.max(0, members.length - rRecorded);
       const rStatusEl = document.getElementById('recitation-status-line');
       if (rStatusEl) rStatusEl.textContent = members.length ? `المُسجَّل اليوم: ${rRecorded} من ${members.length} • المتبقي: ${rRemaining}` : '';
-      const extraRecitChips = noPartnerCount > 0 ? [{ key: 'solo', label: `بدون رفيقة (${noPartnerCount})`, cls: 'active' }] : [];
+      const extraRecitChips = noPartnerCount > 0 ? [{ key: 'solo', label: `👤 بدون رفيقة (${noPartnerCount})`, cls: 'active' }] : [];
       renderFilterChips('recitation-filters', members, day.recitation, recitationFilter, 'setRecitationFilter', extraRecitChips);
       const rawQ = document.getElementById('search-recitation').value.trim(), normQ = toEnglishDigits(rawQ).replace(/^#/, '').replace(/^رقم\s*/, '').trim().toLowerCase(), isNumSearch = /^\d+$/.test(normQ);
       let visiblePartnerships = partnerships.map((p, idx) => ({ p, pNum: p.number || (idx + 1) }));
@@ -3214,17 +3189,17 @@
         const isEd = editingPartnerNumId === p.id;
         const isAddingPartner = isSolo && addingPartnerToPId === p.id;
         const pNumEn = String(pNum);
-        const numPillText = isSolo ? `رقم ${pNumEn}` : `رفقاء ${pNumEn}`;
+        const numPillText = isSolo ? `🔢 رقم ${pNumEn}` : `🔢 رفقاء رقم ${pNumEn}`;
         const soloOrTypeControl = isSolo
-          ? `<button class="btn ${isAddingPartner ? 'btn-primary' : 'btn-soft'} btn-xs" onclick="toggleAddPartnerToCard('${p.id}')">➕ رفيقة</button>`
-          : `<span class="partner-type-pill">${allValid.length === 3 ? '· ثلاثي' : '· ثنائي'}</span>`;
+          ? `<button class="btn ${isAddingPartner ? 'btn-primary' : 'btn-soft'} btn-xs" onclick="toggleAddPartnerToCard('${p.id}')">➕ إضافة رفيقة</button>`
+          : `<span class="partner-type-pill">${allValid.length === 3 ? 'ثلاثي (3 رفقاء)' : 'ثنائي (رفيقان)'}</span>`;
         const headerActions = isSolo
-          ? `<button class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="dissolvePartnership('${p.id}')">إزالة</button>`
-          : `<button class="btn btn-xs ${allPresent ? 'btn-primary' : 'btn-soft'}" onclick="toggleWholePartnership('${p.id}', ${!allPresent})">${allPresent ? '✓ سمّع الكل' : 'تحضير الكل'}</button><button class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="dissolvePartnership('${p.id}')">فك</button>`;
+          ? `<button class="btn btn-danger btn-xs" onclick="dissolvePartnership('${p.id}')">إزالة الرقم</button>`
+          : `<button class="btn btn-sm ${allPresent ? 'btn-primary' : 'btn-soft'}" onclick="toggleWholePartnership('${p.id}', ${!allPresent})">${allPresent ? '✅ تم التسميع للكل' : 'تسميع للكل'}</button><button class="btn btn-danger btn-sm" onclick="dissolvePartnership('${p.id}')">فك</button>`;
         const inlineAddBox = isAddingPartner
-          ? `<div style="background:var(--primary-soft); border-bottom:1px solid #a7f3d0; padding:10px 14px;"><div style="font-size:12.5px; font-weight:700; color:var(--primary); margin-bottom:6px;">اختاري رفيقة لإضافتها لرقم ${pNumEn}:</div><input type="text" class="input" style="padding:7px 10px; font-size:13px; margin-bottom:6px;" placeholder="🔍 ابحثي بالاسم..." value="${escapeHtml(addingPartnerSearchQuery)}" oninput="filterInlinePartnerCandidates('${p.id}', this.value)" /><div id="inline-add-partner-grid-${p.id}" class="select-grid" style="max-height:175px; margin-top:0;">${getInlinePartnerCandidatesHtml(p, addingPartnerSearchQuery)}</div><div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;"><button id="inline-add-partner-save-${p.id}" class="btn btn-primary btn-xs" onclick="saveAddPartnerToCard('${p.id}')">حفظ (${addingPartnerSelectedIds.length})</button><button class="btn btn-outline btn-xs" onclick="cancelAddPartnerToCard()">إلغاء</button></div></div>`
+          ? `<div style="background:var(--primary-soft); border:1.5px solid #a7f3d0; border-radius:10px; padding:10px; margin-bottom:10px;"><div style="font-size:12.5px; font-weight:700; color:var(--primary); margin-bottom:6px;">اختاري رفيقة (أو رفيقتين) لإضافتها إلى رقم ${pNumEn}:</div><input type="text" class="input" style="padding:7px 10px; font-size:13px; margin-bottom:6px;" placeholder="🔍 ابحث بالاسم..." value="${escapeHtml(addingPartnerSearchQuery)}" oninput="filterInlinePartnerCandidates('${p.id}', this.value)" /><div id="inline-add-partner-grid-${p.id}" class="select-grid" style="max-height:175px; margin-top:0;">${getInlinePartnerCandidatesHtml(p, addingPartnerSearchQuery)}</div><div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;"><button id="inline-add-partner-save-${p.id}" class="btn btn-primary btn-xs" onclick="saveAddPartnerToCard('${p.id}')">💾 حفظ الإضافة (${addingPartnerSelectedIds.length})</button><button class="btn btn-outline btn-xs" onclick="cancelAddPartnerToCard()">إلغاء</button></div></div>`
           : '';
-        html += `<div class="partner-card ${allPresent ? 'all-done' : ''}"><div class="partner-header"><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${isEd ? `<input type="number" min="1" id="partner-num-input-${p.id}" class="input" style="width:72px; padding:4px 8px; font-size:13px;" value="${pNum}" onkeypress="if(event.key==='Enter') savePartnerNumber('${p.id}')" /><button class="btn btn-primary btn-xs" onclick="savePartnerNumber('${p.id}')">حفظ</button><button class="btn btn-outline btn-xs" onclick="editingPartnerNumId=null; renderRecitation();">إلغاء</button>` : `<span class="partner-num-pill">${numPillText}</span>${soloOrTypeControl}<button class="btn btn-outline btn-xs" title="تعديل الرقم" onclick="addingPartnerToPId=null; editingPartnerNumId='${p.id}'; renderRecitation();">✏️</button>`}</div><div style="display:flex; gap:5px;">${headerActions}</div></div>${inlineAddBox}<div class="partner-members-list">${shownMembers.map(m => renderRecitationMemberRow(m, day)).join('')}</div></div>`;
+        html += `<div class="partner-card ${allPresent ? 'all-done' : ''}"><div class="partner-header"><div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${isEd ? `<input type="number" min="1" id="partner-num-input-${p.id}" class="input" style="width:72px; padding:4px 8px; font-size:13px;" value="${pNum}" onkeypress="if(event.key==='Enter') savePartnerNumber('${p.id}')" /><button class="btn btn-primary btn-xs" onclick="savePartnerNumber('${p.id}')">حفظ</button><button class="btn btn-outline btn-xs" onclick="editingPartnerNumId=null; renderRecitation();">إلغاء</button>` : `<span class="partner-num-pill">${numPillText}</span><button class="btn btn-outline btn-xs" onclick="addingPartnerToPId=null; editingPartnerNumId='${p.id}'; renderRecitation();">✏️ رقم</button>${soloOrTypeControl}`}</div><div style="display:flex; gap:6px;">${headerActions}</div></div>${inlineAddBox}<div class="partner-members-list">${shownMembers.map(m => renderRecitationMemberRow(m, day)).join('')}</div></div>`;
       });
       const nextNum = getNextPartnershipNumber();
       let unpaired = members.filter(m => !numberedIds.has(m.id) && matchesStatusFilter(day.recitation[m.id], recitationFilter));
@@ -3570,7 +3545,7 @@
         if (editingMemberId === m.id) {
           return `<div style="padding:10px; border-radius:12px; background:var(--primary-soft); border:1.5px solid #6ee7b7; margin-bottom:8px;"><div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;"><input type="text" id="edit-member-name-${m.id}" class="input" style="padding:8px 10px; font-size:14px; flex:1; min-width:170px;" value="${escapeHtml(m.name)}" onkeypress="if(event.key==='Enter') saveMemberEdit('${m.id}')" /><button class="btn btn-primary btn-sm" onclick="saveMemberEdit('${m.id}')">💾 حفظ</button><button class="btn btn-outline btn-sm" onclick="editingMemberId=null; renderManage();">إلغاء</button></div></div>`;
         }
-        return `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid #f1f5f9; flex-wrap:wrap;"><div style="min-width:0;"><div style="font-weight:700; font-size:14.5px;">${toEnglishDigits(i + 1)}. ${escapeHtml(m.name)} ${pInfo ? `<span style="font-size:12px; color:var(--primary); font-weight:700;">· ${pInfo.c === 1 ? 'رقم ' + pInfo.n : 'رفقاء ' + pInfo.n}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div><div style="font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'}${lAbs > 2 ? ' (إنذار)' : ''} · `}تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'}${rAbs > 2 ? ' (إنذار)' : ''}</div></div><div style="display:flex; gap:5px; flex-wrap:wrap;"><button class="btn btn-outline btn-xs" onclick="startEditMember('${m.id}')">تعديل</button><button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? 'تفعيل الاستماع' : 'تسميع فقط'}</button><button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">حذف</button></div></div>`;
+        return `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid var(--border); flex-wrap:wrap;"><div><div style="font-weight:700;">${i + 1}. ${escapeHtml(m.name)} ${pInfo ? `<span class="partner-type-pill" style="font-size:11px; padding:1px 7px;">${pInfo.c === 1 ? 'رقم كشف #' + pInfo.n : 'رفقاء #' + pInfo.n}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div><div style="font-size:12px; color:var(--muted);">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'} ${lAbs > 2 ? '⚠️ إنذار' : ''} •`} تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'} ${rAbs > 2 ? '⚠️ إنذار' : ''}</div></div><div style="display:flex; gap:5px; flex-wrap:wrap;"><button class="btn btn-soft btn-xs" onclick="startEditMember('${m.id}')">✏️ تعديل</button><button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? '🎧 تفعيل الاستماع' : '📖 تسميع فقط'}</button><button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">🗑️ حذف</button></div></div>`;
       }).join('');
     }
 
