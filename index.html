@@ -204,6 +204,9 @@
     .name-match-chip.absent-chip { background: var(--danger-soft); border-color: #fca5a5; color: var(--danger); }
     .name-match-chip.excused-chip { background: #fffbeb; border-color: #fcd34d; color: #b45309; }
     .paste-hint-banner { background: #f0fdf4; border: 1px dashed #6ee7b7; color: var(--primary); font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 10px; text-align: center; margin-bottom: 8px; }
+    .mobile-paste-box { background: #f0fdf4; border: 1.5px dashed #6ee7b7; border-radius: 11px; padding: 8px 10px; min-height: 38px; font-size: 12px; font-weight: 700; color: var(--primary); text-align: center; outline: none; margin-bottom: 8px; cursor: text; }
+    .mobile-paste-box:focus { border-color: var(--primary); background: #ecfdf5; box-shadow: 0 0 0 3px rgba(6,95,70,0.1); }
+    .mobile-paste-box:empty::before { content: attr(data-placeholder); color: var(--primary); opacity: 0.9; pointer-events: none; }
     .name-chip-remove { background: transparent; border: none; color: inherit; font-weight: 800; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 2px; opacity: 0.75; }
     .name-chip-remove:hover { opacity: 1; }
     .bulk-actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -907,11 +910,14 @@
       </p>
 
       <div id="sched-import-image-panel">
-        <label class="btn btn-primary btn-block btn-sm" style="cursor:pointer; margin-bottom:8px;">
-          🖼️ اختيار صورة الجدول
-          <input type="file" id="sched-import-file" accept="image/*" class="hidden" onchange="onSchedImportFileSelected(this)" />
-        </label>
-        <div class="paste-hint-banner">📋 أو خذي لقطة شاشة واضغطي لصق مباشرة (Ctrl+V) لتنفيذ الجدول فوراً</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+          <label class="btn btn-primary btn-sm" style="flex:1; min-width:140px; cursor:pointer;">
+            🖼️ اختيار صورة الجدول
+            <input type="file" id="sched-import-file" accept="image/*" class="hidden" onchange="onSchedImportFileSelected(this)" />
+          </label>
+          <button type="button" class="btn btn-soft btn-sm" style="flex:1; min-width:140px;" onclick="pasteImageFromClipboard('sched')">📋 لصق من الحافظة</button>
+        </div>
+        <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الجدول من الهاتف" data-placeholder="📱 من الهاتف: اضغطي هنا ثم اختاري «لصق» أو صورة من حافظة الكيبورد (أو Ctrl+V من الكمبيوتر)" oninput="handleMobilePasteBoxInput(this, 'sched')"></div>
         <div id="sched-import-preview-wrap" class="hidden" style="margin-bottom:10px; text-align:center; background:#f8faf9; padding:8px; border-radius:12px; border:1px solid var(--border);">
           <img id="sched-import-preview-img" src="" alt="معاينة صورة الجدول" style="max-width:100%; max-height:240px; border-radius:8px; object-fit:contain;" />
         </div>
@@ -988,10 +994,11 @@
         </div>
       </div>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
-        <label class="btn btn-primary btn-sm" style="flex:1; cursor:pointer;">🖼️ اختيار صور (صورة أو أكثر)<input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" /></label>
+        <label class="btn btn-primary btn-sm" style="flex:1; min-width:140px; cursor:pointer;">🖼️ اختيار صور (صورة أو أكثر)<input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" /></label>
+        <button type="button" class="btn btn-soft btn-sm" style="flex:1; min-width:130px;" onclick="pasteImageFromClipboard('ocr')">📋 لصق من الحافظة</button>
         <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles(true)">🗑️ مسح الصور</button>
       </div>
-      <div class="paste-hint-banner">📋 يمكنكِ لصق لقطة الشاشة مباشرة هنا (Ctrl+V) لقراءتها فوراً دون حفظها</div>
+      <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الغياب من الهاتف" data-placeholder="📱 من الهاتف: اضغطي هنا ثم اختاري «لصق» أو صورة من حافظة الكيبورد (أو Ctrl+V من الكمبيوتر)" oninput="handleMobilePasteBoxInput(this, 'ocr')"></div>
       <label style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px;"><input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" /><span>فرض الوضع الليلي (عكس الألوان يدوياً)</span></label>
       <div id="ocr-files-meta" class="hidden" style="font-size:12.5px; font-weight:700; color:var(--primary); margin-top:4px;"></div>
       <div id="ocr-thumbs-wrap" class="ocr-thumbs-wrap hidden"></div>
@@ -6008,6 +6015,68 @@
       return out;
     }
 
+    function handlePastedImagesForTarget(files, target) {
+      if (!files || !files.length) return;
+      if (target === 'ocr') {
+        addOcrImageFiles(files);
+        showToast(files.length > 1 ? `📋 تم لصق ${files.length} صور وجاري قراءتها...` : '📋 تم لصق الصورة وجاري قراءتها...');
+      } else if (target === 'sched') {
+        if (schedImportMode !== 'gemini') setSchedImportMode('gemini');
+        loadSchedImportFile(files[0], true);
+        showToast('📋 تم لصق صورة الجدول وجاري قراءتها...');
+      }
+    }
+
+    async function pasteImageFromClipboard(target) {
+      if (!navigator.clipboard || typeof navigator.clipboard.read !== 'function') {
+        showToast('اضغطي داخل المربع الأخضر بالأسفل ثم اختاري الصورة من حافظة الكيبورد أو «لصق»');
+        return;
+      }
+      try {
+        const items = await navigator.clipboard.read();
+        const files = [];
+        for (const item of items) {
+          const imgType = (item.types || []).find(t => t.startsWith('image/'));
+          if (imgType) {
+            const blob = await item.getType(imgType);
+            const ext = (imgType.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '') || 'png';
+            files.push(new File([blob], `clipboard-${Date.now()}.${ext}`, { type: imgType }));
+          }
+        }
+        if (!files.length) {
+          showToast('الحافظة لا تحتوي على صورة منسوخة الآن — انسخي الصورة أولاً أو استخدمي حافظة الكيبورد داخل المربع');
+          return;
+        }
+        handlePastedImagesForTarget(files, target);
+      } catch (err) {
+        showToast('اضغطي داخل المربع الأخضر بالأسفل ثم اختاري الصورة من حافظة الكيبورد أو «لصق»');
+      }
+    }
+
+    async function handleMobilePasteBoxInput(boxEl, target) {
+      if (!boxEl) return;
+      const imgs = Array.from(boxEl.querySelectorAll('img'));
+      if (imgs.length) {
+        const files = [];
+        for (const imgEl of imgs) {
+          const src = imgEl.getAttribute('src') || '';
+          if (!src) continue;
+          try {
+            const resp = await fetch(src);
+            const blob = await resp.blob();
+            if (blob && blob.type.startsWith('image/')) {
+              const ext = (blob.type.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '') || 'png';
+              files.push(new File([blob], `mobile-paste-${Date.now()}.${ext}`, { type: blob.type }));
+            }
+          } catch (e) {}
+        }
+        boxEl.innerHTML = '';
+        if (files.length) handlePastedImagesForTarget(files, target);
+        return;
+      }
+      boxEl.innerHTML = '';
+    }
+
     document.addEventListener('paste', (e) => {
       const pastedImages = extractPastedImagesFromClipboard(e.clipboardData);
       if (!pastedImages.length) return;
@@ -6015,15 +6084,12 @@
       const schedOpen = document.getElementById('sched-import-modal')?.classList.contains('open');
       if (ocrOpen) {
         e.preventDefault();
-        addOcrImageFiles(pastedImages);
-        showToast(pastedImages.length > 1 ? `📋 تم لصق ${pastedImages.length} صور وجاري قراءتها...` : '📋 تم لصق الصورة وجاري قراءتها...');
+        handlePastedImagesForTarget(pastedImages, 'ocr');
         return;
       }
       if (schedOpen) {
         e.preventDefault();
-        if (schedImportMode !== 'gemini') setSchedImportMode('gemini');
-        loadSchedImportFile(pastedImages[0], true);
-        showToast('📋 تم لصق صورة الجدول وجاري قراءتها...');
+        handlePastedImagesForTarget(pastedImages, 'sched');
       }
     });
 
