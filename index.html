@@ -115,7 +115,7 @@
     .dash-tier-high { color: #059669; font-weight: 800; }
     .dash-tier-mid { color: #b45309; font-weight: 800; }
     .dash-tier-low { color: #dc2626; font-weight: 800; }
-    .dash-history-row { display: grid; grid-template-columns: 115px 1fr 1fr; gap: 8px; align-items: center; padding: 8px 6px; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .dash-history-row { display: grid; grid-template-columns: 165px 1fr 1fr; gap: 8px; align-items: center; padding: 8px 6px; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 13px; font-variant-numeric: tabular-nums; }
     .dash-history-row:last-child { border-bottom: none; }
     .guide-card { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
     .guide-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
@@ -218,7 +218,7 @@
       .tab-btn { font-size: 11.5px; padding: 8px 2px; min-height: 40px; }
       .dash-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .dash-split-grid { grid-template-columns: 1fr; }
-      .dash-history-row { grid-template-columns: 95px 1fr 1fr; font-size: 12px; }
+      .dash-history-row { grid-template-columns: 125px 1fr 1fr; font-size: 12px; }
       .modal { padding: 16px; border-radius: 18px; }
     }
     /* ==================== صانع الجداول الشهرية ==================== */
@@ -3342,6 +3342,12 @@
         .sort();
     }
 
+    function formatDashDateWithDay(dateStr) {
+      if (!dateStr) return '';
+      const dayName = getArabicWeekday(dateStr);
+      return `${dayName ? dayName + ' ' : ''}${toEnglishDigits(dateStr)}`;
+    }
+
     function getDashboardDateScope() {
       const allGroupDates = getGroupAttendanceDates();
       const firstDate = allGroupDates.length ? allGroupDates[0] : '';
@@ -3372,7 +3378,7 @@
         const dates = valid ? allGroupDates.filter(d => d >= start && d <= end) : [];
         return {
           mode: 'custom',
-          label: valid ? `من ${toEnglishDigits(start)} إلى ${toEnglishDigits(end)}` : 'يرجى تحديد فترة زمنية صحيحة',
+          label: valid ? `من ${formatDashDateWithDay(start)} إلى ${formatDashDateWithDay(end)}` : 'يرجى تحديد فترة زمنية صحيحة',
           dates,
           endDate: end || lastDate
         };
@@ -3380,7 +3386,7 @@
 
       return {
         mode: 'all',
-        label: allGroupDates.length ? `منذ البداية (${toEnglishDigits(firstDate)} ← ${toEnglishDigits(lastDate)})` : 'منذ البداية (لا توجد تسجيلات بعد)',
+        label: allGroupDates.length ? `منذ البداية (${formatDashDateWithDay(firstDate)} ← ${formatDashDateWithDay(lastDate)})` : 'منذ البداية (لا توجد تسجيلات بعد)',
         dates: allGroupDates,
         endDate: lastDate
       };
@@ -3621,19 +3627,21 @@
           const shown = dailySeries.slice(-31);
           chartBody.innerHTML = `
             <div class="dash-chart-scroll">
-              <div style="display:flex; align-items:flex-end; gap:10px; min-width:${Math.max(320, shown.length * 38)}px; height:158px; padding:18px 8px 4px; border-bottom:1px solid var(--border); position:relative; background:linear-gradient(to top, rgba(6,95,70,0.03) 0%, transparent 100%);">
+              <div style="display:flex; align-items:flex-end; gap:10px; min-width:${Math.max(320, shown.length * 48)}px; height:172px; padding:18px 8px 6px; border-bottom:1px solid var(--border); position:relative; background:linear-gradient(to top, rgba(6,95,70,0.03) 0%, transparent 100%);">
                 ${shown.map(pt => {
-                  const lH = pt.lPct !== null ? Math.max(4, Math.round((pt.lPct / 100) * 108)) : 0;
-                  const rH = pt.rPct !== null ? Math.max(4, Math.round((pt.rPct / 100) * 108)) : 0;
+                  const lH = pt.lPct !== null ? Math.max(4, Math.round((pt.lPct / 100) * 104)) : 0;
+                  const rH = pt.rPct !== null ? Math.max(4, Math.round((pt.rPct / 100) * 104)) : 0;
+                  const dayName = getArabicWeekday(pt.date);
                   const shortD = toEnglishDigits(pt.date.slice(5).replace('-', '/'));
-                  const titleTxt = `${toEnglishDigits(pt.date)} — الاستماع: ${pt.lPct !== null ? pt.lPct + '%' : '—'} | التسميع: ${pt.rPct !== null ? pt.rPct + '%' : '—'}`;
+                  const titleTxt = `${dayName} ${toEnglishDigits(pt.date)} — الاستماع: ${pt.lPct !== null ? pt.lPct + '%' : '—'} | التسميع: ${pt.rPct !== null ? pt.rPct + '%' : '—'}`;
                   return `
-                    <div title="${escapeHtml(titleTxt)}" style="flex:1 0 28px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%;">
-                      <div style="display:flex; align-items:flex-end; gap:3px; height:110px;">
+                    <div title="${escapeHtml(titleTxt)}" style="flex:1 0 40px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px; height:100%;">
+                      <div style="display:flex; align-items:flex-end; gap:3px; height:106px;">
                         <div style="width:10px; border-radius:4px 4px 0 0; background:${pt.lPct !== null ? '#059669' : '#e5e7eb'}; height:${pt.lPct !== null ? lH : 4}px; transition:height 0.3s;"></div>
                         <div style="width:10px; border-radius:4px 4px 0 0; background:${pt.rPct !== null ? '#d97706' : '#e5e7eb'}; height:${pt.rPct !== null ? rH : 4}px; transition:height 0.3s;"></div>
                       </div>
-                      <span style="font-size:10.5px; color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap;">${shortD}</span>
+                      <span style="font-size:10px; color:var(--primary); font-weight:800; white-space:nowrap; line-height:1.1;">${escapeHtml(dayName)}</span>
+                      <span style="font-size:10px; color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.1;">${shortD}</span>
                     </div>
                   `;
                 }).join('')}
@@ -3846,13 +3854,13 @@
       } else {
         histEl.innerHTML = `
           <div class="dash-history-row" style="font-weight:800; color:var(--primary); border-bottom:1.5px solid var(--border);">
-            <div>التاريخ</div>
+            <div>اليوم والتاريخ</div>
             <div>الاستماع</div>
             <div>التسميع</div>
           </div>
           ${s.history.map(h => `
             <div class="dash-history-row">
-              <div style="font-weight:700; color:var(--text);">${toEnglishDigits(h.date)}</div>
+              <div style="font-weight:700; color:var(--text);">${escapeHtml(getArabicWeekday(h.date))} <span style="color:var(--muted); font-weight:600; font-size:11.5px;">${toEnglishDigits(h.date)}</span></div>
               <div>${statusBadge(h.listening)}</div>
               <div>${statusBadge(h.recitation)}</div>
             </div>
