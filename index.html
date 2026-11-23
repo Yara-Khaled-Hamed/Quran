@@ -203,10 +203,6 @@
     .name-match-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-soft); border: 1px solid #6ee7b7; color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; margin: 2px; }
     .name-match-chip.absent-chip { background: var(--danger-soft); border-color: #fca5a5; color: var(--danger); }
     .name-match-chip.excused-chip { background: #fffbeb; border-color: #fcd34d; color: #b45309; }
-    .paste-hint-banner { background: #f0fdf4; border: 1px dashed #6ee7b7; color: var(--primary); font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 10px; text-align: center; margin-bottom: 8px; }
-    .mobile-paste-box { background: #f0fdf4; border: 1.5px dashed #6ee7b7; border-radius: 11px; padding: 8px 10px; min-height: 38px; font-size: 12px; font-weight: 700; color: var(--primary); text-align: center; outline: none; margin-bottom: 8px; cursor: text; }
-    .mobile-paste-box:focus { border-color: var(--primary); background: #ecfdf5; box-shadow: 0 0 0 3px rgba(6,95,70,0.1); }
-    .mobile-paste-box:empty::before { content: attr(data-placeholder); color: var(--primary); opacity: 0.9; pointer-events: none; }
     .name-chip-remove { background: transparent; border: none; color: inherit; font-weight: 800; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 2px; opacity: 0.75; }
     .name-chip-remove:hover { opacity: 1; }
     .bulk-actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -910,14 +906,10 @@
       </p>
 
       <div id="sched-import-image-panel">
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-          <label class="btn btn-primary btn-sm" style="flex:1; min-width:140px; cursor:pointer;">
-            🖼️ اختيار صورة الجدول
-            <input type="file" id="sched-import-file" accept="image/*" class="hidden" onchange="onSchedImportFileSelected(this)" />
-          </label>
-          <button type="button" class="btn btn-soft btn-sm" style="flex:1; min-width:140px;" onclick="pasteImageFromClipboard('sched')">📋 لصق من الحافظة</button>
-        </div>
-        <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الجدول" data-placeholder="💻 للكمبيوتر: Ctrl+V هنا | 📱 للهاتف: انسخي الصورة واضغطي زر «لصق من الحافظة» بالأعلى (أو ضغطة مطولة ← لصق)" oninput="handleMobilePasteBoxInput(this, 'sched')"></div>
+        <label class="btn btn-primary btn-block btn-sm" style="cursor:pointer; margin-bottom:10px;">
+          🖼️ اختيار صورة الجدول
+          <input type="file" id="sched-import-file" accept="image/*" class="hidden" onchange="onSchedImportFileSelected(this)" />
+        </label>
         <div id="sched-import-preview-wrap" class="hidden" style="margin-bottom:10px; text-align:center; background:#f8faf9; padding:8px; border-radius:12px; border:1px solid var(--border);">
           <img id="sched-import-preview-img" src="" alt="معاينة صورة الجدول" style="max-width:100%; max-height:240px; border-radius:8px; object-fit:contain;" />
         </div>
@@ -994,11 +986,9 @@
         </div>
       </div>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
-        <label class="btn btn-primary btn-sm" style="flex:1; min-width:140px; cursor:pointer;">🖼️ اختيار صور (صورة أو أكثر)<input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" /></label>
-        <button type="button" class="btn btn-soft btn-sm" style="flex:1; min-width:130px;" onclick="pasteImageFromClipboard('ocr')">📋 لصق من الحافظة</button>
+        <label class="btn btn-primary btn-sm" style="flex:1; cursor:pointer;">🖼️ اختيار صور (صورة أو أكثر)<input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="onOcrFilesSelected(this)" /></label>
         <button id="ocr-clear-files-btn" class="btn btn-danger btn-sm hidden" onclick="clearOcrFiles(true)">🗑️ مسح الصور</button>
       </div>
-      <div class="mobile-paste-box" contenteditable="true" role="textbox" aria-label="منطقة لصق صورة الغياب" data-placeholder="💻 للكمبيوتر: Ctrl+V هنا | 📱 للهاتف: انسخي الصورة واضغطي زر «لصق من الحافظة» بالأعلى (أو ضغطة مطولة ← لصق)" oninput="handleMobilePasteBoxInput(this, 'ocr')"></div>
       <label style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px;"><input type="checkbox" id="ocr-invert-check" onchange="reprocessAllOcrImages()" /><span>فرض الوضع الليلي (عكس الألوان يدوياً)</span></label>
       <div id="ocr-files-meta" class="hidden" style="font-size:12.5px; font-weight:700; color:var(--primary); margin-top:4px;"></div>
       <div id="ocr-thumbs-wrap" class="ocr-thumbs-wrap hidden"></div>
@@ -2472,31 +2462,118 @@
       });
     }
 
-    function fileToCompressedImagePayload(file) {
+    function fileToOcrSlicesForGemini(file) {
       return new Promise((resolve) => {
         const imgUrl = URL.createObjectURL(file), img = new Image();
         img.onload = () => {
           try {
             const origW = img.naturalWidth || img.width, origH = img.naturalHeight || img.height;
-            const maxDim = 1800;
-            const scale = Math.min(1, maxDim / Math.max(origW, origH, 1));
-            const w = Math.max(1, Math.round(origW * scale)), h = Math.max(1, Math.round(origH * scale));
-            const c = document.createElement('canvas');
-            c.width = w; c.height = h;
-            const ctx = c.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            const dataUrl = c.toDataURL('image/jpeg', 0.90);
+            const targetW = Math.min(origW, 1280);
+            const scale = targetW / Math.max(1, origW);
+            const targetH = Math.max(1, Math.round(origH * scale));
+
+            // إذا كانت الصورة عادية الارتفاع، نرسلها كاملة بدقة عالية
+            if (targetH <= 1850) {
+              const c = document.createElement('canvas');
+              c.width = targetW; c.height = targetH;
+              const ctx = c.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, targetW, targetH);
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+              ctx.drawImage(img, 0, 0, origW, origH, 0, 0, targetW, targetH);
+              const dataUrl = c.toDataURL('image/jpeg', 0.92);
+              URL.revokeObjectURL(imgUrl);
+              resolve([{ imageBase64: dataUrl, mimeType: 'image/jpeg' }]);
+              return;
+            }
+
+            // للصور المطولة: فحص الصفوف الهادئة الفاصلة بين الأسماء دون إنشاء Canvas ضخم قد يفشل على الهاتف
+            const probeW = Math.min(320, Math.max(40, origW));
+            const probeH = Math.min(4000, Math.max(100, origH));
+            const pCanvas = document.createElement('canvas');
+            pCanvas.width = probeW; pCanvas.height = probeH;
+            const pCtx = pCanvas.getContext('2d');
+            pCtx.drawImage(img, 0, 0, origW, origH, 0, 0, probeW, probeH);
+            const pData = pCtx.getImageData(0, 0, probeW, probeH).data;
+            const probeQuiet = new Uint8Array(probeH);
+            const xStart = Math.floor(probeW * 0.20), xEnd = Math.floor(probeW * 0.82);
+            for (let py = 0; py < probeH; py++) {
+              let minL = 255, maxL = 0;
+              const off = py * probeW * 4;
+              for (let px = xStart; px <= xEnd; px += 2) {
+                const i = off + px * 4;
+                const lum = 0.299 * pData[i] + 0.587 * pData[i + 1] + 0.114 * pData[i + 2];
+                if (lum < minL) minL = lum;
+                if (lum > maxL) maxL = lum;
+              }
+              if (maxL - minL <= 16) probeQuiet[py] = 1;
+            }
+
+            const SLICE_TARGET_H = 1400;
+            const slices = [];
+            let curY = 0;
+            while (curY < targetH) {
+              let endY = Math.min(targetH, curY + SLICE_TARGET_H);
+              let usedSafeCut = false;
+              if (endY < targetH) {
+                const yWinStart = Math.max(curY + 850, endY - 320);
+                const yWinEnd = Math.min(targetH - 1, endY + 120);
+                const pStart = Math.max(0, Math.floor((yWinStart / targetH) * probeH));
+                const pEnd = Math.min(probeH - 1, Math.ceil((yWinEnd / targetH) * probeH));
+                let bestStart = -1, bestLen = 0, runStart = -1;
+                for (let py = pStart; py <= pEnd; py++) {
+                  if (probeQuiet[py]) {
+                    if (runStart === -1) runStart = py;
+                  } else if (runStart !== -1) {
+                    const len = py - runStart;
+                    if (len > bestLen) { bestLen = len; bestStart = runStart; }
+                    runStart = -1;
+                  }
+                }
+                if (runStart !== -1) {
+                  const len = pEnd - runStart + 1;
+                  if (len > bestLen) { bestLen = len; bestStart = runStart; }
+                }
+                if (bestStart !== -1 && bestLen >= 2) {
+                  const midP = bestStart + bestLen / 2;
+                  const safeY = Math.round((midP / probeH) * targetH);
+                  if (safeY > curY + 500 && safeY < targetH) {
+                    endY = safeY;
+                    usedSafeCut = true;
+                  }
+                }
+              }
+
+              const srcY0 = Math.max(0, Math.floor((curY / targetH) * origH));
+              const srcY1 = Math.min(origH, Math.ceil((endY / targetH) * origH));
+              const srcSliceH = Math.max(1, srcY1 - srcY0);
+              const dstSliceH = Math.max(1, Math.round(srcSliceH * scale));
+              const sc = document.createElement('canvas');
+              sc.width = targetW; sc.height = dstSliceH;
+              const sCtx = sc.getContext('2d');
+              sCtx.fillStyle = '#ffffff';
+              sCtx.fillRect(0, 0, targetW, dstSliceH);
+              sCtx.imageSmoothingEnabled = true;
+              sCtx.imageSmoothingQuality = 'high';
+              sCtx.drawImage(img, 0, srcY0, origW, srcSliceH, 0, 0, targetW, dstSliceH);
+              slices.push({ imageBase64: sc.toDataURL('image/jpeg', 0.92), mimeType: 'image/jpeg' });
+
+              if (endY >= targetH) break;
+              curY = usedSafeCut ? Math.max(curY + 1, endY - 36) : Math.max(curY + 1, endY - 220);
+            }
+
             URL.revokeObjectURL(imgUrl);
-            resolve({ imageBase64: dataUrl, mimeType: 'image/jpeg' });
+            resolve(slices);
           } catch (e) {
             URL.revokeObjectURL(imgUrl);
             const reader = new FileReader();
-            reader.onload = () => resolve({ imageBase64: String(reader.result || ''), mimeType: file.type || 'image/png' });
-            reader.onerror = () => resolve(null);
+            reader.onload = () => resolve([{ imageBase64: String(reader.result || ''), mimeType: file.type || 'image/png' }]);
+            reader.onerror = () => resolve([]);
             reader.readAsDataURL(file);
           }
         };
-        img.onerror = () => { URL.revokeObjectURL(imgUrl); resolve(null); };
+        img.onerror = () => { URL.revokeObjectURL(imgUrl); resolve([]); };
         img.src = imgUrl;
       });
     }
@@ -2557,6 +2634,24 @@
       document.getElementById('ocr-extracted-text').value = uniqueLines.join('\n');
     }
 
+    async function callAttendanceOcrApiWithRetry(payload) {
+      for (let retry = 0; retry < 2; retry++) {
+        try {
+          const resp = await fetch('/api/parse-attendance-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (resp.ok) {
+            const json = await resp.json();
+            if (Array.isArray(json.names)) return { ok: true, names: json.names };
+          }
+        } catch (e) {}
+        if (retry === 0) await new Promise(r => setTimeout(r, 350));
+      }
+      return { ok: false, names: [] };
+    }
+
     async function processPendingOcrFiles() {
       if (ocrIsProcessing) return;
       const pendingItems = ocrFiles.filter(f => f.status === 'pending'); if (!pendingItems.length) return;
@@ -2572,24 +2667,28 @@
             const item = pendingItems[i];
             item.status = 'processing';
             renderOcrThumbnails();
-            barEl.style.width = Math.max(12, Math.round(((i + 0.35) / pendingItems.length) * 88)) + '%';
-            statusEl.textContent = pendingItems.length > 1 ? `جاري قراءة صورة ${i + 1} من ${pendingItems.length} بالذكاء الاصطناعي...` : 'جاري قراءة الأسماء من الصورة بالذكاء الاصطناعي...';
             try {
-              const payload = await fileToCompressedImagePayload(item.file);
-              if (payload && payload.imageBase64) {
-                const resp = await fetch('/api/parse-attendance-image', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-                });
-                if (resp.ok) {
-                  const json = await resp.json();
-                  if (Array.isArray(json.names) && json.names.length > 0) {
-                    item.lines = json.names.map(n => cleanOcrLineToShortName(n) || String(n || '').trim()).filter(Boolean);
-                    item.status = 'done';
-                    renderOcrThumbnails();
-                    continue;
+              const slices = await fileToOcrSlicesForGemini(item.file);
+              if (slices.length > 0) {
+                const collectedNames = [];
+                let anySliceSucceeded = false;
+                for (let sIdx = 0; sIdx < slices.length; sIdx++) {
+                  const pct = Math.max(10, Math.min(92, Math.round(((i + (sIdx + 0.5) / slices.length) / pendingItems.length) * 90)));
+                  barEl.style.width = pct + '%';
+                  statusEl.textContent = slices.length > 1
+                    ? `جاري قراءة الجزء ${sIdx + 1} من ${slices.length} من الصورة المطولة...`
+                    : (pendingItems.length > 1 ? `جاري قراءة صورة ${i + 1} من ${pendingItems.length} بالذكاء الاصطناعي...` : 'جاري قراءة الأسماء من الصورة بالذكاء الاصطناعي...');
+                  const res = await callAttendanceOcrApiWithRetry(slices[sIdx]);
+                  if (res.ok) {
+                    anySliceSucceeded = true;
+                    res.names.forEach(n => collectedNames.push(n));
                   }
+                }
+                if (anySliceSucceeded && collectedNames.length > 0) {
+                  item.lines = collectedNames.map(n => cleanOcrLineToShortName(n) || String(n || '').trim()).filter(Boolean);
+                  item.status = 'done';
+                  renderOcrThumbnails();
+                  continue;
                 }
               }
             } catch (e) {}
@@ -5519,7 +5618,7 @@
       } else {
         imgPanel?.classList.remove('hidden');
         txtPanel?.classList.add('hidden');
-        if (descEl) descEl.textContent = 'اختاري صورة جدول شهري (أو الصقيها بـ Ctrl+V)، وسيتم قراءته وتنفيذه مباشرة في الجدول لتعديله وحفظه وتحميله.';
+        if (descEl) descEl.textContent = 'اختاري صورة جدول شهري (إكسل أو مكتوب بخط اليد)، وسيتم قراءته وتنفيذه مباشرة في الجدول لتعديله وحفظه وتحميله.';
       }
       updateSchedImportActionState();
     }
@@ -5995,103 +6094,6 @@
         updateSchedImportActionState();
       }
     }
-
-    function extractPastedImagesFromClipboard(clipboardData) {
-      const out = [];
-      if (!clipboardData) return out;
-      if (clipboardData.items && clipboardData.items.length) {
-        for (const item of clipboardData.items) {
-          if (item.kind === 'file' && item.type && item.type.startsWith('image/')) {
-            const f = item.getAsFile();
-            if (f) out.push(f);
-          }
-        }
-      }
-      if (!out.length && clipboardData.files && clipboardData.files.length) {
-        for (const f of clipboardData.files) {
-          if (f && f.type && f.type.startsWith('image/')) out.push(f);
-        }
-      }
-      return out;
-    }
-
-    function handlePastedImagesForTarget(files, target) {
-      if (!files || !files.length) return;
-      if (target === 'ocr') {
-        addOcrImageFiles(files);
-        showToast(files.length > 1 ? `📋 تم لصق ${files.length} صور وجاري قراءتها...` : '📋 تم لصق الصورة وجاري قراءتها...');
-      } else if (target === 'sched') {
-        if (schedImportMode !== 'gemini') setSchedImportMode('gemini');
-        loadSchedImportFile(files[0], true);
-        showToast('📋 تم لصق صورة الجدول وجاري قراءتها...');
-      }
-    }
-
-    async function pasteImageFromClipboard(target) {
-      if (!navigator.clipboard || typeof navigator.clipboard.read !== 'function') {
-        showToast('متصفح الهاتف لا يدعم لصق الصور مباشرة — استخدمي زر «اختيار صور» لاختيار أحدث لقطة شاشة');
-        return;
-      }
-      try {
-        const items = await navigator.clipboard.read();
-        const files = [];
-        for (const item of items) {
-          const imgType = (item.types || []).find(t => t.startsWith('image/'));
-          if (imgType) {
-            const blob = await item.getType(imgType);
-            const ext = (imgType.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '') || 'png';
-            files.push(new File([blob], `clipboard-${Date.now()}.${ext}`, { type: imgType }));
-          }
-        }
-        if (!files.length) {
-          showToast('لا توجد صورة منسوخة في الحافظة — اضغطي «نسخ» على الصورة أولاً أو استخدمي زر «اختيار صور»');
-          return;
-        }
-        handlePastedImagesForTarget(files, target);
-      } catch (err) {
-        showToast('تعذر قراءة الحافظة (أو تم رفض الإذن) — استخدمي زر «اختيار صور» لفتح أحدث صورة مباشرة');
-      }
-    }
-
-    async function handleMobilePasteBoxInput(boxEl, target) {
-      if (!boxEl) return;
-      const imgs = Array.from(boxEl.querySelectorAll('img'));
-      if (imgs.length) {
-        const files = [];
-        for (const imgEl of imgs) {
-          const src = imgEl.getAttribute('src') || '';
-          if (!src) continue;
-          try {
-            const resp = await fetch(src);
-            const blob = await resp.blob();
-            if (blob && blob.type.startsWith('image/')) {
-              const ext = (blob.type.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '') || 'png';
-              files.push(new File([blob], `mobile-paste-${Date.now()}.${ext}`, { type: blob.type }));
-            }
-          } catch (e) {}
-        }
-        boxEl.innerHTML = '';
-        if (files.length) handlePastedImagesForTarget(files, target);
-        return;
-      }
-      boxEl.innerHTML = '';
-    }
-
-    document.addEventListener('paste', (e) => {
-      const pastedImages = extractPastedImagesFromClipboard(e.clipboardData);
-      if (!pastedImages.length) return;
-      const ocrOpen = document.getElementById('ocr-modal')?.classList.contains('open');
-      const schedOpen = document.getElementById('sched-import-modal')?.classList.contains('open');
-      if (ocrOpen) {
-        e.preventDefault();
-        handlePastedImagesForTarget(pastedImages, 'ocr');
-        return;
-      }
-      if (schedOpen) {
-        e.preventDefault();
-        handlePastedImagesForTarget(pastedImages, 'sched');
-      }
-    });
 
     (async function initApp() {
       if (session && session.role === 'head') {
