@@ -84,10 +84,39 @@
     .stat-mini-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin-top: 6px; }
     .stat-mini-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.4s var(--ease); border-radius: 99px; }
     .stat-box.amber .stat-mini-fill { background: var(--accent); }
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #e5e7eb; padding: 5px; border-radius: 16px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .tab-btn { min-height: 42px; padding: 9px 6px; border: none; border-radius: 12px; background: transparent; font-weight: 800; font-size: 13.5px; color: #4b5563; cursor: pointer; transition: all 0.2s var(--ease); }
+    .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; background: #e5e7eb; padding: 5px; border-radius: 16px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .tab-btn { min-height: 42px; padding: 9px 4px; border: none; border-radius: 12px; background: transparent; font-weight: 800; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.2s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
     .tab-panel { animation: fadeSlideUp 0.22s var(--ease); }
+    /* ==================== داشبورد الالتزام ==================== */
+    .dash-segmented { display: inline-flex; gap: 4px; background: #f3f4f6; padding: 4px; border-radius: 12px; border: 1px solid var(--border); flex-wrap: wrap; }
+    .dash-seg-btn { min-height: 36px; padding: 6px 12px; border: none; border-radius: 9px; background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all 0.16s var(--ease); white-space: nowrap; }
+    .dash-seg-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .dash-kpi-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 13px 14px; }
+    .dash-kpi-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    .dash-kpi-val { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .dash-kpi-sub { font-size: 11.5px; color: var(--muted); font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .dash-split-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; align-items: stretch; }
+    .dash-split-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; }
+    .dash-spotlight-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.06); cursor: pointer; }
+    .dash-spotlight-row:last-child { border-bottom: none; }
+    .dash-spotlight-row:hover { background: #f9fafb; }
+    .dash-progress-track { height: 7px; background: #e5e7eb; border-radius: 99px; overflow: hidden; width: 100%; }
+    .dash-progress-fill { height: 100%; border-radius: 99px; transition: width 0.35s var(--ease); }
+    .dash-chart-scroll { overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .dash-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: #fff; -webkit-overflow-scrolling: touch; }
+    .dash-table { width: 100%; border-collapse: collapse; min-width: 610px; font-size: 13.5px; }
+    .dash-table th { background: #f8faf9; color: var(--primary); font-weight: 800; font-size: 12.5px; padding: 10px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+    .dash-table td { padding: 10px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: middle; font-variant-numeric: tabular-nums; }
+    .dash-table tbody tr { cursor: pointer; transition: background-color 0.14s; }
+    .dash-table tbody tr:hover { background: #f8faf9; }
+    .dash-table tbody tr:last-child td { border-bottom: none; }
+    .dash-tier-high { color: #059669; font-weight: 800; }
+    .dash-tier-mid { color: #b45309; font-weight: 800; }
+    .dash-tier-low { color: #dc2626; font-weight: 800; }
+    .dash-history-row { display: grid; grid-template-columns: 115px 1fr 1fr; gap: 8px; align-items: center; padding: 8px 6px; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .dash-history-row:last-child { border-bottom: none; }
     .guide-card { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
     .guide-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
     .guide-step { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: #374151; line-height: 1.55; }
@@ -185,8 +214,11 @@
       .member-row, .partner-member-item { flex-direction: column; align-items: stretch; }
       .status-pills { justify-content: space-between; }
       .pill { flex: 1; text-align: center; padding: 9px 6px; }
-      .tabs { top: 4px; }
-      .tab-btn { font-size: 12.5px; padding: 9px 4px; }
+      .tabs { top: 4px; gap: 3px; padding: 4px; }
+      .tab-btn { font-size: 11.5px; padding: 8px 2px; min-height: 40px; }
+      .dash-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dash-split-grid { grid-template-columns: 1fr; }
+      .dash-history-row { grid-template-columns: 95px 1fr 1fr; font-size: 12px; }
       .modal { padding: 16px; border-radius: 18px; }
     }
     /* ==================== صانع الجداول الشهرية ==================== */
@@ -396,7 +428,8 @@
       <div class="tabs">
         <button class="tab-btn active" id="tab-btn-listening" onclick="switchTab('listening')">🎧 الاستماع</button>
         <button class="tab-btn" id="tab-btn-recitation" onclick="switchTab('recitation')">📖 التسميع</button>
-        <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء والتقرير</button>
+        <button class="tab-btn" id="tab-btn-dashboard" onclick="switchTab('dashboard')">📊 الداشبورد</button>
+        <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء</button>
       </div>
 
       <div id="tab-listening" class="tab-panel">
@@ -492,6 +525,80 @@
           </div>
         </div>
         <div id="recitation-list"></div>
+      </div>
+
+      <div id="tab-dashboard" class="tab-panel hidden">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+            <div>
+              <h3 style="font-size:17px; font-weight:800; color:var(--primary);">📊 داشبورد متابعة الالتزام</h3>
+              <p id="dash-period-subtitle" style="font-size:12.5px; color:var(--muted); font-weight:600; margin-top:2px;"></p>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-soft btn-sm" onclick="copyDashboardSummary()">📋 نسخ ملخص الالتزام</button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div class="dash-segmented" role="tablist" aria-label="الفترة الزمنية">
+              <button type="button" id="dash-period-btn-all" class="dash-seg-btn active" onclick="setDashboardPeriod('all')">منذ البداية</button>
+              <button type="button" id="dash-period-btn-month" class="dash-seg-btn" onclick="setDashboardPeriod('month')">خلال الشهر</button>
+              <button type="button" id="dash-period-btn-custom" class="dash-seg-btn" onclick="setDashboardPeriod('custom')">فترة مخصصة</button>
+            </div>
+
+            <div id="dash-month-controls" class="hidden" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-xs" onclick="shiftDashboardMonth(-1)">◀️ السابق</button>
+              <input type="month" id="dash-month-input" class="input" style="width:auto; padding:6px 10px; font-size:13px;" onchange="onDashboardMonthChange()" />
+              <button type="button" class="btn btn-outline btn-xs" onclick="shiftDashboardMonth(1)">التالي ▶️</button>
+            </div>
+
+            <div id="dash-custom-controls" class="hidden" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <label style="font-size:12px; font-weight:700; color:var(--muted);">من:</label>
+              <input type="date" id="dash-start-input" class="input" style="width:auto; padding:6px 9px; font-size:13px;" onchange="renderDashboard()" />
+              <label style="font-size:12px; font-weight:700; color:var(--muted);">إلى:</label>
+              <input type="date" id="dash-end-input" class="input" style="width:auto; padding:6px 9px; font-size:13px;" onchange="renderDashboard()" />
+            </div>
+          </div>
+        </div>
+
+        <div id="dash-kpi-grid" class="dash-kpi-grid"></div>
+
+        <div id="dash-chart-card" class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+            <h4 style="font-size:15px; font-weight:800; color:var(--text);">نسبة الحضور عبر الأيام</h4>
+            <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:700; color:var(--muted);">
+              <span><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#059669; margin-left:4px;"></span>الاستماع</span>
+              <span><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#d97706; margin-left:4px;"></span>التسميع</span>
+            </div>
+          </div>
+          <div id="dash-chart-body"></div>
+        </div>
+
+        <div id="dash-split-grid" class="dash-split-grid"></div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+            <h4 style="font-size:15.5px; font-weight:800; color:var(--text);">جدول التزام جميع الأعضاء (<span id="dash-table-count">0</span>)</h4>
+            <span style="font-size:12px; color:var(--muted); font-weight:600;">اضغطي على أي اسم لعرض سجل أيامه التفصيلي</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr auto; gap:8px; margin-bottom:8px; align-items:center;">
+            <div class="search-wrap" style="margin-bottom:0;">
+              <input type="text" id="dash-search" class="input" style="padding:8px 12px; font-size:14px;" placeholder="🔍 ابحث عن اسم في الداشبورد..." oninput="renderDashboardTableOnly()" />
+              <button type="button" class="search-clear-btn" data-target="dash-search" title="مسح البحث" onclick="clearSearchInput('dash-search', renderDashboardTableOnly)">✕</button>
+            </div>
+            <select id="dash-sort-select" class="input" style="width:auto; padding:8px 10px; font-size:13px; font-weight:700;" onchange="renderDashboardTableOnly()">
+              <option value="rate_desc">الأعلى التزاماً</option>
+              <option value="rate_asc">الأقل التزاماً</option>
+              <option value="absent_desc">الأكثر غياباً</option>
+              <option value="roster">ترتيب الكشف</option>
+              <option value="name">أبجدي</option>
+            </select>
+          </div>
+
+          <div id="dash-tier-filters" class="filter-chips"></div>
+          <div id="dash-table-container"></div>
+        </div>
       </div>
 
       <div id="tab-manage" class="tab-panel hidden">
@@ -927,6 +1034,20 @@
     </div>
   </div>
 
+  <div id="member-detail-modal" class="modal-backdrop" onclick="if(event.target===this) closeMemberDetailModal()">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="member-detail-title" style="color:var(--primary); font-size:17.5px;">سجل التزام العضوة</h3>
+          <p id="member-detail-sub" style="font-size:12px; color:var(--muted); font-weight:600;"></p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeMemberDetailModal()">✕</button>
+      </div>
+      <div id="member-detail-stats" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:12px;"></div>
+      <div id="member-detail-history" style="max-height:52vh; overflow-y:auto; border:1px solid var(--border); border-radius:12px; padding:8px 10px;"></div>
+    </div>
+  </div>
+
   <div id="download-modal" class="modal-backdrop" onclick="if(event.target===this) closeDownloadModal()">
     <div class="modal">
       <div class="modal-header">
@@ -987,6 +1108,10 @@
     const GUIDE_STORAGE_KEY = 'taahadu_hide_guide_v1';
     let listeningFilter = 'all';
     let recitationFilter = 'all';
+    let dashPeriodMode = 'all';
+    let dashMonthValue = getTodayStr().slice(0, 7);
+    let dashTierFilter = 'all';
+    let dashLastData = null;
     let recitationMatchedMemberIds = [];
     let listeningBatchMatchedIds = [];
     let listeningBatchExcludedIds = new Set();
@@ -1037,6 +1162,7 @@
     let ocrMatchedReasons = {};
     let ocrMatchedScores = {};
     let ocrUnmatchedLines = [];
+    let ocrAmbiguousMatches = [];
 
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('scroll-top-btn');
@@ -1098,14 +1224,25 @@
         .replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
         .replace(/\s+/g, ' ');
     }
+    function normalizeForSearch(s) {
+      return normalizeArabicText(toEnglishDigits(s)).toLowerCase();
+    }
+    function arabicIncludes(text, query) {
+      const nq = normalizeForSearch(query);
+      if (!nq) return true;
+      return normalizeForSearch(text).includes(nq);
+    }
+    function findArabicWeekdayIndex(name) {
+      const n = normalizeArabicText(name);
+      return ARABIC_WEEKDAYS.findIndex(d => normalizeArabicText(d) === n);
+    }
     function stripArabicDots(s) {
       return normalizeArabicText(s)
         .replace(/[بتثني]/g, 'ب').replace(/[جحخ]/g, 'ح').replace(/[دذ]/g, 'د').replace(/[رز]/g, 'ر')
         .replace(/[سش]/g, 'س').replace(/[صض]/g, 'ص').replace(/[طظ]/g, 'ط').replace(/[عغ]/g, 'ع').replace(/[فق]/g, 'ف');
     }
     function compareArabic(a, b) {
-      const norm = s => String(s || '').trim().replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي');
-      return norm(a).localeCompare(norm(b), 'ar');
+      return normalizeArabicText(a).localeCompare(normalizeArabicText(b), 'ar');
     }
     let __nameMeasureCtx = null;
     function getVisualNameWidth(s) {
@@ -1291,12 +1428,12 @@
     function togglePwVisibility(id, btn) { const i = document.getElementById(id); if (i.type === 'password') { i.type = 'text'; btn.textContent = '🙈'; } else { i.type = 'password'; btn.textContent = '👁️'; } }
 
     function isSupervisorNameInSameGroup(name, groupId, excludeSupId = null) {
-      const lower = name.trim().toLowerCase(), group = db.groups.find(g => g.id === groupId);
-      return group ? (group.supervisors || []).some(s => s.id !== excludeSupId && s.name.trim().toLowerCase() === lower) : false;
+      const lower = normalizeForSearch(name), group = db.groups.find(g => g.id === groupId);
+      return group ? (group.supervisors || []).some(s => s.id !== excludeSupId && normalizeForSearch(s.name) === lower) : false;
     }
     function getSupervisorGroups(supName, supPass) {
-      const nameLower = String(supName || '').trim().toLowerCase(), passNorm = normalizePassword(supPass);
-      return db.groups.filter(g => (g.supervisors || []).some(s => s.name.trim().toLowerCase() === nameLower && normalizePassword(s.password) === passNorm));
+      const nameLower = normalizeForSearch(supName), passNorm = normalizePassword(supPass);
+      return db.groups.filter(g => (g.supervisors || []).some(s => normalizeForSearch(s.name) === nameLower && normalizePassword(s.password) === passNorm));
     }
 
     function normalizeGroupNameForMatch(str) {
@@ -1468,7 +1605,7 @@
       for (const s of group.supervisors) {
         const newName = document.querySelector(`[data-sup-name="${s.id}"]`).value.trim(), newPass = normalizePassword(document.querySelector(`[data-sup-pass="${s.id}"]`).value.trim());
         if (!newName || !newPass) return showToast('تأكد من كتابة اسم وباسورد كل مشرف');
-        const lower = newName.toLowerCase(); if (seenNames.has(lower)) return showToast(`الاسم "${newName}" مكرر داخل نفس الجروب`);
+        const lower = normalizeForSearch(newName); if (seenNames.has(lower)) return showToast(`الاسم "${newName}" مكرر داخل نفس الجروب`);
         seenNames.add(lower); updatedSups.push({ id: s.id, name: newName, password: newPass });
       }
       group.name = gName; group.supervisors = updatedSups; cloudSaveGroup(group); editingGroupId = null; renderHeadDashboard(); showToast('تم حفظ التعديلات');
@@ -1574,6 +1711,7 @@
       document.getElementById('header-supervisor-name').textContent = supLabel;
       document.getElementById('date-readable').textContent = formatArabicDate(currentDate);
       updateSwitchGroupBtn(); renderStats(); renderListening(); renderRecitation(); renderManage(); previewListeningBatch(); previewRecitationUnified();
+      if (currentTab === 'dashboard') renderDashboard();
       const pb = document.getElementById('partner-builder'); if (pb && !pb.classList.contains('hidden')) renderUnpairedGrid();
     }
 
@@ -1590,10 +1728,13 @@
 
     function switchTab(tab) {
       currentTab = tab;
-      ['listening', 'recitation', 'manage'].forEach(t => {
-        document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
-        document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+      ['listening', 'recitation', 'dashboard', 'manage'].forEach(t => {
+        const panel = document.getElementById('tab-' + t);
+        const btn = document.getElementById('tab-btn-' + t);
+        if (panel) panel.classList.toggle('hidden', t !== tab);
+        if (btn) btn.classList.toggle('active', t === tab);
       });
+      if (tab === 'dashboard') renderDashboard();
     }
     function matchesStatusFilter(st, filter) {
       if (filter === 'all') return true;
@@ -1632,13 +1773,13 @@
 
     function renderListening() {
       updateSearchClearBtn('search-listening');
-      const list = document.getElementById('listening-list'), q = document.getElementById('search-listening').value.trim().toLowerCase();
+      const list = document.getElementById('listening-list'), q = document.getElementById('search-listening').value.trim();
       const allListen = getListeningMembers(), day = ensureDayRecord();
       const lRecorded = allListen.filter(m => Boolean(day.listening[m.id])).length, lRemaining = Math.max(0, allListen.length - lRecorded);
       const lStatusEl = document.getElementById('listening-status-line');
       if (lStatusEl) lStatusEl.textContent = allListen.length ? `المُسجَّل اليوم: ${lRecorded} من ${allListen.length} • المتبقي: ${lRemaining}` : '';
       renderFilterChips('listening-filters', allListen, day.listening, listeningFilter, 'setListeningFilter');
-      const members = allListen.filter(m => m.name.toLowerCase().includes(q) && matchesStatusFilter(day.listening[m.id], listeningFilter)).sort((a, b) => compareArabic(a.name, b.name));
+      const members = allListen.filter(m => arabicIncludes(m.name, q) && matchesStatusFilter(day.listening[m.id], listeningFilter)).sort((a, b) => compareArabic(a.name, b.name));
       if (!allListen.length) { list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="card empty-state">${listeningFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في الاستماع اليوم!' : 'لا يوجد أعضاء مطابقون للتصفية الحالية.'}</div>`; return; }
       list.innerHTML = members.map(m => {
@@ -1784,9 +1925,12 @@
       const normEntry = normalizeArabicText(entry), normWords = normEntry.split(' ').filter(Boolean), normEntryNoSpace = normEntry.replace(/\s+/g, '');
       if (!normEntry) return { status: 'empty' };
       if (normWords.length === 1) {
-        const fw = normWords[0], startsMatches = members.filter(m => { const mNorm = normalizeArabicText(m.name); return mNorm.split(' ')[0] === fw || mNorm.startsWith(fw); });
+        const fw = normWords[0];
+        const exactSolo = members.filter(m => { const mw = normalizeArabicText(m.name).split(' ').filter(Boolean); return mw.length === 1 && mw[0] === fw; });
+        if (exactSolo.length === 1) return { status: 'matched', member: exactSolo[0] };
+        const startsMatches = members.filter(m => { const mNorm = normalizeArabicText(m.name); return mNorm.split(' ')[0] === fw || mNorm.startsWith(fw); });
         if (startsMatches.length === 1) return { status: 'matched', member: startsMatches[0] };
-        if (startsMatches.length > 1) return { status: 'ambiguous', entry, names: startsMatches.slice(0, 3).map(x => x.name) };
+        if (startsMatches.length > 1) return { status: 'ambiguous', entry, names: startsMatches.slice(0, 5).map(x => x.name) };
       }
       const entryShortNorm = normalizeArabicText(extractFirstTwoArabicNames(entry)), entryShortNoSpace = entryShortNorm.replace(/\s+/g, '');
       let bestM = null, bestScore = 0;
@@ -1862,7 +2006,7 @@
     }
     function clearOcrFiles(showMsg = false) {
       ocrFiles.forEach(item => { try { URL.revokeObjectURL(item.url); } catch (e) {} });
-      ocrFiles = []; ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
+      ocrFiles = []; ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = []; ocrAmbiguousMatches = [];
       document.getElementById('ocr-file-input').value = ''; document.getElementById('ocr-filter-input').value = ''; updateSearchClearBtn('ocr-filter-input');
       document.getElementById('ocr-extracted-text').value = ''; document.getElementById('ocr-checklist').innerHTML = '';
       document.getElementById('ocr-unmatched-box').classList.add('hidden'); document.getElementById('ocr-unmatched-box').innerHTML = '';
@@ -1967,89 +2111,71 @@
 
           let bestGapStart = -1, bestGapEnd = -1, curStart = -1, bestGapQuality = 0;
           for (let x = gSearchStart; x <= gSearchEnd; x++) {
-            const isGutter = colQuiet[x] >= 0.60 && colDensity[x] <= Math.max(0.08, avPeak * 0.28);
+            const isGutter = colQuiet[x] >= 0.85 && colDensity[x] <= Math.max(0.06, avPeak * 0.22);
             if (isGutter) {
               if (curStart === -1) curStart = x;
             } else if (curStart !== -1) {
               const len = x - curStart;
-              if (len >= 2 && (bestGapStart === -1 || len > (bestGapEnd - bestGapStart + 1))) {
+              if (len >= 3 && (bestGapStart === -1 || len > (bestGapEnd - bestGapStart + 1))) {
                 bestGapStart = curStart; bestGapEnd = x - 1;
               }
               curStart = -1;
             }
           }
-          if (curStart !== -1 && (bestGapStart === -1 || (gSearchEnd - curStart + 1) > (bestGapEnd - bestGapStart + 1))) {
+          if (curStart !== -1 && (gSearchEnd - curStart + 1) >= 3 && (bestGapStart === -1 || (gSearchEnd - curStart + 1) > (bestGapEnd - bestGapStart + 1))) {
             bestGapStart = curStart; bestGapEnd = gSearchEnd;
           }
 
-          let cutX = -1;
-          if (bestGapStart !== -1) {
-            cutX = Math.round(bestGapStart + (bestGapEnd - bestGapStart) * 0.60);
-            for (let x = bestGapStart; x <= bestGapEnd; x++) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
-          } else {
-            let minX = gSearchStart, minD = 999;
-            for (let x = gSearchStart; x <= gSearchEnd; x++) {
-              if (colDensity[x] < minD) { minD = colDensity[x]; minX = x; }
-            }
-            if (minD >= avPeak * 0.45) return { score: 0 };
-            cutX = Math.min(gSearchEnd, minX + 1);
-            bestGapQuality = Math.max(0.35, colQuiet[minX]);
-          }
+          if (bestGapStart === -1) return { score: 0 };
+          const cutX = Math.round(bestGapStart + (bestGapEnd - bestGapStart) * 0.60);
+          if (cutX < Math.floor(probeW * 0.05)) return { score: 0 };
+          for (let x = bestGapStart; x <= bestGapEnd; x++) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
 
           let textMax = 0;
           const tEnd = Math.min(probeW - 1, cutX + Math.floor(probeW * 0.25));
           for (let x = cutX + 2; x <= tEnd; x++) if (colDensity[x] > textMax) textMax = colDensity[x];
           if (textMax < 0.08) return { score: 0 };
 
-          return { score: avPeak * Math.max(0.35, bestGapQuality), cropPct: cutX / probeW };
+          return { score: avPeak * Math.max(0.4, bestGapQuality), cropPct: cutX / probeW };
         } else {
           let peakX = Math.floor(probeW * 0.91), avPeak = 0;
-          for (let x = Math.floor(probeW * 0.98); x >= Math.floor(probeW * 0.82); x--) {
+          for (let x = Math.floor(probeW * 0.98); x >= Math.floor(probeW * 0.84); x--) {
             if (colDensity[x] > avPeak) { avPeak = colDensity[x]; peakX = x; }
           }
           if (avPeak < 0.12) return { score: 0 };
 
           const gSearchStart = Math.min(peakX - 2, Math.floor(probeW * 0.90));
-          const gSearchEnd = Math.floor(probeW * 0.73);
+          const gSearchEnd = Math.floor(probeW * 0.80);
           if (gSearchStart <= gSearchEnd) return { score: 0 };
 
           let bestGapStart = -1, bestGapEnd = -1, curStart = -1, bestGapQuality = 0;
           for (let x = gSearchStart; x >= gSearchEnd; x--) {
-            const isGutter = colQuiet[x] >= 0.60 && colDensity[x] <= Math.max(0.08, avPeak * 0.28);
+            const isGutter = colQuiet[x] >= 0.85 && colDensity[x] <= Math.max(0.06, avPeak * 0.22);
             if (isGutter) {
               if (curStart === -1) curStart = x;
             } else if (curStart !== -1) {
               const len = curStart - x;
-              if (len >= 2 && (bestGapStart === -1 || len > (bestGapStart - bestGapEnd + 1))) {
+              if (len >= 3 && (bestGapStart === -1 || len > (bestGapStart - bestGapEnd + 1))) {
                 bestGapStart = curStart; bestGapEnd = x + 1;
               }
               curStart = -1;
             }
           }
-          if (curStart !== -1 && (bestGapStart === -1 || (curStart - gSearchEnd + 1) > (bestGapStart - bestGapEnd + 1))) {
+          if (curStart !== -1 && (curStart - gSearchEnd + 1) >= 3 && (bestGapStart === -1 || (curStart - gSearchEnd + 1) > (bestGapStart - bestGapEnd + 1))) {
             bestGapStart = curStart; bestGapEnd = gSearchEnd;
           }
 
-          let cutX = -1;
-          if (bestGapStart !== -1) {
-            cutX = Math.round(bestGapStart - (bestGapStart - bestGapEnd) * 0.60);
-            for (let x = bestGapStart; x >= bestGapEnd; x--) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
-          } else {
-            let minX = gSearchStart, minD = 999;
-            for (let x = gSearchStart; x >= gSearchEnd; x--) {
-              if (colDensity[x] < minD) { minD = colDensity[x]; minX = x; }
-            }
-            if (minD >= avPeak * 0.45) return { score: 0 };
-            cutX = Math.max(gSearchEnd, minX - 1);
-            bestGapQuality = Math.max(0.35, colQuiet[minX]);
-          }
+          if (bestGapStart === -1) return { score: 0 };
+          const cutX = Math.round(bestGapStart - (bestGapStart - bestGapEnd) * 0.60);
+          if ((probeW - cutX) < Math.floor(probeW * 0.05)) return { score: 0 };
+          for (let x = bestGapStart; x >= bestGapEnd; x--) bestGapQuality = Math.max(bestGapQuality, colQuiet[x]);
 
           let textMax = 0;
           const tStart = Math.max(0, cutX - Math.floor(probeW * 0.25));
           for (let x = cutX - 2; x >= tStart; x--) if (colDensity[x] > textMax) textMax = colDensity[x];
           if (textMax < 0.08) return { score: 0 };
 
-          return { score: avPeak * Math.max(0.35, bestGapQuality), cropPct: cutX / probeW };
+          return { score: avPeak * Math.max(0.4, bestGapQuality), cropPct: cutX / probeW };
         }
       };
 
@@ -2057,12 +2183,12 @@
       const rightRes = analyzeSide(true);
       let cropStartPct = 0.0, cropEndPct = 1.0;
 
-      if (leftRes.score > 0.08 && leftRes.score >= rightRes.score) {
-        cropStartPct = Math.min(0.30, Math.max(0.0, leftRes.cropPct));
-        cropEndPct = 0.99;
-      } else if (rightRes.score > 0.08) {
-        cropStartPct = 0.01;
-        cropEndPct = Math.max(0.70, Math.min(1.0, rightRes.cropPct));
+      if (leftRes.score > 0.10 && leftRes.score >= rightRes.score) {
+        cropStartPct = Math.min(0.20, Math.max(0.0, leftRes.cropPct));
+        cropEndPct = 1.0;
+      } else if (rightRes.score > 0.10) {
+        cropStartPct = 0.0;
+        cropEndPct = Math.max(0.80, Math.min(1.0, rightRes.cropPct));
       }
 
       return { bgLum, cropStartPct, cropEndPct };
@@ -2197,23 +2323,51 @@
       });
     }
 
-    function createBandCropBlob(fullCanvas, band, targetW, pad = 24) {
+    function createBandCropBlob(fullCanvas, band, targetW, pad = 40) {
       return new Promise((resolve) => {
         try {
           const bw = Math.max(1, band.x1 - band.x0 + 1), bh = Math.max(1, band.y1 - band.y0);
-          const downScale = (targetW >= 1100 && bh > 54) ? 0.75 : 1.0;
-          const nw = Math.max(1, Math.round(bw * downScale)), nh = Math.max(1, Math.round(bh * downScale));
+          const safePad = Math.max(36, pad || 40);
           const c = document.createElement('canvas');
-          c.width = nw + pad * 2;
-          c.height = nh + pad * 2;
+          c.width = bw + safePad * 2;
+          c.height = bh + safePad * 2;
           const ctx = c.getContext('2d');
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, c.width, c.height);
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(fullCanvas, band.x0, band.y0, bw, bh, pad, pad, nw, nh);
+          ctx.drawImage(fullCanvas, band.x0, band.y0, bw, bh, safePad, safePad, bw, bh);
           c.toBlob(b => resolve(b), 'image/png');
         } catch (e) { resolve(null); }
+      });
+    }
+
+    function fileToCompressedImagePayload(file) {
+      return new Promise((resolve) => {
+        const imgUrl = URL.createObjectURL(file), img = new Image();
+        img.onload = () => {
+          try {
+            const origW = img.naturalWidth || img.width, origH = img.naturalHeight || img.height;
+            const maxDim = 1800;
+            const scale = Math.min(1, maxDim / Math.max(origW, origH, 1));
+            const w = Math.max(1, Math.round(origW * scale)), h = Math.max(1, Math.round(origH * scale));
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = c.toDataURL('image/jpeg', 0.90);
+            URL.revokeObjectURL(imgUrl);
+            resolve({ imageBase64: dataUrl, mimeType: 'image/jpeg' });
+          } catch (e) {
+            URL.revokeObjectURL(imgUrl);
+            const reader = new FileReader();
+            reader.onload = () => resolve({ imageBase64: String(reader.result || ''), mimeType: file.type || 'image/png' });
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(file);
+          }
+        };
+        img.onerror = () => { URL.revokeObjectURL(imgUrl); resolve(null); };
+        img.src = imgUrl;
       });
     }
 
@@ -2222,7 +2376,9 @@
     const OCR_INLINE_TIME_WORDS = new Set([
       'امس', 'امسء', 'اليوم', 'الان', 'منذ', 'دقيقه', 'دقائق', 'ساعه', 'ساعات', 'ثانيه', 'ثواني',
       'صباحا', 'مساء', ...OCR_MONTH_WORDS,
-      'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعه', 'السبت', 'الاحد'
+      'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعه', 'السبت', 'الاحد',
+      'غياب', 'الاستماع', 'التسميع', 'ليوم', 'انذار', 'بالحذف', 'الحذف', 'تسميع', 'فقط',
+      'مثابرات', 'الاسبوع', 'اسبوع', 'الجميله', 'الجروب', 'مجموعه', 'رساله', 'حذف'
     ]);
     function isFuzzyMonthWord(normWord) {
       if (!normWord || normWord.length < 4) return false;
@@ -2252,6 +2408,19 @@
       if (finalWords.length >= 2 && (totalChars < 4 || !finalWords.some(w => w.length >= 3))) return '';
       return shortName;
     }
+    function hasLikelyMemberMatch(lineText, targetMembers) {
+      const cleaned = cleanOcrLineToShortName(lineText);
+      if (!cleaned) return false;
+      const normLine = normalizeArabicText(cleaned);
+      const words = normLine.split(' ').filter(Boolean);
+      if (!words.length) return false;
+      return targetMembers.some(m => {
+        const mNorm = normalizeArabicText(m.name);
+        const mWords = mNorm.split(' ').filter(Boolean);
+        if (mWords.length && words.some(w => w === mWords[0] || (w.length >= 3 && nameSimilarity(w, mWords[0]) >= 0.80))) return true;
+        return nameSimilarity(normLine, normalizeArabicText(extractFirstTwoArabicNames(m.name))) >= 0.72;
+      });
+    }
     function rebuildExtractedTextFromFiles() {
       const uniqueLines = [], seenNorm = new Set();
       ocrFiles.forEach(item => (item.lines || []).forEach(l => { const norm = normalizeArabicText(l); if (norm && !seenNorm.has(norm)) { seenNorm.add(norm); uniqueLines.push(l); } }));
@@ -2260,103 +2429,152 @@
 
     async function processPendingOcrFiles() {
       if (ocrIsProcessing) return;
-      if (typeof Tesseract === 'undefined') return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
       const pendingItems = ocrFiles.filter(f => f.status === 'pending'); if (!pendingItems.length) return;
       ocrIsProcessing = true;
       const progBox = document.getElementById('ocr-progress-box'), statusEl = document.getElementById('ocr-status-text'), barEl = document.getElementById('ocr-progress-bar'), resBox = document.getElementById('ocr-result-box');
-      progBox.classList.remove('hidden'); barEl.style.width = '5%'; statusEl.textContent = 'جاري تجهيز الصور للقراءة...';
+      progBox.classList.remove('hidden'); barEl.style.width = '8%'; statusEl.textContent = 'جاري تجهيز الصور للقراءة الذكية...';
       try {
         const forceInvert = document.getElementById('ocr-invert-check').checked;
-        let curFileIdx = 0, curSliceIdx = 0, curSliceCount = 1;
-        const worker = await Tesseract.createWorker('ara', 1, {
-          logger: m => {
-            if (m && m.status === 'recognizing text') {
-              const pct = Math.max(8, Math.min(96, Math.round(((curFileIdx + (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount)) / pendingItems.length) * 92)));
-              barEl.style.width = pct + '%';
-              statusEl.textContent = pendingItems.length > 1 ? `جاري قراءة صورة ${curFileIdx + 1} من ${pendingItems.length}... (${pct}%)` : `جاري استخراج الأسماء من الصورة... (${pct}%)`;
-            } else if (m && m.status) statusEl.textContent = 'جاري تجهيز القاموس العربي...';
-          }
-        });
-        const pass2Queue = [];
-        const itemEntries = pendingItems.map(() => []);
-        for (let fIdx = 0; fIdx < pendingItems.length; fIdx++) {
-          const item = pendingItems[fIdx]; curFileIdx = fIdx; item.status = 'processing'; renderOcrThumbnails();
-          try {
-            const prep = await sliceAndPreprocessImageForOcr(item.file, forceInvert);
-            curSliceCount = prep.slices.length;
-            const coveredLines = [];
-            for (let sIdx = 0; sIdx < prep.slices.length; sIdx++) {
-              curSliceIdx = sIdx;
-              const sl = prep.slices[sIdx];
-              const { data } = await worker.recognize(sl.blob);
-              if (data && Array.isArray(data.lines) && data.lines.length) {
-                data.lines.forEach(l => {
-                  const txt = (l.text || '').trim();
-                  if (!txt) return;
-                  const ly0 = l.bbox ? (sl.yStart - prep.pad + l.bbox.y0) : sl.yStart;
-                  const ly1 = l.bbox ? (sl.yStart - prep.pad + l.bbox.y1) : sl.yStart;
-                  itemEntries[fIdx].push({ y: ly0, text: txt });
-                  const arCount = (txt.match(/[\u0621-\u064A]/g) || []).length;
-                  if (arCount >= 3 && l.bbox) coveredLines.push({ y0: ly0, y1: ly1 });
+        const tesseractItems = [];
+
+        if (!forceInvert) {
+          for (let i = 0; i < pendingItems.length; i++) {
+            const item = pendingItems[i];
+            item.status = 'processing';
+            renderOcrThumbnails();
+            barEl.style.width = Math.max(12, Math.round(((i + 0.35) / pendingItems.length) * 88)) + '%';
+            statusEl.textContent = pendingItems.length > 1 ? `جاري قراءة صورة ${i + 1} من ${pendingItems.length} بالذكاء الاصطناعي...` : 'جاري قراءة الأسماء من الصورة بالذكاء الاصطناعي...';
+            try {
+              const payload = await fileToCompressedImagePayload(item.file);
+              if (payload && payload.imageBase64) {
+                const resp = await fetch('/api/parse-attendance-image', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
                 });
-              } else {
-                String((data && data.text) || '').split(/\r?\n/).forEach((l, li) => {
-                  if (l.trim()) itemEntries[fIdx].push({ y: sl.yStart + li, text: l });
-                });
+                if (resp.ok) {
+                  const json = await resp.json();
+                  if (Array.isArray(json.names) && json.names.length > 0) {
+                    item.lines = json.names.map(n => cleanOcrLineToShortName(n) || String(n || '').trim()).filter(Boolean);
+                    item.status = 'done';
+                    renderOcrThumbnails();
+                    continue;
+                  }
+                }
               }
+            } catch (e) {}
+            item.status = 'pending';
+            tesseractItems.push(item);
+          }
+        } else {
+          pendingItems.forEach(item => tesseractItems.push(item));
+        }
+
+        if (tesseractItems.length > 0) {
+          if (typeof Tesseract === 'undefined') {
+            tesseractItems.forEach(it => { it.status = 'error'; });
+            renderOcrThumbnails();
+            if (tesseractItems.length === pendingItems.length) {
+              progBox.classList.add('hidden');
+              return showToast('⚠️ تعذر تحميل أداة قراءة الصور، تأكدي من الاتصال بالإنترنت');
             }
-            if (prep.fullCanvas && prep.bands.length) {
-              const maxGapForSub = Math.max(28, Math.round(prep.targetH * 0.012));
-              for (let bi = 0; bi < prep.bands.length; bi++) {
-                const b = prep.bands[bi];
-                if (b.y1 < prep.targetH * 0.08) continue;
-                const isCovered = coveredLines.some(cl => Math.min(b.y1, cl.y1) - Math.max(b.y0, cl.y0) >= 8);
-                if (isCovered) continue;
-                const prevB = bi > 0 ? prep.bands[bi - 1] : null;
-                const isSubTimestamp = prevB && (b.y0 - prevB.y1 <= maxGapForSub) && ((b.y1 - b.y0) < (prevB.y1 - prevB.y0) * 0.88) && ((b.x1 - b.x0) < 280) && (b.veryDarkRatio < prevB.veryDarkRatio * 0.65);
-                if (!isSubTimestamp) pass2Queue.push({ fIdx, prep, band: b });
+          } else {
+            const targetMembers = getListeningMembers();
+            let curFileIdx = 0, curSliceIdx = 0, curSliceCount = 1;
+            const worker = await Tesseract.createWorker('ara', 1, {
+              logger: m => {
+                if (m && m.status === 'recognizing text') {
+                  const pct = Math.max(8, Math.min(96, Math.round(((curFileIdx + (curSliceIdx + (m.progress || 0)) / Math.max(1, curSliceCount)) / tesseractItems.length) * 92)));
+                  barEl.style.width = pct + '%';
+                  statusEl.textContent = tesseractItems.length > 1 ? `جاري قراءة صورة ${curFileIdx + 1} من ${tesseractItems.length}... (${pct}%)` : `جاري استخراج الأسماء من الصورة... (${pct}%)`;
+                } else if (m && m.status) statusEl.textContent = 'جاري تجهيز القاموس العربي...';
               }
+            });
+            const pass2Queue = [];
+            const itemEntries = tesseractItems.map(() => []);
+            for (let fIdx = 0; fIdx < tesseractItems.length; fIdx++) {
+              const item = tesseractItems[fIdx]; curFileIdx = fIdx; item.status = 'processing'; renderOcrThumbnails();
+              try {
+                const prep = await sliceAndPreprocessImageForOcr(item.file, forceInvert);
+                curSliceCount = prep.slices.length;
+                const coveredLines = [];
+                for (let sIdx = 0; sIdx < prep.slices.length; sIdx++) {
+                  curSliceIdx = sIdx;
+                  const sl = prep.slices[sIdx];
+                  const { data } = await worker.recognize(sl.blob);
+                  if (data && Array.isArray(data.lines) && data.lines.length) {
+                    data.lines.forEach(l => {
+                      const txt = (l.text || '').trim();
+                      if (!txt) return;
+                      const ly0 = l.bbox ? (sl.yStart - prep.pad + l.bbox.y0) : sl.yStart;
+                      const ly1 = l.bbox ? (sl.yStart - prep.pad + l.bbox.y1) : sl.yStart;
+                      itemEntries[fIdx].push({ y: ly0, text: txt });
+                      const arCount = (txt.match(/[\u0621-\u064A]/g) || []).length;
+                      if (arCount >= 3 && l.bbox && hasLikelyMemberMatch(txt, targetMembers)) {
+                        coveredLines.push({ y0: ly0, y1: ly1 });
+                      }
+                    });
+                  } else {
+                    String((data && data.text) || '').split(/\r?\n/).forEach((l, li) => {
+                      if (l.trim()) itemEntries[fIdx].push({ y: sl.yStart + li, text: l });
+                    });
+                  }
+                }
+                if (prep.fullCanvas && prep.bands.length) {
+                  const maxGapForSub = Math.max(28, Math.round(prep.targetH * 0.012));
+                  for (let bi = 0; bi < prep.bands.length; bi++) {
+                    const b = prep.bands[bi];
+                    const isCovered = coveredLines.some(cl => Math.min(b.y1, cl.y1) - Math.max(b.y0, cl.y0) >= 8);
+                    if (isCovered) continue;
+                    const prevB = bi > 0 ? prep.bands[bi - 1] : null;
+                    const isSubTimestamp = prevB && (b.y0 - prevB.y1 <= maxGapForSub) && ((b.y1 - b.y0) < (prevB.y1 - prevB.y0) * 0.85) && ((b.x1 - b.x0) < 260) && (b.veryDarkRatio < 0.25) && (b.veryDarkRatio < prevB.veryDarkRatio * 0.45);
+                    if (!isSubTimestamp) pass2Queue.push({ fIdx, prep, band: b });
+                  }
+                }
+                if (!pass2Queue.some(q => q.fIdx === fIdx)) {
+                  itemEntries[fIdx].sort((a, b) => a.y - b.y);
+                  item.lines = itemEntries[fIdx].map(e => cleanOcrLineToShortName(e.text)).filter(Boolean);
+                  item.status = 'done';
+                }
+              } catch (e) { item.status = 'error'; }
+              renderOcrThumbnails();
             }
-            if (!pass2Queue.some(q => q.fIdx === fIdx)) {
-              itemEntries[fIdx].sort((a, b) => a.y - b.y);
-              item.lines = itemEntries[fIdx].map(e => cleanOcrLineToShortName(e.text)).filter(Boolean);
-              item.status = 'done';
+            if (pass2Queue.length) {
+              statusEl.textContent = `جاري استعادة ${pass2Queue.length} سطر إضافي بدقة عالية...`;
+              barEl.style.width = '96%';
+              await worker.setParameters({ tessedit_pageseg_mode: '7' });
+              const retryQueue11 = [];
+              for (const q of pass2Queue) {
+                const blob = await createBandCropBlob(q.prep.fullCanvas, q.band, q.prep.targetW, 40);
+                if (!blob) continue;
+                const { data } = await worker.recognize(blob);
+                const txt = ((data && data.text) || '').trim();
+                const arCount = (txt.match(/[\u0621-\u064A]/g) || []).length;
+                if (arCount >= 3) itemEntries[q.fIdx].push({ y: q.band.y0, text: txt });
+                else retryQueue11.push({ ...q, blob });
+              }
+              if (retryQueue11.length) {
+                await worker.setParameters({ tessedit_pageseg_mode: '11' });
+                for (const q of retryQueue11) {
+                  const { data } = await worker.recognize(q.blob);
+                  const txt = ((data && data.text) || '').trim();
+                  if (txt) itemEntries[q.fIdx].push({ y: q.band.y0, text: txt });
+                }
+              }
+              const touched = new Set(pass2Queue.map(q => q.fIdx));
+              touched.forEach(fIdx => {
+                const item = tesseractItems[fIdx];
+                itemEntries[fIdx].sort((a, b) => a.y - b.y);
+                item.lines = itemEntries[fIdx].map(e => cleanOcrLineToShortName(e.text)).filter(Boolean);
+                if (item.status !== 'error') item.status = 'done';
+              });
+              renderOcrThumbnails();
             }
-          } catch (e) { item.status = 'error'; }
-          renderOcrThumbnails();
-        }
-        if (pass2Queue.length) {
-          statusEl.textContent = `جاري استعادة ${pass2Queue.length} سطر إضافي بدقة عالية...`;
-          barEl.style.width = '96%';
-          await worker.setParameters({ tessedit_pageseg_mode: '13' });
-          const retryQueue11 = [];
-          for (const q of pass2Queue) {
-            const blob = await createBandCropBlob(q.prep.fullCanvas, q.band, q.prep.targetW, q.prep.pad);
-            if (!blob) continue;
-            const { data } = await worker.recognize(blob);
-            const txt = ((data && data.text) || '').trim();
-            const arCount = (txt.match(/[\u0621-\u064A]/g) || []).length;
-            if (arCount >= 3) itemEntries[q.fIdx].push({ y: q.band.y0, text: txt });
-            else retryQueue11.push({ ...q, blob });
+            await worker.terminate();
           }
-          if (retryQueue11.length) {
-            await worker.setParameters({ tessedit_pageseg_mode: '11' });
-            for (const q of retryQueue11) {
-              const { data } = await worker.recognize(q.blob);
-              const txt = ((data && data.text) || '').trim();
-              if (txt) itemEntries[q.fIdx].push({ y: q.band.y0, text: txt });
-            }
-          }
-          const touched = new Set(pass2Queue.map(q => q.fIdx));
-          touched.forEach(fIdx => {
-            const item = pendingItems[fIdx];
-            itemEntries[fIdx].sort((a, b) => a.y - b.y);
-            item.lines = itemEntries[fIdx].map(e => cleanOcrLineToShortName(e.text)).filter(Boolean);
-            if (item.status !== 'error') item.status = 'done';
-          });
-          renderOcrThumbnails();
         }
-        await worker.terminate();
+
+        barEl.style.width = '100%';
         rebuildExtractedTextFromFiles(); progBox.classList.add('hidden'); resBox.classList.remove('hidden'); matchOcrLinesToMembers();
       } catch (err) { progBox.classList.add('hidden'); showToast('❌ حدث خطأ أثناء قراءة الصور، تأكدي من وضوح الصور'); }
       finally { ocrIsProcessing = false; if (ocrFiles.some(f => f.status === 'pending')) processPendingOcrFiles(); }
@@ -2381,7 +2599,7 @@
         .map(l => cleanOcrLineToShortName(l.trim()) || extractFirstTwoArabicNames(l.trim(), true))
         .filter(Boolean);
       const targetMembers = getListeningMembers();
-      ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = [];
+      ocrSelectedMemberIds = new Set(); ocrMatchedReasons = {}; ocrMatchedScores = {}; ocrUnmatchedLines = []; ocrAmbiguousMatches = [];
       const matchedLineNorms = [], firstWordCounts = {};
       targetMembers.forEach(m => { const fw = normalizeArabicText(m.name).split(' ')[0]; if (fw) firstWordCounts[fw] = (firstWordCounts[fw] || 0) + 1; });
       const rawUnmatched = [];
@@ -2390,74 +2608,103 @@
         const normLine = normalizeArabicText(line), normLineWords = normLine.split(' ').filter(Boolean), normLineNoSpace = normLine.replace(/\s+/g, '');
         let bestMember = null, bestScore = 0;
         const dotlessLine = stripArabicDots(normLine);
+        let handledAmbiguous = false;
 
-        targetMembers.forEach(m => {
-          const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
-          const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
-          let score = 0;
-          if (normLine === normMShort || normLineNoSpace === normMShortNoSpace || normLineNoSpace === normMFullNoSpace) {
-            score = 1.0;
-          } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort) || normMFullNoSpace.startsWith(normLineNoSpace) || normLineNoSpace.startsWith(normMShortNoSpace)) {
-            score = 0.95;
+        if (normLineWords.length === 1) {
+          const fw = normLineWords[0];
+          const exactSolo = targetMembers.filter(m => { const mw = normalizeArabicText(m.name).split(' ').filter(Boolean); return mw.length === 1 && mw[0] === fw; });
+          if (exactSolo.length === 1) {
+            bestMember = exactSolo[0]; bestScore = 1.0;
           } else {
-            const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
-            const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)));
-            score = dotSim >= 0.85 ? (0.60 * sim + 0.40 * dotSim) : (sim >= 0.50 ? (0.68 * sim + 0.32 * dotSim) : sim);
-            if (normLineWords.length >= 2 && mFullWords.length >= 2) {
-              const sFirst = nameSimilarity(normLineWords[0], mFullWords[0]);
-              const sLast = Math.max(...mFullWords.slice(1).map(w => nameSimilarity(normLineWords[1], w)));
-              if (sFirst < 0.45 && nameSimilarity(stripArabicDots(normLineWords[0]), stripArabicDots(mFullWords[0])) < 0.60) {
-                score = Math.min(score, 0.55);
-              } else if (sFirst >= 0.72 && sLast >= 0.72) {
-                score = Math.max(score, 0.92 * (0.65 * sFirst + 0.35 * sLast));
-              }
-            }
-          }
-          if (score > bestScore) { bestScore = score; bestMember = m; }
-        });
-
-        if (bestScore < 0.85 && (normLineWords.length === 1 || normLineNoSpace.length >= 4)) {
-          const fw = normLineWords.length === 1 ? normLineWords[0] : normLineNoSpace;
-          if (firstWordCounts[fw] === 1) {
-            const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
-            if (uniqueM && 0.92 > bestScore) { bestMember = uniqueM; bestScore = 0.92; }
-          } else if (normLineWords.length === 1) {
-            let candidates = [];
-            targetMembers.forEach(m => {
-              const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
-              const sim = nameSimilarity(fw, mFw), dotSim = nameSimilarity(stripArabicDots(fw), stripArabicDots(mFw));
-              const sc = dotSim >= 0.85 ? (0.55 * sim + 0.45 * dotSim) : (sim >= 0.55 ? 0.72 * sim + 0.28 * dotSim : sim);
-              if (sc >= 0.72) candidates.push({ m, sc });
-            });
-            candidates.sort((a, b) => b.sc - a.sc);
-            if (candidates.length === 1 || (candidates.length > 1 && candidates[0].sc - candidates[1].sc >= 0.12)) {
-              if (candidates[0].sc > bestScore) { bestMember = candidates[0].m; bestScore = candidates[0].sc; }
+            const firstMatches = targetMembers.filter(m => normalizeArabicText(m.name).split(' ')[0] === fw);
+            if (firstMatches.length === 1) {
+              bestMember = firstMatches[0]; bestScore = 0.96;
+            } else if (firstMatches.length > 1) {
+              ocrAmbiguousMatches.push({ line, candidates: firstMatches });
+              handledAmbiguous = true;
             }
           }
         }
 
-        if (bestScore < 0.70 && normLineWords.length >= 2) {
-          for (let wi = 0; wi < normLineWords.length; wi++) {
-            const w = normLineWords[wi];
-            if (w.length < (wi === 0 ? 3 : 4)) continue;
-            if (firstWordCounts[w] === 1) {
-              const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === w);
-              if (uniqueM) { bestMember = uniqueM; bestScore = 0.88; break; }
-            } else if (w.length >= 5) {
+        if (!handledAmbiguous && bestScore < 0.96) {
+          targetMembers.forEach(m => {
+            const normMShort = normalizeArabicText(extractFirstTwoArabicNames(m.name)), normMFull = normalizeArabicText(m.name);
+            const normMShortNoSpace = normMShort.replace(/\s+/g, ''), normMFullNoSpace = normMFull.replace(/\s+/g, ''), mFullWords = normMFull.split(' ').filter(Boolean);
+            let score = 0;
+            if (normLine === normMShort || normLineNoSpace === normMShortNoSpace || normLineNoSpace === normMFullNoSpace) {
+              score = 1.0;
+            } else if (normMFull.startsWith(normLine) || normLine.startsWith(normMShort) || normMFullNoSpace.startsWith(normLineNoSpace) || normLineNoSpace.startsWith(normMShortNoSpace)) {
+              score = 0.95;
+            } else {
+              const sim = Math.max(nameSimilarity(normLine, normMShort), nameSimilarity(normLine, normMFull));
+              const dotSim = Math.max(nameSimilarity(dotlessLine, stripArabicDots(normMShort)), nameSimilarity(dotlessLine, stripArabicDots(normMFull)));
+              score = dotSim >= 0.85 ? (0.60 * sim + 0.40 * dotSim) : (sim >= 0.50 ? (0.68 * sim + 0.32 * dotSim) : sim);
+              if (normLineWords.length >= 2 && mFullWords.length >= 2) {
+                const sFirst = nameSimilarity(normLineWords[0], mFullWords[0]);
+                const sLast = Math.max(...mFullWords.slice(1).map(w => nameSimilarity(normLineWords[1], w)));
+                if (sFirst < 0.45 && nameSimilarity(stripArabicDots(normLineWords[0]), stripArabicDots(mFullWords[0])) < 0.60) {
+                  score = Math.min(score, 0.55);
+                } else if (sFirst >= 0.72 && sLast >= 0.72) {
+                  score = Math.max(score, 0.92 * (0.65 * sFirst + 0.35 * sLast));
+                }
+              }
+            }
+            if (score > bestScore) { bestScore = score; bestMember = m; }
+          });
+
+          if (bestScore < 0.85 && (normLineWords.length === 1 || normLineNoSpace.length >= 4)) {
+            const fw = normLineWords.length === 1 ? normLineWords[0] : normLineNoSpace;
+            if (firstWordCounts[fw] === 1) {
+              const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === fw);
+              if (uniqueM && 0.92 > bestScore) { bestMember = uniqueM; bestScore = 0.92; }
+            } else if (normLineWords.length === 1) {
               let candidates = [];
               targetMembers.forEach(m => {
                 const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
-                const sc = nameSimilarity(w, mFw);
-                if (sc >= 0.80) candidates.push({ m, sc });
+                const sim = nameSimilarity(fw, mFw), dotSim = nameSimilarity(stripArabicDots(fw), stripArabicDots(mFw));
+                const sc = dotSim >= 0.85 ? (0.55 * sim + 0.45 * dotSim) : (sim >= 0.55 ? 0.72 * sim + 0.28 * dotSim : sim);
+                if (sc >= 0.72) candidates.push({ m, sc });
               });
               candidates.sort((a, b) => b.sc - a.sc);
               if (candidates.length === 1 || (candidates.length > 1 && candidates[0].sc - candidates[1].sc >= 0.12)) {
-                bestMember = candidates[0].m; bestScore = candidates[0].sc; break;
+                if (candidates[0].sc > bestScore) { bestMember = candidates[0].m; bestScore = candidates[0].sc; }
+              } else if (candidates.length > 1) {
+                ocrAmbiguousMatches.push({ line, candidates: candidates.slice(0, 5).map(c => c.m) });
+                handledAmbiguous = true;
+              }
+            }
+          }
+
+          if (!handledAmbiguous && bestScore < 0.70 && normLineWords.length >= 2) {
+            for (let wi = 0; wi < normLineWords.length; wi++) {
+              const w = normLineWords[wi];
+              if (w.length < 3) continue;
+              if (firstWordCounts[w] === 1) {
+                const uniqueM = targetMembers.find(m => normalizeArabicText(m.name).split(' ')[0] === w);
+                if (uniqueM) { bestMember = uniqueM; bestScore = 0.88; break; }
+              } else if ((firstWordCounts[w] || 0) > 1) {
+                const multiM = targetMembers.filter(m => normalizeArabicText(m.name).split(' ')[0] === w);
+                ocrAmbiguousMatches.push({ line, candidates: multiM.slice(0, 5) });
+                handledAmbiguous = true;
+                break;
+              } else if (w.length >= 4) {
+                let candidates = [];
+                targetMembers.forEach(m => {
+                  const mFw = normalizeArabicText(m.name).split(' ')[0]; if (!mFw) return;
+                  const sim = nameSimilarity(w, mFw), dotSim = nameSimilarity(stripArabicDots(w), stripArabicDots(mFw));
+                  const sc = dotSim >= 0.85 ? (0.55 * sim + 0.45 * dotSim) : sim;
+                  if (sc >= 0.78) candidates.push({ m, sc });
+                });
+                candidates.sort((a, b) => b.sc - a.sc);
+                if (candidates.length === 1 || (candidates.length > 1 && candidates[0].sc - candidates[1].sc >= 0.12)) {
+                  bestMember = candidates[0].m; bestScore = candidates[0].sc; break;
+                }
               }
             }
           }
         }
 
+        if (handledAmbiguous) return;
         if (bestMember && bestScore >= 0.70) {
           ocrSelectedMemberIds.add(bestMember.id);
           if (!ocrMatchedScores[bestMember.id] || bestScore > ocrMatchedScores[bestMember.id]) { ocrMatchedReasons[bestMember.id] = line; ocrMatchedScores[bestMember.id] = bestScore; }
@@ -2469,17 +2716,32 @@
       renderOcrChecklist();
     }
 
+    function pickOcrAmbiguousMember(memberId, lineText) {
+      ocrSelectedMemberIds.add(memberId);
+      if (lineText) { ocrMatchedReasons[memberId] = lineText; ocrMatchedScores[memberId] = 1; }
+      const normL = normalizeArabicText(lineText || '');
+      ocrAmbiguousMatches = ocrAmbiguousMatches.filter(a => normalizeArabicText(a.line) !== normL);
+      renderOcrChecklist();
+    }
+
     function renderOcrChecklist() {
       updateSearchClearBtn('ocr-filter-input');
-      const targetMembers = getListeningMembers(), filterQ = (document.getElementById('ocr-filter-input').value || '').trim().toLowerCase();
-      const sorted = [...targetMembers].filter(m => !filterQ || m.name.toLowerCase().includes(filterQ)).sort((a, b) => (ocrSelectedMemberIds.has(a.id) ? 0 : 1) - (ocrSelectedMemberIds.has(b.id) ? 0 : 1) || compareArabic(a.name, b.name));
+      const targetMembers = getListeningMembers(), filterQ = (document.getElementById('ocr-filter-input').value || '').trim();
+      const sorted = [...targetMembers].filter(m => arabicIncludes(m.name, filterQ)).sort((a, b) => (ocrSelectedMemberIds.has(a.id) ? 0 : 1) - (ocrSelectedMemberIds.has(b.id) ? 0 : 1) || compareArabic(a.name, b.name));
       document.getElementById('ocr-match-summary').innerHTML = `تمت مطابقة <strong>${ocrSelectedMemberIds.size}</strong> عضو من أصل ${targetMembers.length}`;
       const unmatchedBox = document.getElementById('ocr-unmatched-box');
-      if (ocrUnmatchedLines.length > 0) {
-        unmatchedBox.innerHTML = `<strong style="color:#92400e; display:block; margin-bottom:6px;">⚠️ أسماء من الصورة لم تطابق تلقائياً (${ocrUnmatchedLines.length}):</strong>` +
-          `<div style="display:flex; flex-wrap:wrap; gap:6px;">` +
-          ocrUnmatchedLines.map(line => `<span style="background:#fff; border:1px solid #fcd34d; color:#78350f; font-weight:700; padding:3px 10px; border-radius:99px; font-size:12.5px;">«${escapeHtml(line)}»</span>`).join('') +
-          `</div>`;
+      if (ocrAmbiguousMatches.length > 0 || ocrUnmatchedLines.length > 0) {
+        let boxHtml = '';
+        if (ocrAmbiguousMatches.length > 0) {
+          boxHtml += ocrAmbiguousMatches.map(a => `<div class="ambig-row"><div style="color:#92400e; font-weight:700;">⚠️ «${escapeHtml(a.line)}» يطابق أكثر من عضوة — اضغطي للاختيار:</div><div>${a.candidates.map(c => `<button type="button" class="ambig-pick-btn" data-id="${escapeHtml(c.id)}" data-line="${escapeHtml(a.line)}" onclick="pickOcrAmbiguousMember(this.dataset.id, this.dataset.line)">${escapeHtml(c.name)}</button>`).join('')}</div></div>`).join('');
+        }
+        if (ocrUnmatchedLines.length > 0) {
+          boxHtml += `<strong style="color:#92400e; display:block; margin-top:${ocrAmbiguousMatches.length ? '8px' : '0'}; margin-bottom:6px;">⚠️ أسماء من الصورة لم تطابق تلقائياً (${ocrUnmatchedLines.length}):</strong>` +
+            `<div style="display:flex; flex-wrap:wrap; gap:6px;">` +
+            ocrUnmatchedLines.map(line => `<span style="background:#fff; border:1px solid #fcd34d; color:#78350f; font-weight:700; padding:3px 10px; border-radius:99px; font-size:12.5px;">«${escapeHtml(line)}»</span>`).join('') +
+            `</div>`;
+        }
+        unmatchedBox.innerHTML = boxHtml;
         unmatchedBox.classList.remove('hidden');
       } else { unmatchedBox.classList.add('hidden'); unmatchedBox.innerHTML = ''; }
       document.getElementById('ocr-checklist').innerHTML = sorted.map(m => {
@@ -2596,9 +2858,9 @@
 
     function getInlinePartnerCandidatesHtml(p, query) {
       const { multiPairedIds, soloNumByMemberId } = getValidGroupPartnershipMap();
-      const q = (query || '').trim().toLowerCase();
+      const q = (query || '').trim();
       const candidates = getGroupMembers()
-        .filter(m => !multiPairedIds.has(m.id) && !(p.memberIds || []).includes(m.id) && (!q || m.name.toLowerCase().includes(q)))
+        .filter(m => !multiPairedIds.has(m.id) && !(p.memberIds || []).includes(m.id) && arabicIncludes(m.name, q))
         .sort((a, b) => compareArabic(a.name, b.name));
       if (!candidates.length) {
         return `<p style="grid-column:1/-1; color:var(--muted); font-size:12.5px; margin:4px 0;">${q ? 'لا توجد نتائج مطابقة للبحث.' : 'لا توجد عضوات بدون رفقاء حالياً لإضافتهن.'}</p>`;
@@ -2677,7 +2939,7 @@
       let visiblePartnerships = partnerships.map((p, idx) => ({ p, pNum: p.number || (idx + 1) }));
       if (normQ) {
         if (isNumSearch) visiblePartnerships = visiblePartnerships.filter(it => String(it.pNum).startsWith(normQ)).sort((a, b) => (a.pNum === Number(normQ) ? 0 : 1) - (b.pNum === Number(normQ) ? 0 : 1) || (a.pNum - b.pNum));
-        else visiblePartnerships = visiblePartnerships.filter(it => it.p.memberIds.some(id => memberMap[id] && memberMap[id].name.toLowerCase().includes(normQ)));
+        else visiblePartnerships = visiblePartnerships.filter(it => it.p.memberIds.some(id => memberMap[id] && arabicIncludes(memberMap[id].name, rawQ)));
       }
       let html = '', renderedPartnerCards = 0;
       visiblePartnerships.forEach(({ p, pNum }) => {
@@ -2706,7 +2968,7 @@
       });
       const nextNum = getNextPartnershipNumber();
       let unpaired = members.filter(m => !numberedIds.has(m.id) && matchesStatusFilter(day.recitation[m.id], recitationFilter));
-      if (normQ) unpaired = isNumSearch ? [] : unpaired.filter(m => m.name.toLowerCase().includes(normQ));
+      if (normQ) unpaired = isNumSearch ? [] : unpaired.filter(m => arabicIncludes(m.name, rawQ));
       if (unpaired.length) {
         const unpairedRows = unpaired.map(m => {
           const soloControl = assigningSoloMemberId === m.id
@@ -3039,8 +3301,8 @@
         if (pa) return -1; if (pb) return 1; return 0;
       });
       document.getElementById('reset-date-note').textContent = group && group.absenceStartDate ? `يتم حساب الغياب المتتابع بدءاً من: ${toEnglishDigits(group.absenceStartDate)}` : 'يتم حساب الغياب المتتابع (يتصفر تلقائياً عند الحضور).';
-      const list = document.getElementById('manage-members-list'), searchEl = document.getElementById('search-manage'), q = searchEl ? searchEl.value.trim().toLowerCase() : '';
-      const members = q ? orderedAllMembers.filter(m => m.name.toLowerCase().includes(q)) : orderedAllMembers;
+      const list = document.getElementById('manage-members-list'), searchEl = document.getElementById('search-manage'), q = searchEl ? searchEl.value.trim() : '';
+      const members = q ? orderedAllMembers.filter(m => arabicIncludes(m.name, q)) : orderedAllMembers;
       if (!allMembers.length) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة للبحث "${escapeHtml(q)}".</div>`; return; }
       list.innerHTML = members.map((m, i) => {
@@ -3061,6 +3323,559 @@
       return `${title}\n\n${absentList.map(it => `🥀${it.name} ${'🔴'.repeat(Math.max(1, it.count))}${it.count > 2 ? ' إنذار بالحذف' : ''}`).join('\n')}`;
     }
     function copyAbsenceMessage(mode) { copyTextSilently(buildAbsenceSection(mode), '✅ تم نسخ رسالة الغياب بنجاح!'); }
+
+    // ==================== داشبورد متابعة الالتزام ====================
+    function formatDashMonthLabel(ym) {
+      if (!/^\d{4}-\d{2}$/.test(String(ym || ''))) return toEnglishDigits(ym || '');
+      try {
+        const d = new Date(ym + '-01T00:00:00');
+        return toEnglishDigits(d.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' }));
+      } catch (e) { return toEnglishDigits(ym); }
+    }
+
+    function getGroupAttendanceDates() {
+      const members = getGroupMembers();
+      if (!members.length) return [];
+      const memberIds = members.map(m => m.id);
+      return Object.keys(db.attendance || {})
+        .filter(d => memberIds.some(id => Boolean(db.attendance[d]?.listening?.[id] || db.attendance[d]?.recitation?.[id])))
+        .sort();
+    }
+
+    function getDashboardDateScope() {
+      const allGroupDates = getGroupAttendanceDates();
+      const firstDate = allGroupDates.length ? allGroupDates[0] : '';
+      const lastDate = allGroupDates.length ? allGroupDates[allGroupDates.length - 1] : currentDate;
+
+      if (dashPeriodMode === 'month') {
+        const monthInp = document.getElementById('dash-month-input');
+        if (monthInp && monthInp.value) dashMonthValue = monthInp.value;
+        if (!/^\d{4}-\d{2}$/.test(dashMonthValue)) dashMonthValue = getTodayStr().slice(0, 7);
+        if (monthInp && monthInp.value !== dashMonthValue) monthInp.value = dashMonthValue;
+        const dates = allGroupDates.filter(d => d.startsWith(dashMonthValue));
+        return {
+          mode: 'month',
+          label: `خلال شهر ${formatDashMonthLabel(dashMonthValue)}`,
+          dates,
+          endDate: dates.length ? dates[dates.length - 1] : `${dashMonthValue}-31`
+        };
+      }
+
+      if (dashPeriodMode === 'custom') {
+        const startEl = document.getElementById('dash-start-input');
+        const endEl = document.getElementById('dash-end-input');
+        if (startEl && !startEl.value) startEl.value = firstDate || getTodayStr().slice(0, 7) + '-01';
+        if (endEl && !endEl.value) endEl.value = lastDate || getTodayStr();
+        const start = startEl ? startEl.value : '';
+        const end = endEl ? endEl.value : '';
+        const valid = Boolean(start && end && start <= end);
+        const dates = valid ? allGroupDates.filter(d => d >= start && d <= end) : [];
+        return {
+          mode: 'custom',
+          label: valid ? `من ${toEnglishDigits(start)} إلى ${toEnglishDigits(end)}` : 'يرجى تحديد فترة زمنية صحيحة',
+          dates,
+          endDate: end || lastDate
+        };
+      }
+
+      return {
+        mode: 'all',
+        label: allGroupDates.length ? `منذ البداية (${toEnglishDigits(firstDate)} ← ${toEnglishDigits(lastDate)})` : 'منذ البداية (لا توجد تسجيلات بعد)',
+        dates: allGroupDates,
+        endDate: lastDate
+      };
+    }
+
+    function computeDashboardStats() {
+      const scope = getDashboardDateScope();
+      const members = getGroupMembers();
+      const partnerships = getGroupPartnerships();
+      const pNumMap = {};
+      partnerships.forEach((p, idx) => {
+        const n = p.number || (idx + 1);
+        (p.memberIds || []).forEach((id, mIdx) => { pNumMap[id] = { n, mIdx }; });
+      });
+
+      const dailySeries = [];
+      let groupListenRecorded = 0, groupListenPresent = 0;
+      let groupRecitRecorded = 0, groupRecitPresent = 0;
+
+      scope.dates.forEach(d => {
+        const dayObj = db.attendance[d] || {};
+        const lMap = dayObj.listening || {};
+        const rMap = dayObj.recitation || {};
+        let lRec = 0, lPres = 0, rRec = 0, rPres = 0;
+        members.forEach(m => {
+          if (!m.recitationOnly && lMap[m.id]) {
+            lRec++;
+            if (lMap[m.id] === 'present') lPres++;
+          }
+          if (rMap[m.id]) {
+            rRec++;
+            if (rMap[m.id] === 'present') rPres++;
+          }
+        });
+        groupListenRecorded += lRec;
+        groupListenPresent += lPres;
+        groupRecitRecorded += rRec;
+        groupRecitPresent += rPres;
+        dailySeries.push({
+          date: d,
+          lRec, lPres,
+          lPct: lRec > 0 ? Math.round((lPres / lRec) * 100) : null,
+          rRec, rPres,
+          rPct: rRec > 0 ? Math.round((rPres / rRec) * 100) : null
+        });
+      });
+
+      const memberStats = members.map((m, idx) => {
+        let lPresent = 0, lExcused = 0, lAbsent = 0;
+        let rPresent = 0, rExcused = 0, rAbsent = 0;
+        let curStreak = 0, bestStreak = 0;
+        const history = [];
+
+        scope.dates.forEach(d => {
+          const dayObj = db.attendance[d] || {};
+          const lSt = !m.recitationOnly ? (dayObj.listening?.[m.id] || '') : '';
+          const rSt = dayObj.recitation?.[m.id] || '';
+          if (!m.recitationOnly) {
+            if (lSt === 'present') lPresent++;
+            else if (lSt === 'excused') lExcused++;
+            else if (lSt === 'absent') lAbsent++;
+          }
+          if (rSt === 'present') rPresent++;
+          else if (rSt === 'excused') rExcused++;
+          else if (rSt === 'absent') rAbsent++;
+
+          const dayHasAny = Boolean(lSt || rSt);
+          if (dayHasAny) {
+            history.push({ date: d, listening: m.recitationOnly ? 'recitationOnly' : lSt, recitation: rSt });
+            const lOk = m.recitationOnly || !lSt || lSt === 'present';
+            const rOk = !rSt || rSt === 'present';
+            const atLeastOnePresent = lSt === 'present' || rSt === 'present';
+            if (lOk && rOk && atLeastOnePresent) {
+              curStreak++;
+              if (curStreak > bestStreak) bestStreak = curStreak;
+            } else {
+              curStreak = 0;
+            }
+          }
+        });
+
+        const lRecorded = lPresent + lExcused + lAbsent;
+        const rRecorded = rPresent + rExcused + rAbsent;
+        const lRate = (!m.recitationOnly && lRecorded > 0) ? Math.round((lPresent / lRecorded) * 100) : null;
+        const rRate = rRecorded > 0 ? Math.round((rPresent / rRecorded) * 100) : null;
+        const totalPresent = (m.recitationOnly ? 0 : lPresent) + rPresent;
+        const totalExcused = (m.recitationOnly ? 0 : lExcused) + rExcused;
+        const totalAbsent = (m.recitationOnly ? 0 : lAbsent) + rAbsent;
+        const totalSessions = totalPresent + totalExcused + totalAbsent;
+        const overallRate = totalSessions > 0 ? Math.round((totalPresent / totalSessions) * 100) : null;
+        const pInfo = pNumMap[m.id];
+
+        return {
+          member: m,
+          rosterOrder: pInfo ? (pInfo.n * 100 + pInfo.mIdx) : (999999 + idx),
+          partnerNum: pInfo ? pInfo.n : null,
+          lPresent, lExcused, lAbsent, lRecorded, lRate,
+          rPresent, rExcused, rAbsent, rRecorded, rRate,
+          totalPresent, totalExcused, totalAbsent, totalSessions, overallRate,
+          bestStreak,
+          curAbsL: m.recitationOnly ? 0 : getAbsenceCount(m.id, 'listening', scope.endDate),
+          curAbsR: getAbsenceCount(m.id, 'recitation', scope.endDate),
+          history: history.reverse()
+        };
+      });
+
+      const activeStats = memberStats.filter(s => s.overallRate !== null);
+      const avgOverall = activeStats.length ? Math.round(activeStats.reduce((sum, s) => sum + s.overallRate, 0) / activeStats.length) : null;
+      const avgListen = groupListenRecorded > 0 ? Math.round((groupListenPresent / groupListenRecorded) * 100) : null;
+      const avgRecit = groupRecitRecorded > 0 ? Math.round((groupRecitPresent / groupRecitRecorded) * 100) : null;
+
+      return {
+        scope,
+        memberStats,
+        dailySeries,
+        activeCount: activeStats.length,
+        totalMembers: members.length,
+        avgOverall,
+        avgListen,
+        avgRecit
+      };
+    }
+
+    function setDashboardPeriod(mode) {
+      dashPeriodMode = mode;
+      ['all', 'month', 'custom'].forEach(m => {
+        const btn = document.getElementById('dash-period-btn-' + m);
+        if (btn) btn.classList.toggle('active', m === mode);
+      });
+      const monthBox = document.getElementById('dash-month-controls');
+      const customBox = document.getElementById('dash-custom-controls');
+      if (monthBox) monthBox.classList.toggle('hidden', mode !== 'month');
+      if (customBox) customBox.classList.toggle('hidden', mode !== 'custom');
+
+      if (mode === 'month') {
+        const allDates = getGroupAttendanceDates();
+        const curYM = getTodayStr().slice(0, 7);
+        if (allDates.length && !allDates.some(d => d.startsWith(dashMonthValue))) {
+          dashMonthValue = allDates.some(d => d.startsWith(curYM)) ? curYM : allDates[allDates.length - 1].slice(0, 7);
+        }
+        const monthInp = document.getElementById('dash-month-input');
+        if (monthInp) monthInp.value = dashMonthValue;
+      } else if (mode === 'custom') {
+        const allDates = getGroupAttendanceDates();
+        const startEl = document.getElementById('dash-start-input');
+        const endEl = document.getElementById('dash-end-input');
+        if (startEl && !startEl.value) startEl.value = allDates.length ? allDates[0] : getTodayStr().slice(0, 7) + '-01';
+        if (endEl && !endEl.value) endEl.value = allDates.length ? allDates[allDates.length - 1] : getTodayStr();
+      }
+      renderDashboard();
+    }
+
+    function shiftDashboardMonth(delta) {
+      const inp = document.getElementById('dash-month-input');
+      const cur = (inp && inp.value) || dashMonthValue || getTodayStr().slice(0, 7);
+      const [y, m] = cur.split('-').map(Number);
+      const d = new Date(y, (m - 1) + delta, 1);
+      dashMonthValue = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (inp) inp.value = dashMonthValue;
+      renderDashboard();
+    }
+
+    function onDashboardMonthChange() {
+      const inp = document.getElementById('dash-month-input');
+      if (inp && inp.value) dashMonthValue = inp.value;
+      renderDashboard();
+    }
+
+    function setDashTierFilter(tier) {
+      dashTierFilter = tier;
+      renderDashboardTableOnly();
+    }
+
+    function getDashTierClass(rate) {
+      if (rate === null) return '';
+      if (rate >= 90) return 'dash-tier-high';
+      if (rate >= 70) return 'dash-tier-mid';
+      return 'dash-tier-low';
+    }
+
+    function getDashTierColor(rate) {
+      if (rate === null) return '#9ca3af';
+      if (rate >= 90) return '#059669';
+      if (rate >= 70) return '#d97706';
+      return '#dc2626';
+    }
+
+    function getDashTierLabel(rate) {
+      if (rate === null) return 'بدون تسجيل';
+      if (rate >= 90) return 'ملتزمة جداً';
+      if (rate >= 70) return 'جيد';
+      return 'تحتاج متابعة';
+    }
+
+    function renderDashboard() {
+      const panel = document.getElementById('tab-dashboard');
+      if (!panel) return;
+      const data = computeDashboardStats();
+      dashLastData = data;
+      const { scope, memberStats, dailySeries, avgOverall, avgListen, avgRecit, totalMembers } = data;
+
+      const subEl = document.getElementById('dash-period-subtitle');
+      if (subEl) subEl.textContent = `${scope.label} · ${toEnglishDigits(scope.dates.length)} يوم مسجَّل`;
+
+      const kpiEl = document.getElementById('dash-kpi-grid');
+      if (kpiEl) {
+        const highCount = memberStats.filter(s => s.overallRate !== null && s.overallRate >= 90).length;
+        const lowCount = memberStats.filter(s => s.overallRate !== null && s.overallRate < 70).length;
+        kpiEl.innerHTML = `
+          <div class="dash-kpi-card">
+            <div class="dash-kpi-label">متوسط الالتزام العام</div>
+            <div class="dash-kpi-val ${getDashTierClass(avgOverall)}">${avgOverall !== null ? toEnglishDigits(avgOverall) + '%' : '—'}</div>
+            <div class="dash-kpi-sub">${toEnglishDigits(highCount)} عضوة ≥ 90% · ${toEnglishDigits(lowCount)} تحتاج متابعة</div>
+          </div>
+          <div class="dash-kpi-card">
+            <div class="dash-kpi-label">التزام الاستماع</div>
+            <div class="dash-kpi-val" style="color:var(--primary);">${avgListen !== null ? toEnglishDigits(avgListen) + '%' : '—'}</div>
+            <div class="dash-kpi-sub">${toEnglishDigits(scope.dates.filter((_, idx) => dailySeries[idx].lRec > 0).length)} يوم مسجل للاستماع</div>
+          </div>
+          <div class="dash-kpi-card">
+            <div class="dash-kpi-label">التزام التسميع</div>
+            <div class="dash-kpi-val" style="color:#b45309;">${avgRecit !== null ? toEnglishDigits(avgRecit) + '%' : '—'}</div>
+            <div class="dash-kpi-sub">${toEnglishDigits(scope.dates.filter((_, idx) => dailySeries[idx].rRec > 0).length)} يوم مسجل للتسميع</div>
+          </div>
+          <div class="dash-kpi-card">
+            <div class="dash-kpi-label">أيام المتابعة / الأعضاء</div>
+            <div class="dash-kpi-val">${toEnglishDigits(scope.dates.length)} <span style="font-size:13px; color:var(--muted); font-weight:700;">يوم</span></div>
+            <div class="dash-kpi-sub">إجمالي الأعضاء: ${toEnglishDigits(totalMembers)} عضوة</div>
+          </div>
+        `;
+      }
+
+      const chartBody = document.getElementById('dash-chart-body');
+      if (chartBody) {
+        if (!dailySeries.length) {
+          chartBody.innerHTML = `<div class="empty-state" style="padding:20px 10px;">لا توجد بيانات حضور مسجلة في هذه الفترة لعرض الرسم البياني.</div>`;
+        } else {
+          const shown = dailySeries.slice(-31);
+          chartBody.innerHTML = `
+            <div class="dash-chart-scroll">
+              <div style="display:flex; align-items:flex-end; gap:10px; min-width:${Math.max(320, shown.length * 38)}px; height:158px; padding:18px 8px 4px; border-bottom:1px solid var(--border); position:relative; background:linear-gradient(to top, rgba(6,95,70,0.03) 0%, transparent 100%);">
+                ${shown.map(pt => {
+                  const lH = pt.lPct !== null ? Math.max(4, Math.round((pt.lPct / 100) * 108)) : 0;
+                  const rH = pt.rPct !== null ? Math.max(4, Math.round((pt.rPct / 100) * 108)) : 0;
+                  const shortD = toEnglishDigits(pt.date.slice(5).replace('-', '/'));
+                  const titleTxt = `${toEnglishDigits(pt.date)} — الاستماع: ${pt.lPct !== null ? pt.lPct + '%' : '—'} | التسميع: ${pt.rPct !== null ? pt.rPct + '%' : '—'}`;
+                  return `
+                    <div title="${escapeHtml(titleTxt)}" style="flex:1 0 28px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%;">
+                      <div style="display:flex; align-items:flex-end; gap:3px; height:110px;">
+                        <div style="width:10px; border-radius:4px 4px 0 0; background:${pt.lPct !== null ? '#059669' : '#e5e7eb'}; height:${pt.lPct !== null ? lH : 4}px; transition:height 0.3s;"></div>
+                        <div style="width:10px; border-radius:4px 4px 0 0; background:${pt.rPct !== null ? '#d97706' : '#e5e7eb'}; height:${pt.rPct !== null ? rH : 4}px; transition:height 0.3s;"></div>
+                      </div>
+                      <span style="font-size:10.5px; color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap;">${shortD}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      const splitEl = document.getElementById('dash-split-grid');
+      if (splitEl) {
+        const withData = memberStats.filter(s => s.overallRate !== null);
+        const topCommitted = [...withData]
+          .sort((a, b) => (b.overallRate - a.overallRate) || (b.totalPresent - a.totalPresent) || compareArabic(a.member.name, b.member.name))
+          .slice(0, 5);
+        const needFollowUp = [...withData]
+          .filter(s => s.overallRate < 85 || s.totalAbsent > 0)
+          .sort((a, b) => (a.overallRate - b.overallRate) || (b.totalAbsent - a.totalAbsent) || compareArabic(a.member.name, b.member.name))
+          .slice(0, 5);
+
+        splitEl.innerHTML = `
+          <div class="dash-split-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h4 style="font-size:14.5px; font-weight:800; color:var(--primary);">🌟 الأكثر التزاماً</h4>
+              <span style="font-size:11.5px; color:var(--muted); font-weight:600;">أعلى نسبة حضور</span>
+            </div>
+            ${!topCommitted.length ? `<div class="empty-state" style="padding:18px 8px;">لا توجد تسجيلات كافية بعد</div>` : topCommitted.map((s, idx) => `
+              <div class="dash-spotlight-row" onclick="openMemberDetailModal('${s.member.id}')">
+                <div style="min-width:0;">
+                  <div style="font-weight:800; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${toEnglishDigits(idx + 1)}. ${escapeHtml(s.member.name)}</div>
+                  <div style="font-size:11.5px; color:var(--muted); font-weight:600; font-variant-numeric:tabular-nums;">حضر ${toEnglishDigits(s.totalPresent)} من ${toEnglishDigits(s.totalSessions)} · أطول سلسلة: ${toEnglishDigits(s.bestStreak)} يوم</div>
+                </div>
+                <div style="text-align:left; flex-shrink:0;">
+                  <div class="${getDashTierClass(s.overallRate)}" style="font-size:14.5px; font-variant-numeric:tabular-nums;">${toEnglishDigits(s.overallRate)}%</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="dash-split-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h4 style="font-size:14.5px; font-weight:800; color:var(--danger);">📌 تحتاج متابعة وتشجيع</h4>
+              <span style="font-size:11.5px; color:var(--muted); font-weight:600;">أكثر غياباً أو أقل نسبة</span>
+            </div>
+            ${!needFollowUp.length ? `<div class="empty-state" style="padding:18px 8px;">✨ ما شاء الله، جميع الأعضاء ملتزمون في هذه الفترة!</div>` : needFollowUp.map((s) => `
+              <div class="dash-spotlight-row" onclick="openMemberDetailModal('${s.member.id}')">
+                <div style="min-width:0;">
+                  <div style="font-weight:800; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(s.member.name)}</div>
+                  <div style="font-size:11.5px; color:var(--muted); font-weight:600; font-variant-numeric:tabular-nums;">غياب: ${toEnglishDigits(s.totalAbsent)} · بعذر: ${toEnglishDigits(s.totalExcused)} · متتابع الآن: ${toEnglishDigits(Math.max(s.curAbsL, s.curAbsR))}</div>
+                </div>
+                <div style="text-align:left; flex-shrink:0;">
+                  <div class="${getDashTierClass(s.overallRate)}" style="font-size:14.5px; font-variant-numeric:tabular-nums;">${toEnglishDigits(s.overallRate)}%</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      renderDashboardTableOnly();
+    }
+
+    function renderDashboardTableOnly() {
+      updateSearchClearBtn('dash-search');
+      const data = dashLastData || computeDashboardStats();
+      const { memberStats } = data;
+      const searchEl = document.getElementById('dash-search');
+      const sortEl = document.getElementById('dash-sort-select');
+      const filtersEl = document.getElementById('dash-tier-filters');
+      const containerEl = document.getElementById('dash-table-container');
+      const countEl = document.getElementById('dash-table-count');
+      if (!containerEl) return;
+
+      const q = searchEl ? searchEl.value.trim() : '';
+      const sortBy = sortEl ? sortEl.value : 'rate_desc';
+
+      const highC = memberStats.filter(s => s.overallRate !== null && s.overallRate >= 90).length;
+      const midC = memberStats.filter(s => s.overallRate !== null && s.overallRate >= 70 && s.overallRate < 90).length;
+      const lowC = memberStats.filter(s => s.overallRate !== null && s.overallRate < 70).length;
+
+      if (filtersEl) {
+        const tierChips = [
+          { key: 'all', label: `الكل (${toEnglishDigits(memberStats.length)})`, cls: 'active' },
+          { key: 'high', label: `ملتزمة ≥90% (${toEnglishDigits(highC)})`, cls: 'active-present' },
+          { key: 'mid', label: `متوسط 70-89% (${toEnglishDigits(midC)})`, cls: 'active-unmarked' },
+          { key: 'low', label: `تحتاج متابعة <70% (${toEnglishDigits(lowC)})`, cls: 'active-absent' }
+        ];
+        filtersEl.innerHTML = tierChips.map(c => `<button type="button" class="filter-chip ${dashTierFilter === c.key ? c.cls : ''}" onclick="setDashTierFilter('${c.key}')">${c.label}</button>`).join('');
+      }
+
+      let filtered = memberStats.filter(s => arabicIncludes(s.member.name, q));
+      if (dashTierFilter === 'high') filtered = filtered.filter(s => s.overallRate !== null && s.overallRate >= 90);
+      else if (dashTierFilter === 'mid') filtered = filtered.filter(s => s.overallRate !== null && s.overallRate >= 70 && s.overallRate < 90);
+      else if (dashTierFilter === 'low') filtered = filtered.filter(s => s.overallRate !== null && s.overallRate < 70);
+
+      filtered.sort((a, b) => {
+        if (sortBy === 'rate_desc') {
+          if (a.overallRate === null && b.overallRate !== null) return 1;
+          if (a.overallRate !== null && b.overallRate === null) return -1;
+          return ((b.overallRate ?? -1) - (a.overallRate ?? -1)) || (b.totalPresent - a.totalPresent) || compareArabic(a.member.name, b.member.name);
+        }
+        if (sortBy === 'rate_asc') {
+          if (a.overallRate === null && b.overallRate !== null) return 1;
+          if (a.overallRate !== null && b.overallRate === null) return -1;
+          return ((a.overallRate ?? 999) - (b.overallRate ?? 999)) || (b.totalAbsent - a.totalAbsent) || compareArabic(a.member.name, b.member.name);
+        }
+        if (sortBy === 'absent_desc') {
+          return (b.totalAbsent - a.totalAbsent) || ((a.overallRate ?? 999) - (b.overallRate ?? 999)) || compareArabic(a.member.name, b.member.name);
+        }
+        if (sortBy === 'roster') {
+          return (a.rosterOrder - b.rosterOrder) || compareArabic(a.member.name, b.member.name);
+        }
+        return compareArabic(a.member.name, b.member.name);
+      });
+
+      if (countEl) countEl.textContent = toEnglishDigits(filtered.length);
+
+      if (!memberStats.length) {
+        containerEl.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`;
+        return;
+      }
+      if (!filtered.length) {
+        containerEl.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة للبحث أو التصفية الحالية.</div>`;
+        return;
+      }
+
+      containerEl.innerHTML = `
+        <div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الاسم</th>
+                <th>نسبة الالتزام</th>
+                <th>الاستماع</th>
+                <th>التسميع</th>
+                <th>الحضور / الغياب / بعذر</th>
+                <th>التقييم</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map((s, idx) => {
+                const rateStr = s.overallRate !== null ? toEnglishDigits(s.overallRate) + '%' : '—';
+                const fillW = s.overallRate !== null ? s.overallRate : 0;
+                const listenStr = s.member.recitationOnly ? 'تسميع فقط' : (s.lRate !== null ? `${toEnglishDigits(s.lRate)}% (${toEnglishDigits(s.lPresent)}/${toEnglishDigits(s.lRecorded)})` : '—');
+                const recitStr = s.rRate !== null ? `${toEnglishDigits(s.rRate)}% (${toEnglishDigits(s.rPresent)}/${toEnglishDigits(s.rRecorded)})` : '—';
+                return `
+                  <tr onclick="openMemberDetailModal('${s.member.id}')">
+                    <td style="color:var(--muted); font-weight:700;">${toEnglishDigits(idx + 1)}</td>
+                    <td>
+                      <div style="font-weight:800; color:var(--text);">${escapeHtml(s.member.name)}</div>
+                      ${s.partnerNum ? `<div style="font-size:11px; color:var(--muted);">كشف #${toEnglishDigits(s.partnerNum)}</div>` : ''}
+                    </td>
+                    <td style="min-width:110px;">
+                      <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:4px;">
+                        <span class="${getDashTierClass(s.overallRate)}" style="font-size:14px;">${rateStr}</span>
+                      </div>
+                      <div class="dash-progress-track"><div class="dash-progress-fill" style="width:${fillW}%; background:${getDashTierColor(s.overallRate)};"></div></div>
+                    </td>
+                    <td style="font-size:12.5px; font-weight:700; color:${s.member.recitationOnly ? 'var(--muted)' : 'var(--primary)'};">${listenStr}</td>
+                    <td style="font-size:12.5px; font-weight:700; color:#b45309;">${recitStr}</td>
+                    <td style="font-size:12.5px; font-weight:700; white-space:nowrap;">
+                      <span style="color:#059669;">${toEnglishDigits(s.totalPresent)}</span> ·
+                      <span style="color:#dc2626;">${toEnglishDigits(s.totalAbsent)}</span> ·
+                      <span style="color:#d97706;">${toEnglishDigits(s.totalExcused)}</span>
+                    </td>
+                    <td class="${getDashTierClass(s.overallRate)}" style="font-size:12.5px; white-space:nowrap;">${getDashTierLabel(s.overallRate)}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function openMemberDetailModal(memberId) {
+      const data = dashLastData || computeDashboardStats();
+      const s = data.memberStats.find(x => x.member.id === memberId);
+      if (!s) return;
+      document.getElementById('member-detail-title').textContent = s.member.name;
+      document.getElementById('member-detail-sub').textContent = `${data.scope.label}${s.partnerNum ? ' · كشف #' + toEnglishDigits(s.partnerNum) : ''}${s.member.recitationOnly ? ' · تسميع فقط' : ''}`;
+
+      document.getElementById('member-detail-stats').innerHTML = `
+        <div class="stat-box">
+          <div class="stat-num">${s.overallRate !== null ? toEnglishDigits(s.overallRate) + '%' : '—'}</div>
+          <div class="stat-label">نسبة الالتزام</div>
+        </div>
+        <div class="stat-box amber">
+          <div class="stat-num">${toEnglishDigits(s.totalPresent)} / ${toEnglishDigits(s.totalSessions)}</div>
+          <div class="stat-label">جلسات الحضور</div>
+        </div>
+        <div class="stat-box gray">
+          <div class="stat-num">${toEnglishDigits(s.totalAbsent)}</div>
+          <div class="stat-label">إجمالي الغياب (أطول سلسلة: ${toEnglishDigits(s.bestStreak)})</div>
+        </div>
+      `;
+
+      const statusBadge = (st) => {
+        if (st === 'recitationOnly') return '<span style="color:var(--muted);">تسميع فقط</span>';
+        if (st === 'present') return '<span style="color:#059669; font-weight:800;">✅ حاضر</span>';
+        if (st === 'excused') return '<span style="color:#d97706; font-weight:800;">⏳ بعذر</span>';
+        if (st === 'absent') return '<span style="color:#dc2626; font-weight:800;">❌ غائب</span>';
+        return '<span style="color:var(--muted);">—</span>';
+      };
+
+      const histEl = document.getElementById('member-detail-history');
+      if (!s.history.length) {
+        histEl.innerHTML = `<div class="empty-state" style="padding:18px 8px;">لا توجد أيام مسجلة لهذه العضوة خلال هذه الفترة.</div>`;
+      } else {
+        histEl.innerHTML = `
+          <div class="dash-history-row" style="font-weight:800; color:var(--primary); border-bottom:1.5px solid var(--border);">
+            <div>التاريخ</div>
+            <div>الاستماع</div>
+            <div>التسميع</div>
+          </div>
+          ${s.history.map(h => `
+            <div class="dash-history-row">
+              <div style="font-weight:700; color:var(--text);">${toEnglishDigits(h.date)}</div>
+              <div>${statusBadge(h.listening)}</div>
+              <div>${statusBadge(h.recitation)}</div>
+            </div>
+          `).join('')}
+        `;
+      }
+      document.getElementById('member-detail-modal').classList.add('open');
+    }
+
+    function closeMemberDetailModal() {
+      document.getElementById('member-detail-modal').classList.remove('open');
+    }
+
+    function copyDashboardSummary() {
+      const data = dashLastData || computeDashboardStats();
+      const group = getCurrentGroup();
+      const active = data.memberStats.filter(s => s.overallRate !== null)
+        .sort((a, b) => (b.overallRate - a.overallRate) || compareArabic(a.member.name, b.member.name));
+      if (!active.length) return showToast('لا توجد بيانات التزام مسجلة في هذه الفترة للنسخ');
+      const header = `📊 تقرير التزام ${toEnglishDigits(group ? group.name : '')}\n📅 ${data.scope.label}\n✨ متوسط الالتزام العام: ${data.avgOverall !== null ? toEnglishDigits(data.avgOverall) + '%' : '—'}`;
+      const lines = active.map((s, i) => `${toEnglishDigits(i + 1)}. ${s.member.name} — ${toEnglishDigits(s.overallRate)}% (حضر ${toEnglishDigits(s.totalPresent)}/${toEnglishDigits(s.totalSessions)}، غياب ${toEnglishDigits(s.totalAbsent)})`);
+      copyTextSilently(`${header}\n\n${lines.join('\n')}`, '✅ تم نسخ ملخص الالتزام بنجاح!');
+    }
 
     function fallbackCopySync(text) {
       const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
@@ -3893,7 +4708,7 @@
         const val = toArabicDigits(inp.value.trim());
         r[editingColKey] = val;
         if (editingColKey === 'dayName') {
-          const wdIdx = ARABIC_WEEKDAYS.indexOf(val);
+          const wdIdx = findArabicWeekdayIndex(val);
           if (wdIdx > -1) r.weekdayNum = wdIdx;
         }
       });
@@ -3972,7 +4787,7 @@
       const val = toArabicDigits(document.getElementById('sched-cell-input').value.trim());
       r[colKey] = val;
       if (colKey === 'dayName') {
-        const wdIdx = ARABIC_WEEKDAYS.indexOf(val);
+        const wdIdx = findArabicWeekdayIndex(val);
         if (wdIdx > -1) r.weekdayNum = wdIdx;
       }
       const isRepeatable = ['listenText', 'hifzText', 'extraText', 'reviewText', 'freeText'].includes(colKey);
@@ -4105,11 +4920,11 @@
         r1[first.colKey] = toArabicDigits(r2[colKey] || '');
         r2[colKey] = toArabicDigits(tmp);
         if (first.colKey === 'dayName') {
-          const wd1 = ARABIC_WEEKDAYS.indexOf(r1.dayName);
+          const wd1 = findArabicWeekdayIndex(r1.dayName);
           if (wd1 > -1) r1.weekdayNum = wd1;
         }
         if (colKey === 'dayName') {
-          const wd2 = ARABIC_WEEKDAYS.indexOf(r2.dayName);
+          const wd2 = findArabicWeekdayIndex(r2.dayName);
           if (wd2 > -1) r2.weekdayNum = wd2;
         }
         schedSwapState.singleFirst = null;
@@ -4211,11 +5026,11 @@
         rows[a.rowIdx][a.colKey] = toArabicDigits(rows[b.rowIdx][b.colKey] || '');
         rows[b.rowIdx][b.colKey] = toArabicDigits(tmp);
         if (a.colKey === 'dayName') {
-          const wd = ARABIC_WEEKDAYS.indexOf(rows[a.rowIdx].dayName);
+          const wd = findArabicWeekdayIndex(rows[a.rowIdx].dayName);
           if (wd > -1) rows[a.rowIdx].weekdayNum = wd;
         }
         if (b.colKey === 'dayName') {
-          const wd = ARABIC_WEEKDAYS.indexOf(rows[b.rowIdx].dayName);
+          const wd = findArabicWeekdayIndex(rows[b.rowIdx].dayName);
           if (wd > -1) rows[b.rowIdx].weekdayNum = wd;
         }
       }
@@ -4766,7 +5581,7 @@
         if (mIdx >= 0 && mIdx < 12) fallbackMonthName = HIJRI_MONTHS_AR[mIdx];
       }
       const parsedTitle = String(parsed.title || '');
-      const titleFoundMonth = HIJRI_MONTHS_AR.find(m => parsedTitle.includes(m));
+      const titleFoundMonth = HIJRI_MONTHS_AR.find(m => arabicIncludes(parsedTitle, m));
       if (titleFoundMonth) fallbackMonthName = titleFoundMonth;
       const prevColVals = { listenText: '', hifzText: '', extraText: '', reviewText: '', freeText: '' };
       const dittoOnlyRe = /^(?:\/\/+|\\\\+|""+|''+|"|،،+|〃|=|—|–|-)\s*$/;
