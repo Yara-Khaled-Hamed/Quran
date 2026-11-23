@@ -458,7 +458,7 @@
               <strong style="font-size:14px; color:var(--primary);">📝 تسجيل مجموعة أسماء في الاستماع دفعة واحدة</strong>
               <button class="btn btn-outline btn-xs" onclick="toggleListeningBatch(false)">إغلاق</button>
             </div>
-            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي الأسماء (كل اسم في سطر، أو بينهم فاصلة <code>،</code>). إذا كُتبت كلمة <code>عذر</code> أو <code>بعذر</code> بجانب الاسم يُسجل <strong>غياب بعذر</strong> عند تسجيل الغياب.</p>
+            <p style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">اكتبي أو الصقي الأسماء (كل اسم في سطر، أو بينهم فاصلة <code>،</code>). إذا كُتبت كلمة <code>عذر</code> أو <code>بعذر</code> بجانب الاسم يُسجل <strong>غياب بعذر</strong> تلقائياً.</p>
             <textarea id="listening-batch-input" dir="rtl" class="input" rows="4" style="padding:10px 12px; font-size:14px;" placeholder="مثال:&#10;سلسبيل محمد&#10;مريم كرم عذر، أسماء أبو حسين&#10;🥀 سحر الأفندي (بعذر)" oninput="previewListeningBatch()"></textarea>
             <div id="listening-batch-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:9px; cursor:pointer;">
@@ -468,7 +468,8 @@
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
               <button class="btn btn-primary btn-block" onclick="applyListeningBatch('present')">✅ تسجيل المحددين حاضر مرة واحدة</button>
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:170px;" onclick="applyListeningBatch('absent')">❌ تسجيل المحددين غياب</button>
+                <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:130px;" onclick="applyListeningBatch('absent')">❌ تسجيل المحددين غياب</button>
+                <button class="btn btn-gold btn-sm" style="flex:1; min-width:130px;" onclick="applyListeningBatch('excused')">⏳ تسجيل المحددين بعذر</button>
                 <button class="btn btn-outline btn-sm" onclick="clearListeningBatch()">مسح</button>
               </div>
             </div>
@@ -496,7 +497,7 @@
 
           <div id="recitation-unified-box" class="quick-num-box">
             <div style="font-weight:800; font-size:14px; color:var(--primary); margin-bottom:4px;">⚡ تسجيل سريع (بالأرقام والأسماء معاً)</div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>). كتابة <code>عذر</code> بجانب الاسم أو الرقم تسجله <strong>بعذر</strong> عند الغياب.</p>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">اكتبي أرقام الرفقاء (مثل: <code>1 3 5</code>) أو الأسماء (كل اسم في سطر أو بفاصلة <code>،</code>). كتابة <code>عذر</code> أو <code>بعذر</code> بجانب الاسم أو الرقم تسجله <strong>بعذر</strong> تلقائياً.</p>
             <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 12px; font-size:14px;" placeholder="مثال: 1 3 5&#10;ندى إمام عذر، مريم كرم&#10;أو: 2، أسماء محمد، 7" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer;">
@@ -504,8 +505,9 @@
               <span>تسجيل باقي غير المسجلين بالعكس تلقائياً (مثلاً: الباقي حضور عند تسجيل الغياب)</span>
             </label>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-              <button class="btn btn-primary btn-sm" style="flex:1; min-width:140px;" onclick="applyRecitationUnified('present')">✅ تسجيل المحددين حضور (سمّع)</button>
-              <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:140px;" onclick="applyRecitationUnified('absent')">❌ تسجيل المحددين غياب</button>
+              <button class="btn btn-primary btn-sm" style="flex:1; min-width:120px;" onclick="applyRecitationUnified('present')">✅ تسجيل حضور (سمّع)</button>
+              <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:120px;" onclick="applyRecitationUnified('absent')">❌ تسجيل غياب</button>
+              <button class="btn btn-gold btn-sm" style="flex:1; min-width:110px;" onclick="applyRecitationUnified('excused')">⏳ تسجيل بعذر</button>
             </div>
           </div>
 
@@ -1824,12 +1826,12 @@
       previewListeningBatch();
     }
     function extractExcuseMarker(rawSegment) {
-      let s = String(rawSegment || '');
+      let s = String(rawSegment || '')
+        .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFE0E\uFE0F]/g, '');
       let excused = false;
-      const checkWords = ['بعذر', 'بالعذر', 'عذر شرعي', 'عذر', 'معذورة', 'معذوره', 'معذور', 'اعذار'];
+      const excuseSet = new Set(['عذر', 'بعذر', 'بالعذر', 'العذر', 'عذرا', 'لعذر', 'للعذر', 'اعذار', 'وعذر', 'وبعذر', 'معذوره', 'معذور', 'معتذره', 'معتذر', 'اعتذار', 'باذن', 'اذن']);
       const cleaned = s
-        .replace(/[🌹🍃👑🌻🥀🔴⚠️•▪▫●○♦️🔹🔸✅❌⏳🎧📖#()\[\]{}]/g, ' ')
-        .replace(/[-–—ـ:]+/g, ' ')
+        .replace(/[^\u0621-\u064A\u0671-\u06D3\u064B-\u065F\u06700-9\s]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
       if (!cleaned) return { text: '', excused: false };
@@ -1838,12 +1840,12 @@
       for (let i = 0; i < words.length; i++) {
         const nw = normalizeArabicText(words[i]);
         const nextNw = i + 1 < words.length ? normalizeArabicText(words[i + 1]) : '';
-        if (nw === 'عذر' && nextNw === 'شرعي') {
+        if ((nw === 'عذر' || nw === 'بعذر') && (nextNw === 'شرعي' || nextNw === 'مقبول')) {
           excused = true;
           i++;
           continue;
         }
-        if (checkWords.some(w => normalizeArabicText(w) === nw)) {
+        if (excuseSet.has(nw)) {
           excused = true;
           continue;
         }
@@ -1945,19 +1947,20 @@
       box.innerHTML = html; box.classList.remove('hidden');
     }
     function applyListeningBatch(status) {
+      previewListeningBatch();
       if (!listeningBatchMatchedIds.length) return showToast('اكتبي أو الصقي أسماء صحيحة من قائمة الاستماع أولاً');
       const autoPresent = Boolean(document.getElementById('listening-batch-auto-present')?.checked);
       const members = getListeningMembers(), matchedSet = new Set(listeningBatchMatchedIds);
       const day = ensureDayRecord(), patch = {};
       let directCount = 0, excusedCount = 0;
       matchedSet.forEach(id => {
-        const finalStatus = (status === 'absent' && listeningBatchExcusedIds.has(id)) ? 'excused' : status;
+        const finalStatus = (status === 'excused' || listeningBatchExcusedIds.has(id)) ? 'excused' : status;
         day.listening[id] = finalStatus;
         patch[id] = finalStatus;
         if (finalStatus === 'excused') excusedCount++;
         else directCount++;
       });
-      let restCount = 0; const oppositeStatus = status === 'absent' ? 'present' : 'absent';
+      let restCount = 0; const oppositeStatus = status === 'present' ? 'absent' : 'present';
       if (autoPresent) {
         members.forEach(m => {
           if (!matchedSet.has(m.id) && !day.listening[m.id]) { day.listening[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++; }
@@ -1965,7 +1968,8 @@
       }
       cloudPatchAttendance(currentDate, 'listening', patch);
       clearListeningBatch(); renderAll();
-      const statusLabel = status === 'absent' ? 'غائب' : 'حاضر', restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
+      const statusLabel = status === 'absent' ? 'غائب' : (status === 'excused' ? 'بعذر' : 'حاضر');
+      const restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
       const parts = [];
       if (directCount > 0) parts.push(`${directCount} (${statusLabel})`);
       if (excusedCount > 0) parts.push(`${excusedCount} (بعذر)`);
@@ -2085,22 +2089,24 @@
     }
 
     function applyRecitationUnified(status) {
+      previewRecitationUnified();
       if (!recitationMatchedMemberIds.length) return showToast('اكتبي أرقام رفقاء أو أسماء صحيحة موجودة بالجروب أولاً');
       const autoRest = document.getElementById('recit-unified-auto-rest').checked, members = getGroupMembers();
       const matchedSet = new Set(recitationMatchedMemberIds), day = ensureDayRecord(), patch = {};
       let directCount = 0, excusedCount = 0;
       matchedSet.forEach(id => {
-        const finalStatus = (status === 'absent' && recitationExcusedIds.has(id)) ? 'excused' : status;
+        const finalStatus = (status === 'excused' || recitationExcusedIds.has(id)) ? 'excused' : status;
         day.recitation[id] = finalStatus;
         patch[id] = finalStatus;
         if (finalStatus === 'excused') excusedCount++;
         else directCount++;
       });
-      let restCount = 0; const oppositeStatus = status === 'absent' ? 'present' : 'absent';
+      let restCount = 0; const oppositeStatus = status === 'present' ? 'absent' : 'present';
       if (autoRest) members.forEach(m => { if (!matchedSet.has(m.id) && !day.recitation[m.id]) { day.recitation[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++; } });
       cloudPatchAttendance(currentDate, 'recitation', patch);
       document.getElementById('recitation-unified-input').value = ''; previewRecitationUnified(); renderAll();
-      const statusLabel = status === 'absent' ? 'غائب' : 'حاضر (سمّع)', restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
+      const statusLabel = status === 'absent' ? 'غائب' : (status === 'excused' ? 'بعذر' : 'حاضر (سمّع)');
+      const restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
       const parts = [];
       if (directCount > 0) parts.push(`${directCount} (${statusLabel})`);
       if (excusedCount > 0) parts.push(`${excusedCount} (بعذر)`);
