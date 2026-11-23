@@ -21,12 +21,12 @@
   <style>
     :root {
       --primary: #065f46; --primary-light: #059669; --primary-soft: #ecfdf5;
-      --accent: #d97706; --accent-soft: #fef3c7; --bg: #f6f8f7;
+      --accent: #d97706; --accent-soft: #fef3c7; --bg: #f3f7f5;
       --card: #ffffff; --text: #111827; --muted: #6b7280; --border: #e5e7eb;
       --danger: #dc2626; --danger-soft: #fef2f2;
-      --shadow: 0 2px 10px rgba(6, 95, 70, 0.045);
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-      --radius: 16px;
+      --shadow: 0 4px 18px rgba(6, 95, 70, 0.06);
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.04);
+      --radius: 18px;
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -37,7 +37,7 @@
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     .container { max-width: 940px; margin: 0 auto; padding: 14px; }
-    .card { background: var(--card); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 12px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.04); margin-bottom: 14px; }
     h1, h2, h3 { text-wrap: balance; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 42px; padding: 9px 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-size: 13.5px; white-space: nowrap; transition: transform 0.14s var(--ease), background-color 0.18s, opacity 0.18s; }
     .btn:active { transform: scale(0.97); }
@@ -54,12 +54,12 @@
     .btn-sm { min-height: 38px; padding: 7px 12px; font-size: 13px; border-radius: 10px; }
     .btn-xs { min-height: 32px; padding: 4px 10px; font-size: 12px; border-radius: 8px; }
     .btn-block { width: 100%; }
-    .input { width: 100%; padding: 10px 13px; border-radius: 12px; border: 1px solid var(--border); font-size: 15px; background: #fff; transition: border-color 0.18s, box-shadow 0.18s; }
+    .input { width: 100%; padding: 10px 13px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 15px; background: #fff; transition: border-color 0.18s, box-shadow 0.18s; }
     .input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
     .pw-wrap { position: relative; display: flex; align-items: center; }
     .pw-toggle { position: absolute; left: 10px; background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px; }
-    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--bg); }
-    .login-box { width: 100%; max-width: 440px; background: #fff; border-radius: 22px; padding: 26px 22px; border: 1px solid var(--border); box-shadow: 0 12px 32px rgba(6, 78, 59, 0.08); animation: fadeSlideUp 0.28s var(--ease); }
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(150deg, #ecfdf5 0%, #f3f7f5 55%, #fffbeb 100%); }
+    .login-box { width: 100%; max-width: 440px; background: #fff; border-radius: 24px; padding: 26px 22px; border: 1px solid rgba(6,95,70,0.08); box-shadow: 0 18px 45px rgba(6, 78, 59, 0.1); animation: fadeSlideUp 0.28s var(--ease); }
     .logo-badge { width: 64px; height: 64px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
     .quick-chips { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; max-height: 210px; overflow-y: auto; padding: 2px; -webkit-overflow-scrolling: touch; }
     .quick-group-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 12px; background: #f9fafb; border: 1px solid var(--border); }
@@ -67,28 +67,23 @@
     .chip { padding: 6px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.14s; }
     .chip:hover, .chip:active { background: var(--primary-soft); border-color: var(--primary-light); color: var(--primary); }
     .chip-head { background: var(--accent-soft); border-color: #fcd34d; color: #92400e; align-self: flex-start; padding: 6px 12px; font-size: 12.5px; }
-    .login-footer-links { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
-    .text-link-btn { background: transparent; border: none; color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px 8px; border-radius: 8px; transition: background-color 0.15s; }
-    .text-link-btn:hover { background: var(--primary-soft); }
-    .app-header { background: linear-gradient(135deg, #064e3b, #047857); color: #fff; padding: 12px 16px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 16px rgba(6,95,70,0.14); }
-    .header-top { max-width: 940px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .app-header { background: linear-gradient(135deg, #064e3b, #047857); color: #fff; padding: 13px 16px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; box-shadow: 0 6px 20px rgba(6,95,70,0.18); }
+    .header-top { max-width: 940px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .header-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .header-title { min-width: 0; }
     .header-title h1 { font-size: 17.5px; font-weight: 800; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .header-title p { font-size: 12.5px; opacity: 0.88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .header-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-    .header-btn { min-height: 38px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.22); padding: 6px 11px; border-radius: 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+    .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .header-btn { min-height: 36px; background: rgba(255,255,255,0.16); color: #fff; border: 1px solid rgba(255,255,255,0.22); padding: 6px 11px; border-radius: 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
     .header-btn:hover { background: rgba(255,255,255,0.24); }
     .header-btn:active { transform: scale(0.96); }
-    .header-menu-wrap { position: relative; }
-    .header-menu-pop { position: absolute; left: 0; top: calc(100% + 6px); min-width: 195px; background: #fff; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.14); padding: 6px; z-index: 600; animation: fadeSlideUp 0.14s var(--ease); }
-    .header-menu-item { width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px 11px; border: none; background: transparent; color: var(--text); font-size: 13.5px; font-weight: 700; border-radius: 9px; cursor: pointer; text-align: right; }
-    .header-menu-item:hover { background: #f3f4f6; }
-    .header-menu-item.danger { color: var(--danger); }
-    .header-menu-item.danger:hover { background: var(--danger-soft); }
-    .header-menu-divider { height: 1px; background: var(--border); margin: 4px 6px; }
-    .date-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-    .date-controls { display: flex; align-items: center; gap: 6px; }
+    .date-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .date-pill-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex: 1; min-width: 0; min-height: 38px; padding: 6px 12px; border-radius: 11px; background: #f3f8f6; border: 1px solid #d1e7dd; color: var(--primary); font-weight: 800; font-size: 14px; cursor: pointer; transition: background-color 0.15s; }
+    .date-pill-trigger:hover { background: #ecfdf5; }
+    .date-pill-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .date-native-overlay { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; border: none; font-size: 16px; }
+    .date-nav-btn { min-width: 38px; min-height: 38px; padding: 0 10px; border-radius: 11px; border: 1px solid var(--border); background: #fff; color: var(--text); font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .date-nav-btn:active { transform: scale(0.95); background: #f3f4f6; }
     .daily-progress-strip { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
     .daily-prog-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .daily-prog-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
@@ -98,18 +93,6 @@
     .stat-mini-bar { height: 5px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
     .stat-mini-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.35s var(--ease); border-radius: 99px; }
     .daily-prog-item.amber .stat-mini-fill { background: var(--accent); }
-    .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; background: #e5e7eb; padding: 4px; border-radius: 14px; margin-bottom: 12px; position: sticky; top: 6px; z-index: 50; }
-    .tab-btn { min-height: 40px; padding: 8px 6px; border: none; border-radius: 10px; background: transparent; font-weight: 800; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.18s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-    .tab-icon { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .tab-label { line-height: 1.2; }
-    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
-    .tab-panel { animation: fadeSlideUp 0.18s var(--ease); }
-    .date-pill-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex: 1; min-width: 0; min-height: 38px; padding: 6px 12px; border-radius: 11px; background: #f3f8f6; border: 1px solid #d1e7dd; color: var(--primary); font-weight: 800; font-size: 14px; cursor: pointer; transition: background-color 0.15s; }
-    .date-pill-trigger:hover { background: #ecfdf5; }
-    .date-pill-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .date-native-overlay { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; border: none; font-size: 16px; }
-    .date-nav-btn { min-width: 38px; min-height: 38px; padding: 0 10px; border-radius: 11px; border: 1px solid var(--border); background: #fff; color: var(--text); font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .date-nav-btn:active { transform: scale(0.95); background: #f3f4f6; }
     .stat-box { background: #f8faf9; border: 1px solid var(--border); border-radius: 13px; padding: 10px 8px; text-align: center; }
     .stat-box.amber { background: #fffbeb; border-color: #fde68a; }
     .stat-box.gray { background: #f9fafb; border-color: #e5e7eb; }
@@ -117,13 +100,10 @@
     .stat-box.amber .stat-num { color: #b45309; }
     .stat-box.gray .stat-num { color: var(--text); }
     .stat-label { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-top: 2px; line-height: 1.3; }
-    .batch-actions-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 9px; }
-    .dash-mobile-list { display: none; }
-    .dash-mobile-row { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background-color 0.14s; }
-    .dash-mobile-row:last-child { border-bottom: none; }
-    .dash-mobile-row:active { background: #f8faf9; }
-    .manage-member-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid #f1f5f9; }
-    .manage-member-row:last-child { border-bottom: none; }
+    .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; background: #e5e7eb; padding: 4px; border-radius: 14px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 50; }
+    .tab-btn { min-height: 40px; padding: 8px 4px; border: none; border-radius: 10px; background: transparent; font-weight: 800; font-size: 13px; color: #4b5563; cursor: pointer; transition: all 0.18s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+    .tab-panel { animation: fadeSlideUp 0.18s var(--ease); }
     /* ==================== داشبورد الالتزام ==================== */
     .dash-segmented { display: inline-flex; gap: 4px; background: #f3f4f6; padding: 4px; border-radius: 12px; border: 1px solid var(--border); flex-wrap: wrap; }
     .dash-seg-btn { min-height: 36px; padding: 6px 12px; border: none; border-radius: 9px; background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all 0.16s var(--ease); white-space: nowrap; }
@@ -165,7 +145,7 @@
     .guide-step { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: #374151; line-height: 1.5; }
     .guide-num { flex-shrink: 0; width: 22px; height: 22px; border-radius: 99px; background: #d97706; color: #fff; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
     .action-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
-    .batch-absent-box { background: #f6faf8; border: 1px solid #cce8db; border-radius: 13px; padding: 11px 12px; margin-bottom: 10px; animation: fadeSlideUp 0.16s var(--ease); }
+    .batch-absent-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; margin-bottom: 10px; animation: fadeSlideUp 0.16s var(--ease); }
     .quick-util-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
     .quick-util-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .search-wrap { position: relative; display: flex; align-items: center; margin-bottom: 8px; }
@@ -178,51 +158,46 @@
     .ambig-pick-btn:hover, .ambig-pick-btn:active { background: #fef3c7; }
     .status-summary-line { font-size: 12.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
     .section-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
-    .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0; }
-    .filter-chip { min-height: 34px; padding: 5px 11px; border-radius: 10px; border: 1px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; font-variant-numeric: tabular-nums; }
+    .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .filter-chip { min-height: 34px; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; font-variant-numeric: tabular-nums; }
     .filter-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
     .filter-chip.active-absent { background: var(--danger); border-color: var(--danger); color: #fff; }
     .filter-chip.active-present { background: #059669; border-color: #059669; color: #fff; }
     .filter-chip.active-unmarked { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .clean-list-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
-    .member-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; border-bottom: 1px solid #f1f5f9; background: #fff; transition: background-color 0.14s; }
-    .member-row:last-child { border-bottom: none; }
-    .status-present { background: #f2fbf6 !important; }
-    .status-absent { background: #fef4f4 !important; }
-    .status-excused { background: #fffbeb !important; }
-    .member-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-    .member-name { font-weight: 700; font-size: 15px; color: var(--text); line-height: 1.35; }
-    .member-name-link { cursor: pointer; transition: color 0.15s; text-decoration: underline dotted rgba(6,95,70,0.28); text-underline-offset: 4px; display: inline-block; }
+    .member-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 15px; border: 1.5px solid var(--border); background: #fff; margin-bottom: 8px; box-shadow: var(--shadow-sm); transition: background-color 0.14s, border-color 0.14s; }
+    .status-present { background: #f0fdf4 !important; border-color: #86efac !important; }
+    .status-absent { background: #fef2f2 !important; border-color: #fecaca !important; }
+    .status-excused { background: #fffbeb !important; border-color: #fde68a !important; }
+    .member-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .member-name { font-weight: 700; font-size: 15px; color: var(--text); }
+    .member-name-link { cursor: pointer; transition: color 0.15s; text-decoration: underline dotted rgba(6,95,70,0.32); text-underline-offset: 4px; display: inline-block; }
     .member-name-link:hover, .member-name-link:active { color: var(--primary); }
-    .absence-tag { font-size: 11.5px; color: var(--danger); font-weight: 700; font-variant-numeric: tabular-nums; }
-    .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin-right: 4px; }
-    .status-pills { display: inline-flex; gap: 3px; background: #f3f4f6; padding: 3px; border-radius: 11px; flex-shrink: 0; }
-    .pill { min-height: 38px; padding: 6px 11px; border-radius: 8px; border: none; background: transparent; font-size: 12.5px; font-weight: 700; cursor: pointer; color: #4b5563; white-space: nowrap; transition: all 0.14s; }
-    .pill:hover { color: var(--text); }
+    .absence-tag { font-size: 12px; color: var(--danger); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .recit-only-badge { display: inline-block; background: var(--accent-soft); color: #92400e; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-right: 4px; }
+    .status-pills { display: flex; gap: 5px; flex-shrink: 0; }
+    .pill { min-height: 38px; padding: 6px 12px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: #374151; white-space: nowrap; transition: all 0.14s; }
+    .pill:hover { border-color: #d1d5db; }
     .pill:active { transform: scale(0.96); }
-    .pill.active-present { background: #059669; color: #fff; box-shadow: 0 1px 3px rgba(5,150,105,0.28); }
-    .pill.active-absent { background: #dc2626; color: #fff; box-shadow: 0 1px 3px rgba(220,38,38,0.28); }
-    .pill.active-excused { background: #d97706; color: #fff; box-shadow: 0 1px 3px rgba(217,119,6,0.28); }
-    .partner-card { border: 1px solid var(--border); border-radius: 16px; background: #fff; margin-bottom: 10px; box-shadow: var(--shadow); overflow: hidden; }
-    .partner-card.all-done { border-color: #86efac; }
-    .partner-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 9px 13px; background: #fafbfa; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
-    .partner-card.all-done .partner-header { background: #ecfdf5; }
-    .partner-num-pill { color: var(--primary); font-size: 13.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
-    .partner-type-pill { color: var(--muted); font-size: 12px; font-weight: 700; }
-    .partner-members-list { display: flex; flex-direction: column; }
-    .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; background: #fff; }
-    .partner-member-item:last-child { border-bottom: none; }
+    .pill.active-present { background: #059669; border-color: #059669; color: #fff; }
+    .pill.active-absent { background: #dc2626; border-color: #dc2626; color: #fff; }
+    .pill.active-excused { background: #d97706; border-color: #d97706; color: #fff; }
+    .partner-card { border: 1.5px solid var(--border); border-radius: 16px; background: #fff; padding: 12px 13px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+    .partner-card.all-done { border-color: #86efac; background: #f8fffb; }
+    .partner-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
+    .partner-num-pill { background: var(--primary); color: #fff; font-size: 12.5px; font-weight: 800; padding: 4px 11px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+    .partner-type-pill { background: var(--accent-soft); color: #92400e; font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 99px; }
+    .partner-members-list { display: flex; flex-direction: column; gap: 7px; }
+    .partner-member-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--border); background: #fff; }
     .select-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; margin: 10px 0; }
-    .select-item { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 11px; border: 1px solid var(--border); cursor: pointer; background: #fff; font-size: 14px; font-weight: 600; }
+    .select-item { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 11px; border: 1.5px solid var(--border); cursor: pointer; background: #fff; font-size: 14px; font-weight: 600; }
     .select-item.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
-    .group-manage-card { border: 1px solid var(--border); border-radius: 15px; padding: 14px; margin-bottom: 10px; background: #fff; box-shadow: var(--shadow-sm); }
+    .group-manage-card { border: 1.5px solid var(--border); border-radius: 15px; padding: 14px; margin-bottom: 10px; background: #fff; box-shadow: var(--shadow-sm); }
     .sup-badge { display: inline-flex; align-items: center; gap: 4px; background: #f3f4f6; padding: 2px 8px; border-radius: 8px; font-size: 12px; font-weight: 600; }
     .sup-edit-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
-    .stars-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px; padding: 14px; white-space: pre-wrap; font-size: 14.5px; line-height: 1.65; max-height: 300px; overflow-y: auto; margin: 12px 0; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.52); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 14px; z-index: 1000; }
+    .stars-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; white-space: pre-wrap; font-size: 14.5px; line-height: 1.65; max-height: 300px; overflow-y: auto; margin: 12px 0; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.55); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; padding: 14px; z-index: 1000; }
     .modal-backdrop.open { display: flex; }
     .modal { background: #fff; width: 100%; max-width: 540px; border-radius: 22px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); animation: modalPop 0.22s var(--ease); -webkit-overflow-scrolling: touch; }
-    @keyframes sheetUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .toast { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 11px 18px; border-radius: 14px; font-size: 14px; font-weight: 700; z-index: 2000; display: none; box-shadow: 0 12px 30px rgba(0,0,0,0.25); white-space: normal; text-align: center; line-height: 1.45; width: max-content; max-width: 92vw; }
     .empty-state { text-align: center; padding: 30px 14px; color: var(--muted); font-weight: 600; }
@@ -241,7 +216,7 @@
     .ocr-check-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13.5px; font-weight: 700; }
     .ocr-check-item.matched { background: var(--primary-soft); border-color: #6ee7b7; color: var(--primary); }
     .ocr-unmatched-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 9px 10px; margin-top: 8px; font-size: 12.5px; }
-    .quick-num-box { background: #f6faf8; border: 1px solid #cce8db; border-radius: 14px; padding: 11px 12px; margin-bottom: 10px; animation: fadeSlideUp 0.18s var(--ease); }
+    .quick-num-box { background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-bottom: 10px; animation: fadeSlideUp 0.18s var(--ease); }
     .quick-num-preview { font-size: 12.5px; margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px dashed var(--border); max-height: 190px; overflow-y: auto; }
     .name-match-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-soft); border: 1px solid #6ee7b7; color: var(--primary); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; margin: 2px; }
     .name-match-chip.absent-chip { background: var(--danger-soft); border-color: #fca5a5; color: var(--danger); }
@@ -252,67 +227,27 @@
     .group-pick-btn { width: 100%; text-align: right; justify-content: space-between; padding: 13px 15px; margin-bottom: 8px; background: var(--primary-soft); border: 1.5px solid #a7f3d0; color: var(--primary); border-radius: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; }
     .scroll-top-btn { position: fixed; bottom: max(18px, env(safe-area-inset-bottom)); left: 14px; width: 44px; height: 44px; border-radius: 99px; background: var(--primary); color: #fff; border: none; box-shadow: 0 6px 18px rgba(6,95,70,0.3); font-size: 18px; cursor: pointer; z-index: 900; display: none; align-items: center; justify-content: center; }
     .scroll-top-btn.show { display: flex; }
-    @media (max-width: 640px) {
-      body { padding-bottom: max(92px, calc(78px + env(safe-area-inset-bottom))); }
-      .login-wrap { align-items: flex-start; padding: 16px 12px 32px; }
-      .login-box { padding: 22px 16px; border-radius: 20px; }
-      .container { padding: 10px 10px 16px; }
-      .card { padding: 12px; border-radius: 16px; margin-bottom: 10px; }
-      .app-header { padding: 10px 12px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
-      .header-brand svg { width: 32px; height: 32px; }
-      .header-title h1 { font-size: 15px; }
-      .header-title p { font-size: 11.5px; }
-      .header-btn { min-height: 36px; padding: 6px 10px; font-size: 12px; border-radius: 10px; }
-      .tabs {
-        position: fixed; bottom: 0; left: 0; right: 0; top: auto; z-index: 450;
-        margin-bottom: 0; border-radius: 0; gap: 4px;
-        background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-        border-top: 1px solid rgba(6, 95, 70, 0.12);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
-        padding: 5px 8px max(7px, env(safe-area-inset-bottom));
-      }
-      .tab-btn {
-        flex-direction: column; gap: 2px; min-height: 48px; padding: 4px 2px;
-        font-size: 11px; font-weight: 700; color: #64748b; border-radius: 12px;
-      }
-      .tab-icon { width: 20px; height: 20px; }
-      .tab-btn.active { background: #ecfdf5; color: var(--primary); box-shadow: none; font-weight: 800; }
+    @media (max-width: 560px) {
+      .container { padding: 10px; }
+      .card { padding: 12px 13px; border-radius: 15px; margin-bottom: 10px; }
+      .app-header { padding: 11px 12px; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+      .header-title h1 { font-size: 15.5px; }
+      .header-btn { min-height: 36px; padding: 6px 9px; font-size: 12px; }
       .date-bar { flex-wrap: nowrap; gap: 6px; }
       .date-pill-trigger { font-size: 13px; padding: 5px 10px; min-height: 38px; }
-      .daily-progress-strip { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 9px; padding-top: 9px; }
-      .daily-total-meta { display: none; }
       .input, textarea.input { font-size: 16px !important; }
       .action-row-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-      .action-row-3 .btn { padding: 8px 6px; font-size: 12px; min-height: 42px; }
+      .action-row-3 .btn { padding: 8px 8px; font-size: 12.5px; }
       .action-row-3 .btn-span-mobile { grid-column: 1 / -1; }
-      .batch-actions-3 { gap: 5px; }
-      .batch-actions-3 .btn { padding: 8px 4px; font-size: 11.5px; min-height: 40px; }
-      .quick-util-bar { flex-direction: column; align-items: stretch; gap: 6px; }
-      .quick-util-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; width: 100%; }
-      .quick-util-actions .btn-xs { padding: 5px 3px; font-size: 11px; min-height: 36px; }
-      .filter-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
-      .filter-chips::-webkit-scrollbar { display: none; }
-      .filter-chip { flex-shrink: 0; white-space: nowrap; }
-      .member-row, .partner-member-item { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 11px; }
-      .member-name { font-size: 14px; }
-      .status-pills { padding: 3px; gap: 2px; border-radius: 10px; }
-      .pill { min-height: 40px; padding: 6px 8px; font-size: 11.5px; }
-      .partner-member-item .pill { padding: 6px 6px; font-size: 11px; }
-      .partner-header { padding: 8px 11px; }
-      .manage-member-row { flex-direction: column; align-items: stretch; gap: 8px; padding: 11px 12px; }
-      .dash-segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
-      .dash-seg-btn { padding: 7px 4px; font-size: 12px; text-align: center; }
-      .dash-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-      .dash-kpi-card { padding: 11px 8px; }
-      .dash-split-grid { grid-template-columns: 1fr; gap: 10px; }
-      .dash-table-wrap { display: none; }
-      .dash-mobile-list { display: block; border: 1px solid var(--border); border-radius: 14px; background: #fff; overflow: hidden; }
-      .dash-history-row { grid-template-columns: 118px 1fr 1fr; font-size: 12px; }
-      .modal-backdrop { align-items: flex-end; padding: 0; }
-      .modal { max-width: 100%; width: 100%; border-radius: 24px 24px 0 0; max-height: 88vh; padding: 10px 16px max(22px, env(safe-area-inset-bottom)); animation: sheetUp 0.24s var(--ease); }
-      .modal::before { content: ''; display: block; width: 40px; height: 4px; border-radius: 99px; background: #cbd5e1; margin: 0 auto 12px; }
-      .scroll-top-btn { bottom: calc(74px + env(safe-area-inset-bottom)); left: 12px; width: 42px; height: 42px; font-size: 16px; }
-      .toast { bottom: calc(78px + env(safe-area-inset-bottom)); font-size: 13.5px; }
+      .member-row, .partner-member-item { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 12px; }
+      .status-pills { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .pill { text-align: center; padding: 8px 4px; font-size: 12px; }
+      .tabs { top: 4px; gap: 3px; padding: 4px; }
+      .tab-btn { font-size: 12px; padding: 8px 2px; min-height: 38px; }
+      .dash-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dash-split-grid { grid-template-columns: 1fr; }
+      .dash-history-row { grid-template-columns: 125px 1fr 1fr; font-size: 12px; }
+      .modal { padding: 16px; border-radius: 18px; }
     }
     /* ==================== صانع الجداول الشهرية ==================== */
     .sched-badge-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 99px; font-size: 12px; font-weight: 800; }
@@ -407,10 +342,9 @@
         <div id="login-pick-groups-list"></div>
         <button class="btn btn-outline btn-block btn-sm" style="margin-top:8px;" onclick="cancelPickGroup()">رجوع</button>
       </div>
-      <div class="login-footer-links">
-        <button type="button" class="text-link-btn" onclick="openSchedulesScreen(null, 'login')">📅 الجداول الشهرية</button>
-        <span style="color:var(--border);">·</span>
-        <button type="button" class="text-link-btn" onclick="openDownloadModal()">📲 تثبيت التطبيق</button>
+      <div style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--border); display:flex; flex-direction:column; gap:8px;">
+        <button class="btn btn-soft btn-block" onclick="openSchedulesScreen(null, 'login')">📅 الجداول الشهرية الهجرية</button>
+        <button class="btn btn-outline btn-block" onclick="openDownloadModal()">📲 تحميل التطبيق على الموبايل</button>
       </div>
     </div>
   </div>
@@ -419,20 +353,14 @@
     <header class="app-header">
       <div class="header-top">
         <div class="header-brand">
-          <svg viewBox="0 0 128 128" width="36" height="36" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.16)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
-          <div class="header-title"><h1>المشرف الرئيسي</h1><p id="head-name-display"></p></div>
+          <svg viewBox="0 0 128 128" width="40" height="40" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
+          <div class="header-title"><h1>لوحة المشرف الرئيسي</h1><p id="head-name-display"></p></div>
         </div>
         <div class="header-actions">
           <button class="header-btn" onclick="openSchedulesScreen(null, 'head')">📅 الجداول</button>
-          <div class="header-menu-wrap">
-            <button type="button" class="header-btn" onclick="toggleHeaderMenu('head-more-menu', event)">⋯ المزيد</button>
-            <div id="head-more-menu" class="header-menu-pop hidden">
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); manualSync()">🔄 تحديث البيانات</button>
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); openDownloadModal()">📲 تثبيت التطبيق</button>
-              <div class="header-menu-divider"></div>
-              <button type="button" class="header-menu-item danger" onclick="closeHeaderMenus(); logout()">تسجيل خروج</button>
-            </div>
-          </div>
+          <button class="header-btn" onclick="openDownloadModal()">📲 التطبيق</button>
+          <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
+          <button class="header-btn" onclick="logout()">خروج</button>
         </div>
       </div>
     </header>
@@ -471,65 +399,47 @@
     <header class="app-header">
       <div class="header-top">
         <div class="header-brand">
-          <svg viewBox="0 0 128 128" width="36" height="36" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.16)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
+          <svg viewBox="0 0 128 128" width="40" height="40" style="flex-shrink:0;"><rect width="128" height="128" rx="28" fill="rgba(255,255,255,0.18)" stroke="#fbbf24" stroke-width="3"/><path d="M64 42 C50 32 32 34 24 40 L24 88 C34 82 50 82 64 92 C78 82 94 82 104 88 L104 40 C96 34 78 32 64 42 Z" fill="#ffffff"/><path d="M64 42 L64 92" stroke="#d97706" stroke-width="3"/><circle cx="64" cy="24" r="5" fill="#fbbf24"/></svg>
           <div class="header-title"><h1 id="header-group-name">جروب تعاهدوا القرءان</h1><p>المشرف: <span id="header-supervisor-name"></span></p></div>
         </div>
         <div class="header-actions">
-          <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 الجروبات</button>
+          <button id="back-to-head-btn" class="header-btn hidden" onclick="backToHeadDashboard()">👑 كل الجروبات</button>
           <button class="header-btn" onclick="openSchedulesScreen(currentGroupId, 'app')">📅 الجداول</button>
           <button id="switch-group-btn" class="header-btn hidden" onclick="openSwitchGroupModal()">تبديل</button>
-          <div class="header-menu-wrap">
-            <button type="button" class="header-btn" onclick="toggleHeaderMenu('app-more-menu', event)">⋯ المزيد</button>
-            <div id="app-more-menu" class="header-menu-pop hidden">
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); manualSync()">🔄 تحديث البيانات</button>
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); toggleQuickGuide()">❓ طريقة الاستخدام</button>
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); openDownloadModal()">📲 تثبيت التطبيق</button>
-              <div class="header-menu-divider"></div>
-              <button type="button" class="header-menu-item danger" onclick="closeHeaderMenus(); logout()">تسجيل خروج</button>
-            </div>
-          </div>
+          <button class="header-btn" onclick="toggleQuickGuide()">❓ شرح</button>
+          <button class="header-btn" onclick="openDownloadModal()">📲 التطبيق</button>
+          <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
+          <button class="header-btn" onclick="logout()">خروج</button>
         </div>
       </div>
     </header>
     <div class="container">
       <div id="quick-guide-card" class="guide-card hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-          <strong style="font-size:14.5px; color:#92400e;">طريقة الاستخدام السريعة</strong>
-          <button class="btn btn-outline btn-xs" onclick="dismissQuickGuide()">إخفاء</button>
+          <strong style="font-size:14.5px; color:#92400e;">💡 طريقة الاستخدام السريعة</strong>
+          <button class="btn btn-outline btn-xs" onclick="dismissQuickGuide()">فهمت، إخفاء ✕</button>
         </div>
         <div class="guide-steps">
           <div class="guide-step">
             <span class="guide-num">1</span>
-            <div><strong>الاستماع:</strong> اضغطي أمام كل اسم، أو استخدمي <strong>«تسجيل الغياب من صورة»</strong> أو <strong>«كتابة / لصق أسماء»</strong> لتسجيل مجموعة دفعة واحدة.</div>
+            <div><strong>الاستماع:</strong> اضغطي أمام كل اسم أو استخدمي <strong>«استخراج من صورة»</strong> أو <strong>«كتابة / لصق أسماء»</strong> لتسجيل مجموعة دفعة واحدة.</div>
           </div>
           <div class="guide-step">
             <span class="guide-num">2</span>
-            <div><strong>التسميع:</strong> اكتبـي أرقام الرفقاء (مثل <code>1 3 5</code>) أو الأسماء في صندوق التسجيل السريع مباشرة، أو اضغطي أمام كل عضوة.</div>
+            <div><strong>التسميع:</strong> اضغطي <strong>«⚡ تسجيل الأسماء والأرقام»</strong> واكتبي أرقام الرفقاء (<code>1 3 5</code>) أو الأسماء دفعة واحدة، والباقي يتحسب تلقائياً.</div>
           </div>
           <div class="guide-step">
             <span class="guide-num">3</span>
-            <div><strong>رسالة الغياب:</strong> اضغطي <strong>«نسخ رسالة الغياب»</strong> لنسخ قائمة الغياب بالإنذارات تلقائياً.</div>
+            <div><strong>رسالة الغياب:</strong> اضغطي <strong>«🥀 نسخ رسالة الغياب»</strong> لإرسال قائمة الغياب بالإنذارات على الواتساب مباشرة.</div>
           </div>
         </div>
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" id="tab-btn-listening" onclick="switchTab('listening')">
-          <svg class="tab-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
-          <span class="tab-label">الاستماع</span>
-        </button>
-        <button class="tab-btn" id="tab-btn-recitation" onclick="switchTab('recitation')">
-          <svg class="tab-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span class="tab-label">التسميع</span>
-        </button>
-        <button class="tab-btn" id="tab-btn-dashboard" onclick="switchTab('dashboard')">
-          <svg class="tab-icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-          <span class="tab-label">الداشبورد</span>
-        </button>
-        <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">
-          <svg class="tab-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span class="tab-label">الأعضاء</span>
-        </button>
+        <button class="tab-btn active" id="tab-btn-listening" onclick="switchTab('listening')">🎧 الاستماع</button>
+        <button class="tab-btn" id="tab-btn-recitation" onclick="switchTab('recitation')">📖 التسميع</button>
+        <button class="tab-btn" id="tab-btn-dashboard" onclick="switchTab('dashboard')">📊 الداشبورد</button>
+        <button class="tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">👥 الأعضاء</button>
       </div>
 
       <div id="daily-summary-card" class="card" style="padding:11px 13px;">
@@ -556,31 +466,31 @@
       </div>
 
       <div id="tab-listening" class="tab-panel">
-        <div class="card" style="padding:13px 14px;">
+        <div class="card">
           <div class="action-row-3">
-            <button class="btn btn-gold btn-sm" title="تسجيل الغياب أو الحضور تلقائياً من صورة استطلاع أو قائمة واتساب" onclick="openOcrModal()">📸 تسجيل الغياب من صورة</button>
-            <button id="listening-batch-toggle-btn" class="btn btn-soft btn-sm" title="كتابة أو لصق مجموعة أسماء وتسجيلهم دفعة واحدة" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء</button>
-            <button class="btn btn-danger-solid btn-sm btn-span-mobile" title="نسخ رسالة الغياب الجاهزة لإرسالها على الواتساب" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة الغياب</button>
+            <button class="btn btn-gold btn-sm" onclick="openOcrModal()">📸 استخراج من صورة</button>
+            <button id="listening-batch-toggle-btn" class="btn btn-soft btn-sm" onclick="toggleListeningBatch()">📝 كتابة / لصق أسماء</button>
+            <button class="btn btn-danger-solid btn-sm btn-span-mobile" onclick="copyAbsenceMessage('listening')">🥀 نسخ رسالة الغياب</button>
           </div>
 
           <div id="listening-batch-box" class="batch-absent-box hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
-              <strong style="font-size:13.5px; color:var(--primary);">تسجيل مجموعة أسماء دفعة واحدة</strong>
+              <strong style="font-size:13.5px; color:var(--primary);">📝 تسجيل أسماء الاستماع دفعة واحدة</strong>
               <button class="btn btn-outline btn-xs" onclick="toggleListeningBatch(false)">إغلاق</button>
             </div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:7px; line-height:1.5;">أدخلي الأسماء بالأسفل ثم اختاري حالة التسجيل للأسماء المدخلة — وإذا كُتب <code>عذر</code> أو <code>بعذر</code> بجانب أي اسم يُسجَّل <strong>بعذر</strong> تلقائياً.</p>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:7px; line-height:1.5;">اكتبي أو الصقي الأسماء بأي صيغة (كل اسم في سطر أو بفاصلة) — ولو مكتوب جنب الاسم كلمة <strong>عذر</strong> بيتسجل <strong>بعذر</strong> تلقائياً.</p>
             <textarea id="listening-batch-input" dir="rtl" class="input" rows="3" style="padding:9px 11px; font-size:14px;" placeholder="مثال: سلسبيل محمد، مريم كرم عذر" oninput="previewListeningBatch()"></textarea>
             <div id="listening-batch-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:flex-start; gap:7px; font-size:12px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer; line-height:1.45;">
               <input type="checkbox" id="listening-batch-auto-present" style="width:16px; height:16px; margin-top:2px; flex-shrink:0;" />
-              <span>إكمال باقي الأعضاء غير المسجلين تلقائياً (الباقي غياب عند تسجيل الحضور، أو الباقي حاضر عند تسجيل الغياب/العذر)</span>
+              <span>تسجيل باقي الأعضاء غير المذكورين تلقائياً (باقي الأعضاء غياب عند تسجيل حاضر، أو باقي الأعضاء حاضر عند تسجيل غياب/بعذر)</span>
             </label>
-            <div class="batch-actions-3">
-              <button class="btn btn-primary btn-sm" title="تسجيل الأسماء المدخلة كـ حاضر" onclick="applyListeningBatch('present')">✓ تسجيل الحضور</button>
-              <button class="btn btn-gold btn-sm" title="تسجيل الأسماء المدخلة كـ غياب بعذر" onclick="applyListeningBatch('excused')">⏳ تسجيل بعذر</button>
-              <button class="btn btn-danger-solid btn-sm" title="تسجيل الأسماء المدخلة كـ غائب" onclick="applyListeningBatch('absent')">✕ تسجيل الغياب</button>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(125px, 1fr)); gap:6px; margin-top:9px;">
+              <button class="btn btn-primary btn-sm" onclick="applyListeningBatch('present')">✅ تسجيل المكتوبين حاضر</button>
+              <button class="btn btn-gold btn-sm" onclick="applyListeningBatch('excused')">⏳ تسجيل المكتوبين بعذر</button>
+              <button class="btn btn-danger-solid btn-sm" onclick="applyListeningBatch('absent')">❌ تسجيل المكتوبين غياب</button>
             </div>
-            <button class="btn btn-outline btn-xs btn-block" style="margin-top:6px;" onclick="clearListeningBatch()">إفراغ القائمة</button>
+            <button class="btn btn-outline btn-xs btn-block" style="margin-top:6px;" onclick="clearListeningBatch()">مسح الكلام المكتوب</button>
           </div>
 
           <div class="search-wrap">
@@ -590,9 +500,9 @@
           <div class="quick-util-bar">
             <div id="listening-status-line" class="status-summary-line"></div>
             <div class="quick-util-actions">
-              <button class="btn btn-outline btn-xs" title="تسجيل كل أعضاء القائمة كـ حاضر" onclick="markAllListening('present')">✅ تحضير الكل</button>
-              <button class="btn btn-outline btn-xs" style="color:var(--danger);" title="تسجيل الأعضاء غير المسجلين فقط كـ غائب" onclick="markRemainingAbsent('listening')">❌ غير المسجلين غياب</button>
-              <button class="btn btn-outline btn-xs" title="مسح تسجيلات الاستماع لهذا اليوم فقط" onclick="clearDayType('listening')">🗑️ مسح تسجيل اليوم</button>
+              <button class="btn btn-outline btn-xs" onclick="markAllListening('present')">✅ الكل حاضر</button>
+              <button class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="markRemainingAbsent('listening')">❌ الباقي غياب</button>
+              <button class="btn btn-outline btn-xs" onclick="clearDayType('listening')">🗑️ مسح اليوم</button>
             </div>
           </div>
           <div id="listening-filters" class="filter-chips"></div>
@@ -601,28 +511,29 @@
       </div>
 
       <div id="tab-recitation" class="tab-panel hidden">
-        <div class="card" style="padding:13px 14px;">
-          <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px;">
-            <button class="btn btn-danger-solid btn-sm" style="flex:1; min-width:170px;" title="نسخ رسالة غياب التسميع للواتساب" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع</button>
-            <button class="btn btn-outline btn-sm" title="ربط عضوة أو أكثر برقم كشف واحد" onclick="togglePartnerBuilder()">➕ رفقاء جدد</button>
+        <div class="card">
+          <div class="action-row-3">
+            <button id="recitation-unified-toggle-btn" class="btn btn-primary btn-sm" onclick="toggleRecitationUnified()">⚡ تسجيل الأسماء والأرقام</button>
+            <button class="btn btn-soft btn-sm" onclick="togglePartnerBuilder()">➕ رفقاء جدد</button>
+            <button class="btn btn-danger-solid btn-sm btn-span-mobile" onclick="copyAbsenceMessage('recitation')">🥀 نسخ رسالة غياب التسميع</button>
           </div>
 
-          <div id="recitation-unified-box" class="quick-num-box">
+          <div id="recitation-unified-box" class="quick-num-box hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px;">
-              <strong style="font-size:13.5px; color:var(--primary);">⚡ تسجيل الأسماء والأرقام</strong>
-              <button type="button" class="btn btn-outline btn-xs" onclick="document.getElementById('recitation-unified-input').value=''; previewRecitationUnified();">إفراغ القائمة</button>
+              <strong style="font-size:13.5px; color:var(--primary);">⚡ تسجيل أرقام الرفقاء والأسماء معاً</strong>
+              <button type="button" class="btn btn-outline btn-xs" onclick="toggleRecitationUnified(false)">إغلاق</button>
             </div>
-            <p style="font-size:12px; color:var(--muted); margin-bottom:7px; line-height:1.5;">أدخلي أرقام الرفقاء (مثل <code>1 3 5</code>) أو الأسماء ثم اختاري الحالة المطلوبة — وأي رقم أو اسم بجانبه <code>عذر</code> يُسجَّل <strong>بعذر</strong> تلقائياً.</p>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:7px; line-height:1.5;">اكتبي أرقام الرفقاء (<code>1 3 5</code>) أو الأسماء في نفس الخانة، ولو مكتوب جنب الاسم أو الرقم كلمة <strong>عذر</strong> بيتسجل <strong>بعذر</strong> تلقائياً.</p>
             <textarea id="recitation-unified-input" dir="rtl" class="input" rows="3" style="padding:9px 11px; font-size:14px;" placeholder="مثال: 1 3 5، ندى إمام عذر" oninput="previewRecitationUnified()"></textarea>
             <div id="recitation-unified-preview" class="quick-num-preview hidden"></div>
             <label style="display:flex; align-items:flex-start; gap:7px; font-size:12px; font-weight:700; color:var(--primary); margin-top:8px; cursor:pointer; line-height:1.45;">
               <input type="checkbox" id="recit-unified-auto-rest" checked style="width:16px; height:16px; margin-top:2px; flex-shrink:0;" />
-              <span>إكمال باقي الأعضاء غير المسجلين تلقائياً (الباقي غياب عند تسجيل الحضور، أو الباقي حاضر عند تسجيل الغياب/العذر)</span>
+              <span>تسجيل باقي الأعضاء تلقائياً (باقي الأعضاء غياب عند تسجيل حاضر، أو باقي الأعضاء حاضر عند تسجيل غياب/بعذر)</span>
             </label>
-            <div class="batch-actions-3">
-              <button class="btn btn-primary btn-sm" title="تسجيل المحددين كـ حاضر (سمّع)" onclick="applyRecitationUnified('present')">✓ تسجيل الحضور</button>
-              <button class="btn btn-gold btn-sm" title="تسجيل المحددين كـ غياب بعذر" onclick="applyRecitationUnified('excused')">⏳ تسجيل بعذر</button>
-              <button class="btn btn-danger-solid btn-sm" title="تسجيل المحددين كـ غائب" onclick="applyRecitationUnified('absent')">✕ تسجيل الغياب</button>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(125px, 1fr)); gap:6px; margin-top:9px;">
+              <button class="btn btn-primary btn-sm" onclick="applyRecitationUnified('present')">✅ تسجيل المكتوبين حاضر (سمّع)</button>
+              <button class="btn btn-gold btn-sm" onclick="applyRecitationUnified('excused')">⏳ تسجيل المكتوبين بعذر</button>
+              <button class="btn btn-danger-solid btn-sm" onclick="applyRecitationUnified('absent')">❌ تسجيل المكتوبين غياب</button>
             </div>
           </div>
 
@@ -646,9 +557,9 @@
           <div class="quick-util-bar">
             <div id="recitation-status-line" class="status-summary-line"></div>
             <div class="quick-util-actions">
-              <button class="btn btn-outline btn-xs" title="تسجيل كل الأعضاء كـ سمّع" onclick="markAllRecitation('present')">✅ تحضير الكل</button>
-              <button class="btn btn-outline btn-xs" style="color:var(--danger);" title="تسجيل الأعضاء غير المسجلين فقط كـ غائب" onclick="markRemainingAbsent('recitation')">❌ غير المسجلين غياب</button>
-              <button class="btn btn-outline btn-xs" title="مسح تسجيلات التسميع لهذا اليوم فقط" onclick="clearDayType('recitation')">🗑️ مسح تسجيل اليوم</button>
+              <button class="btn btn-outline btn-xs" onclick="markAllRecitation('present')">✅ الكل سمّع</button>
+              <button class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="markRemainingAbsent('recitation')">❌ الباقي غياب</button>
+              <button class="btn btn-outline btn-xs" onclick="clearDayType('recitation')">🗑️ مسح اليوم</button>
             </div>
           </div>
           <div id="recitation-filters" class="filter-chips"></div>
@@ -727,7 +638,7 @@
             <input type="text" id="new-member-name" class="input" placeholder="اكتبي اسم العضو الجديد..." onkeypress="if(event.key==='Enter') addSingleMember()" />
             <button class="btn btn-primary" onclick="addSingleMember()">إضافة</button>
           </div>
-          <details style="margin-top:12px;">
+          <details open style="margin-top:12px;">
             <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--primary);">📋 تحديث أو إضافة الكشف دفعة واحدة</summary>
             <p style="font-size:12px; color:var(--muted); margin-top:6px;">الصقي الكشف المرقّم لتحديث الترتيب والرفقاء دون فقدان سجل الحضور.</p>
             <div style="display:flex; justify-content:flex-end; margin-top:6px;">
@@ -743,6 +654,8 @@
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
             <h3 style="font-size:15.5px;">أعضاء الجروب (<span id="manage-count">0</span>)</h3>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-danger btn-xs" onclick="copyAbsenceMessage('listening')">🥀 نسخ غياب الاستماع</button>
+              <button class="btn btn-danger btn-xs" onclick="copyAbsenceMessage('recitation')">🥀 نسخ غياب التسميع</button>
               <button class="btn btn-outline btn-xs" onclick="resetAbsenceCounter()">تصفير العداد</button>
               <button class="btn btn-danger btn-xs" onclick="deleteAllGroupMembers()">حذف الكل</button>
             </div>
@@ -769,16 +682,10 @@
           </div>
         </div>
         <div class="header-actions">
+          <button class="header-btn" onclick="openSchedPasswordModal()">🔐 باسورد الجداول</button>
+          <button class="header-btn" onclick="lockSchedulesScreen()">🔒 قفل</button>
           <button class="header-btn" onclick="backFromSchedules()">🔙 رجوع</button>
-          <div class="header-menu-wrap">
-            <button type="button" class="header-btn" onclick="toggleHeaderMenu('sched-more-menu', event)">⋯ المزيد</button>
-            <div id="sched-more-menu" class="header-menu-pop hidden">
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); openSchedPasswordModal()">🔐 باسورد الجداول</button>
-              <button type="button" class="header-menu-item" onclick="closeHeaderMenus(); manualSync()">🔄 تحديث البيانات</button>
-              <div class="header-menu-divider"></div>
-              <button type="button" class="header-menu-item danger" onclick="closeHeaderMenus(); lockSchedulesScreen()">🔒 قفل الجداول</button>
-            </div>
-          </div>
+          <button class="header-btn" onclick="manualSync()">🔄 تحديث</button>
         </div>
       </div>
     </header>
@@ -1629,29 +1536,17 @@
     }
     function cancelNewSupervisor() { document.getElementById('login-step-2').classList.add('hidden'); document.getElementById('login-step-1').classList.remove('hidden'); }
 
-    function toggleHeaderMenu(menuId, event) {
-      if (event) event.stopPropagation();
-      const target = document.getElementById(menuId);
-      const wasHidden = !target || target.classList.contains('hidden');
-      closeHeaderMenus();
-      if (target && wasHidden) target.classList.remove('hidden');
-    }
-    function closeHeaderMenus() {
-      document.querySelectorAll('.header-menu-pop').forEach(el => el.classList.add('hidden'));
-    }
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest || !e.target.closest('.header-menu-wrap')) closeHeaderMenus();
-    });
-
     function initQuickGuideState() {
       const card = document.getElementById('quick-guide-card'); if (!card) return;
-      card.classList.add('hidden');
+      if (localStorage.getItem(GUIDE_STORAGE_KEY) === '1') card.classList.add('hidden');
+      else card.classList.remove('hidden');
     }
     function toggleQuickGuide() {
       const card = document.getElementById('quick-guide-card'); if (!card) return;
       card.classList.toggle('hidden');
     }
     function dismissQuickGuide() {
+      localStorage.setItem(GUIDE_STORAGE_KEY, '1');
       const card = document.getElementById('quick-guide-card'); if (card) card.classList.add('hidden');
     }
     function openGroupScreen(groupId) {
@@ -1867,8 +1762,6 @@
         if (panel) panel.classList.toggle('hidden', t !== tab);
         if (btn) btn.classList.toggle('active', t === tab);
       });
-      const dailyCard = document.getElementById('daily-summary-card');
-      if (dailyCard) dailyCard.classList.toggle('hidden', tab === 'dashboard' || tab === 'manage');
       if (tab === 'dashboard') renderDashboard();
     }
     function matchesStatusFilter(st, filter) {
@@ -1917,11 +1810,11 @@
       const members = allListen.filter(m => arabicIncludes(m.name, q) && matchesStatusFilter(day.listening[m.id], listeningFilter)).sort((a, b) => compareArabic(a.name, b.name));
       if (!allListen.length) { list.innerHTML = `<div class="card empty-state">لا يوجد أعضاء لعرضهم في الاستماع.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="card empty-state">${listeningFilter === 'absent' ? '✨ ما شاء الله، لا يوجد غياب في الاستماع اليوم!' : 'لا يوجد أعضاء مطابقون للتصفية الحالية.'}</div>`; return; }
-      list.innerHTML = `<div class="clean-list-card">` + members.map(m => {
+      list.innerHTML = members.map(m => {
         const st = day.listening[m.id] || '', absCount = getAbsenceCount(m.id, 'listening');
         const absTag = absCount > 0 ? `<span class="absence-tag">غياب متتالي: ${'🔴'.repeat(absCount)}${absCount > 2 ? ' · إنذار' : ''}</span>` : '';
         return `<div class="member-row ${st ? 'status-' + st : ''}"><div class="member-info"><div class="member-name member-name-link" role="button" tabindex="0" title="عرض سجل التزام العضوة" onclick="openMemberDetailModal('${m.id}')" onkeypress="if(event.key==='Enter') openMemberDetailModal('${m.id}')">${escapeHtml(m.name)}</div>${absTag}</div><div class="status-pills"><button class="pill ${st === 'present' ? 'active-present' : ''}" onclick="setListening('${m.id}', 'present')">✓ حاضر</button><button class="pill ${st === 'excused' ? 'active-excused' : ''}" onclick="setListening('${m.id}', 'excused')">⏳ بعذر</button><button class="pill ${st === 'absent' ? 'active-absent' : ''}" onclick="setListening('${m.id}', 'absent')">✕ غائب</button></div></div>`;
-      }).join('') + `</div>`;
+      }).join('');
     }
     function setListening(memberId, status) {
       const day = ensureDayRecord(), next = day.listening[memberId] === status ? null : status;
@@ -2236,7 +2129,7 @@
       let restCount = 0; const oppositeStatus = status === 'present' ? 'absent' : 'present';
       if (autoRest) members.forEach(m => { if (!matchedSet.has(m.id) && !day.recitation[m.id]) { day.recitation[m.id] = oppositeStatus; patch[m.id] = oppositeStatus; restCount++; } });
       cloudPatchAttendance(currentDate, 'recitation', patch);
-      document.getElementById('recitation-unified-input').value = ''; previewRecitationUnified(); renderAll();
+      document.getElementById('recitation-unified-input').value = ''; previewRecitationUnified(); toggleRecitationUnified(false); renderAll();
       const statusLabel = status === 'absent' ? 'غائب' : (status === 'excused' ? 'بعذر' : 'حاضر (سمّع)');
       const restLabel = oppositeStatus === 'present' ? 'حاضر' : 'غائب';
       const parts = [];
@@ -3672,13 +3565,13 @@
       const members = q ? orderedAllMembers.filter(m => arabicIncludes(m.name, q)) : orderedAllMembers;
       if (!allMembers.length) { list.innerHTML = `<div class="empty-state">لا يوجد أعضاء في هذا الجروب بعد.</div>`; return; }
       if (!members.length) { list.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة للبحث "${escapeHtml(q)}".</div>`; return; }
-      list.innerHTML = `<div class="clean-list-card">` + members.map((m, i) => {
+      list.innerHTML = members.map((m, i) => {
         const lAbs = getAbsenceCount(m.id, 'listening'), rAbs = getAbsenceCount(m.id, 'recitation'), pInfo = pNumMap[m.id];
         if (editingMemberId === m.id) {
-          return `<div style="padding:12px; background:var(--primary-soft); border-bottom:1px solid #a7f3d0;"><div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;"><input type="text" id="edit-member-name-${m.id}" class="input" style="padding:8px 10px; font-size:14px; flex:1; min-width:170px;" value="${escapeHtml(m.name)}" onkeypress="if(event.key==='Enter') saveMemberEdit('${m.id}')" /><button class="btn btn-primary btn-sm" onclick="saveMemberEdit('${m.id}')">💾 حفظ</button><button class="btn btn-outline btn-sm" onclick="editingMemberId=null; renderManage();">إلغاء</button></div></div>`;
+          return `<div style="padding:10px; border-radius:12px; background:var(--primary-soft); border:1.5px solid #6ee7b7; margin-bottom:8px;"><div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;"><input type="text" id="edit-member-name-${m.id}" class="input" style="padding:8px 10px; font-size:14px; flex:1; min-width:170px;" value="${escapeHtml(m.name)}" onkeypress="if(event.key==='Enter') saveMemberEdit('${m.id}')" /><button class="btn btn-primary btn-sm" onclick="saveMemberEdit('${m.id}')">💾 حفظ</button><button class="btn btn-outline btn-sm" onclick="editingMemberId=null; renderManage();">إلغاء</button></div></div>`;
         }
-        return `<div class="manage-member-row"><div style="min-width:0; flex:1;"><div style="font-weight:700; font-size:14.5px;">${toEnglishDigits(i + 1)}. ${escapeHtml(m.name)} ${pInfo ? `<span style="font-size:12px; color:var(--primary); font-weight:700;">· ${pInfo.c === 1 ? 'رقم ' + pInfo.n : 'رفقاء ' + pInfo.n}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div><div style="font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'}${lAbs > 2 ? ' (إنذار)' : ''} · `}تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'}${rAbs > 2 ? ' (إنذار)' : ''}</div></div><div style="display:flex; gap:5px; flex-wrap:wrap;"><button class="btn btn-outline btn-xs" onclick="startEditMember('${m.id}')">تعديل</button><button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? 'تفعيل الاستماع' : 'تسميع فقط'}</button><button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">حذف</button></div></div>`;
-      }).join('') + `</div>`;
+        return `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid #f1f5f9; flex-wrap:wrap;"><div style="min-width:0;"><div style="font-weight:700; font-size:14.5px;">${toEnglishDigits(i + 1)}. ${escapeHtml(m.name)} ${pInfo ? `<span style="font-size:12px; color:var(--primary); font-weight:700;">· ${pInfo.c === 1 ? 'رقم ' + pInfo.n : 'رفقاء ' + pInfo.n}</span>` : ''} ${m.recitationOnly ? `<span class="recit-only-badge">تسميع فقط</span>` : ''}</div><div style="font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;">${m.recitationOnly ? 'تسميع فقط' : `استماع: ${lAbs > 0 ? '🔴'.repeat(lAbs) : '0'}${lAbs > 2 ? ' (إنذار)' : ''} · `}تسميع: ${rAbs > 0 ? '🔴'.repeat(rAbs) : '0'}${rAbs > 2 ? ' (إنذار)' : ''}</div></div><div style="display:flex; gap:5px; flex-wrap:wrap;"><button class="btn btn-outline btn-xs" onclick="startEditMember('${m.id}')">تعديل</button><button class="btn btn-outline btn-xs" onclick="toggleRecitationOnly('${m.id}')">${m.recitationOnly ? 'تفعيل الاستماع' : 'تسميع فقط'}</button><button class="btn btn-danger btn-xs" onclick="deleteMember('${m.id}')">حذف</button></div></div>`;
+      }).join('');
     }
 
     function buildAbsenceSection(type) {
@@ -4190,29 +4083,6 @@
       }
 
       containerEl.innerHTML = `
-        <div class="dash-mobile-list">
-          ${filtered.map((s, idx) => {
-            const rateStr = s.overallRate !== null ? toEnglishDigits(s.overallRate) + '%' : '—';
-            const fillW = s.overallRate !== null ? s.overallRate : 0;
-            const listenStr = s.member.recitationOnly ? 'تسميع فقط' : (s.lRate !== null ? `${toEnglishDigits(s.lRate)}%` : '—');
-            const recitStr = s.rRate !== null ? `${toEnglishDigits(s.rRate)}%` : '—';
-            return `
-              <div class="dash-mobile-row" onclick="openMemberDetailModal('${s.member.id}')">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px;">
-                  <div style="font-weight:800; font-size:14.5px; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${toEnglishDigits(idx + 1)}. ${escapeHtml(s.member.name)}${s.partnerNum ? ` <span style="font-size:11.5px; color:var(--muted); font-weight:700;">#${toEnglishDigits(s.partnerNum)}</span>` : ''}</div>
-                  <div style="display:flex; align-items:center; gap:6px; flex-shrink:0; font-variant-numeric:tabular-nums;">
-                    <span class="${getDashTierClass(s.overallRate)}" style="font-size:15px;">${rateStr}</span>
-                  </div>
-                </div>
-                <div class="dash-progress-track" style="height:5px; margin-bottom:6px;"><div class="dash-progress-fill" style="width:${fillW}%; background:${getDashTierColor(s.overallRate)};"></div></div>
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:11.5px; color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums;">
-                  <span>استماع: ${listenStr} · تسميع: ${recitStr}</span>
-                  <span><span style="color:#059669;">✓ ${toEnglishDigits(s.totalPresent)}</span> · <span style="color:#dc2626;">✕ ${toEnglishDigits(s.totalAbsent)}</span> · <span style="color:#d97706;">⏳ ${toEnglishDigits(s.totalExcused)}</span></span>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
         <div class="dash-table-wrap">
           <table class="dash-table">
             <thead>
